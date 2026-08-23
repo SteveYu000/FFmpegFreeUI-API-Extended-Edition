@@ -1,5 +1,8 @@
 Imports System.ComponentModel
+Imports System.Diagnostics
+Imports System.IO
 Imports System.Reflection
+Imports System.Text
 Imports LakeUI
 
 Public Class FormMain_v6
@@ -8,6 +11,8 @@ Public Class FormMain_v6
     Private 退出时清除所有任务 As Boolean = True
     Private 退出里程碑检查进行中 As Boolean = False
     Private 退出里程碑检查已完成 As Boolean = False
+    Private 重启请求待执行 As Boolean = False
+    Private 重启助手已启动 As Boolean = False
 
     Private Sub FormMain_v6_Load(sender As Object, e As EventArgs) Handles Me.Load
         UI同步上下文 = Threading.SynchronizationContext.Current
@@ -39,12 +44,12 @@ Public Class FormMain_v6
         绑定选项卡(Form_v6_性能监控.ModernPanel1)
         Me.ModernTabListControl1.Items(12).BoundControl = Form_v6_集成工具
         绑定选项卡(Form_v6_集成工具.ModernPanel1)
-        Me.ModernTabListControl1.Items(13).BoundControl = Form_v6_插件管理
-        绑定选项卡(Form_v6_插件管理.ModernPanel1)
-        Me.ModernTabListControl1.Items(15).BoundControl = Form_v6_设置
+        Me.ModernTabListControl1.Items(14).BoundControl = Form_v6_设置
         绑定选项卡(Form_v6_设置.ModernPanel1)
-        Me.ModernTabListControl1.Items(16).BoundControl = Form_v6_支持者
+        Me.ModernTabListControl1.Items(15).BoundControl = Form_v6_支持者
         绑定选项卡(Form_v6_支持者.ModernPanel1)
+        Me.ModernTabListControl1.Items(17).BoundControl = Form_v6_插件管理
+        绑定选项卡(Form_v6_插件管理.ModernPanel1)
 
         Select Case 设置_v6.实例对象.窗口样式
             Case 1
@@ -112,6 +117,12 @@ Public Class FormMain_v6
         End If
     End Sub
 
+    Public Sub 请求重启应用()
+        If IsDisposed OrElse Disposing OrElse 重启助手已启动 Then Exit Sub
+        重启请求待执行 = True
+        Close()
+    End Sub
+
     Public Sub 添加插件选项卡(选项卡标题 As String, 面板 As Control)
         Dim 标题 = If(选项卡标题, "").Trim()
         If 标题 = "" OrElse 面板 Is Nothing Then Exit Sub
@@ -135,14 +146,7 @@ Public Class FormMain_v6
     End Sub
 
     Private Function 获取插件选项卡插入位置() As Integer
-        Dim 已到插件区域 = False
-
-        For i = 0 To ModernTabListControl1.Items.Count - 1
-            Dim item = ModernTabListControl1.Items(i)
-            If 已到插件区域 AndAlso item.IsSeparator Then Return i
-            If String.Equals(item.Text, "集成工具", StringComparison.CurrentCultureIgnoreCase) Then 已到插件区域 = True
-        Next
-
+        ' 官方插件入口位于侧栏末尾；插件管理是该区域的固定首项，后注册的插件依次追加。
         Return ModernTabListControl1.Items.Count
     End Function
 
@@ -229,6 +233,7 @@ Public Class FormMain_v6
                             退出时清除所有任务 = False
                         Catch ex As Exception
                             ExOverlayMsgBox(Me, "保存未执行任务失败：" & ex.Message, MsgBoxStyle.Critical, "无法退出")
+                            重启请求待执行 = False
                             e.Cancel = True
                             Exit Sub
                         End Try
@@ -236,6 +241,7 @@ Public Class FormMain_v6
                         编码队列_v6.删除未处理任务缓存()
                         退出时清除所有任务 = True
                     Case Else
+                        重启请求待执行 = False
                         e.Cancel = True
                         Exit Sub
                 End Select
@@ -258,11 +264,60 @@ Public Class FormMain_v6
             Exit Sub
         End If
 
+        If 重启请求待执行 AndAlso Not 重启助手已启动 Then
+            Try
+                启动重启助手()
+                重启助手已启动 = True
+                重启请求待执行 = False
+            Catch ex As Exception
+                重启请求待执行 = False
+                e.Cancel = True
+                ExOverlayMsgBox(Me, "无法启动重启助手：" & ex.Message, MsgBoxStyle.Critical, "重启失败")
+                Exit Sub
+            End Try
+        End If
+
         If 退出时清除所有任务 AndAlso 编码队列_v6.获取进行中任务数量() > 0 Then 编码队列_v6.停止所有进行中任务()
         端口监听_v6.停止客户端()
         设置_v6.退出时保存设置()
         If Form_v6_调试播放器.ffplayHandle <> IntPtr.Zero Then Form_v6_调试播放器.停止()
     End Sub
+
+    Private Shared Sub 启动重启助手()
+        Dim executablePath = System.Windows.Forms.Application.ExecutablePath
+        If String.IsNullOrWhiteSpace(executablePath) OrElse Not File.Exists(executablePath) Then
+            Throw New FileNotFoundException("找不到当前程序文件", executablePath)
+        End If
+
+        Dim command =
+            $"$p = Get-Process -Id {Environment.ProcessId} -ErrorAction SilentlyContinue; " &
+            "if ($null -ne $p) { $p.WaitForExit() }; " &
+            $"Start-Process -FilePath {转换为PowerShell字符串(executablePath)} -WorkingDirectory {转换为PowerShell字符串(System.Windows.Forms.Application.StartupPath)}"
+        Dim encodedCommand = Convert.ToBase64String(Encoding.Unicode.GetBytes(command))
+        Dim powershellPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "WindowsPowerShell\v1.0\powershell.exe")
+        If Not File.Exists(powershellPath) Then powershellPath = "powershell.exe"
+
+        Dim startInfo As New ProcessStartInfo With {
+            .FileName = powershellPath,
+            .UseShellExecute = False,
+            .CreateNoWindow = True,
+            .WindowStyle = ProcessWindowStyle.Hidden
+        }
+        startInfo.ArgumentList.Add("-NoLogo")
+        startInfo.ArgumentList.Add("-NoProfile")
+        startInfo.ArgumentList.Add("-NonInteractive")
+        startInfo.ArgumentList.Add("-WindowStyle")
+        startInfo.ArgumentList.Add("Hidden")
+        startInfo.ArgumentList.Add("-EncodedCommand")
+        startInfo.ArgumentList.Add(encodedCommand)
+        Dim helper = Process.Start(startInfo)
+        If helper Is Nothing Then Throw New InvalidOperationException("重启助手进程未能启动")
+        helper.Dispose()
+    End Sub
+
+    Private Shared Function 转换为PowerShell字符串(value As String) As String
+        Return "'" & If(value, "").Replace("'", "''") & "'"
+    End Function
 
     <CodeAnalysis.SuppressMessage("Performance", "CA1861:不要将常量数组作为参数", Justification:="<挂起>")>
     Private Sub 检查并询问加载未处理任务缓存()

@@ -33,10 +33,11 @@ Public NotInheritable Class 插件信息_v6
     Public Property 加载状态 As String = "未加载"
     Public Property 加载错误 As String = ""
     Public Property 元数据错误 As String = ""
+    Public Property 有待安装更新 As Boolean
 
     Public ReadOnly Property 等待重启 As Boolean
         Get
-            Return 已启用 <> 启动时已启用
+            Return 有待安装更新 OrElse 已启用 <> 启动时已启用
         End Get
     End Property
 
@@ -59,9 +60,24 @@ Public NotInheritable Class 插件信息_v6
             .已加载 = 已加载,
             .加载状态 = 加载状态,
             .加载错误 = 加载错误,
-            .元数据错误 = 元数据错误
+            .元数据错误 = 元数据错误,
+            .有待安装更新 = 有待安装更新
         }
     End Function
+End Class
+
+Public NotInheritable Class 插件安装结果_v6
+    Public ReadOnly Property 已安装文件 As New List(Of String)
+    Public ReadOnly Property 待重启替换文件 As New List(Of String)
+    Public ReadOnly Property 已跳过文件 As New List(Of String)
+    Public ReadOnly Property 无效文件 As New List(Of String)
+    Public ReadOnly Property 错误 As New List(Of String)
+
+    Public ReadOnly Property 有变更 As Boolean
+        Get
+            Return 已安装文件.Count > 0 OrElse 待重启替换文件.Count > 0
+        End Get
+    End Property
 End Class
 
 Friend NotInheritable Class 插件管理配置项_v6
@@ -116,6 +132,12 @@ Public Class 插件管理
         End Get
     End Property
 
+    Private Shared ReadOnly Property 待安装文件夹路径 As String
+        Get
+            Return Path.Combine(插件文件夹路径, ".pending-install")
+        End Get
+    End Property
+
     Public Shared Sub 启动时加载插件()
         SyncLock 插件状态锁
             If 启动加载已执行 Then Exit Sub
@@ -127,7 +149,14 @@ Public Class 插件管理
             编码队列事件已连接 = True
         End If
 
+        Dim 待安装错误 = 应用待安装插件()
         扫描插件目录(作为启动扫描:=True)
+        If 待安装错误.Count > 0 Then
+            SyncLock 插件状态锁
+                Dim message = "应用待安装插件失败：" & String.Join("；", 待安装错误)
+                配置错误 = If(String.IsNullOrWhiteSpace(配置错误), message, 配置错误 & Environment.NewLine & message)
+            End SyncLock
+        End If
         Dim 要加载的插件 = 获取插件列表().Where(Function(item) item.已启用).ToList()
         For Each plugin In 要加载的插件
             Try
@@ -158,6 +187,96 @@ Public Class 插件管理
         扫描插件目录(作为启动扫描:=False)
         通知插件列表变化()
     End Sub
+
+    Public Shared Function 是插件程序集文件(filePath As String) As Boolean
+        If String.IsNullOrWhiteSpace(filePath) Then Return False
+        Dim fileName = Path.GetFileName(filePath.Trim())
+        Return Not String.IsNullOrWhiteSpace(fileName) AndAlso fileName.EndsWith(".3fui.dll", StringComparison.OrdinalIgnoreCase)
+    End Function
+
+    Public Shared Function 安装插件文件(filePaths As IEnumerable(Of String), replaceExisting As Boolean) As 插件安装结果_v6
+        If filePaths Is Nothing Then Throw New ArgumentNullException(NameOf(filePaths))
+
+        Dim result As New 插件安装结果_v6
+        Dim sources = filePaths.
+            Where(Function(item) Not String.IsNullOrWhiteSpace(item)).
+            Select(Function(item) item.Trim()).
+            GroupBy(Function(item) Path.GetFileName(item), StringComparer.OrdinalIgnoreCase).
+            Select(Function(group) group.Last()).
+            ToList()
+
+        For Each source In sources
+            Dim displayName = Path.GetFileName(source)
+            Try
+                If Not File.Exists(source) Then
+                    result.无效文件.Add(If(String.IsNullOrWhiteSpace(displayName), source, displayName))
+                    Continue For
+                End If
+                If Not 是插件程序集文件(source) Then
+                    result.无效文件.Add(displayName)
+                    Continue For
+                End If
+
+                Directory.CreateDirectory(插件文件夹路径)
+                Dim sourcePath = Path.GetFullPath(source)
+                Dim targetPath = Path.GetFullPath(Path.Combine(插件文件夹路径, displayName))
+                If String.Equals(sourcePath, targetPath, StringComparison.OrdinalIgnoreCase) Then
+                    result.已跳过文件.Add(displayName)
+                    Continue For
+                End If
+
+                If File.Exists(targetPath) Then
+                    If Not replaceExisting Then
+                        result.已跳过文件.Add(displayName)
+                        Continue For
+                    End If
+
+                    ' 已加载的 .NET 程序集在 Windows 下不能安全覆盖，先暂存并在下次加载插件前替换。
+                    Directory.CreateDirectory(待安装文件夹路径)
+                    File.Copy(sourcePath, Path.Combine(待安装文件夹路径, displayName), overwrite:=True)
+                    result.待重启替换文件.Add(displayName)
+                Else
+                    File.Copy(sourcePath, targetPath, overwrite:=False)
+                    result.已安装文件.Add(displayName)
+                End If
+            Catch ex As Exception
+                result.错误.Add($"{If(String.IsNullOrWhiteSpace(displayName), source, displayName)}：{ex.Message}")
+            End Try
+        Next
+
+        Return result
+    End Function
+
+    Private Shared Function 应用待安装插件() As List(Of String)
+        Dim errors As New List(Of String)
+        If Not Directory.Exists(待安装文件夹路径) Then Return errors
+
+        Dim pendingFiles As IEnumerable(Of String)
+        Try
+            pendingFiles = Directory.GetFiles(待安装文件夹路径, "*.3fui.dll", SearchOption.TopDirectoryOnly)
+        Catch ex As Exception
+            errors.Add(ex.Message)
+            Return errors
+        End Try
+
+        For Each pendingPath In pendingFiles
+            Dim fileName = Path.GetFileName(pendingPath)
+            Try
+                Directory.CreateDirectory(插件文件夹路径)
+                File.Copy(pendingPath, Path.Combine(插件文件夹路径, fileName), overwrite:=True)
+                File.Delete(pendingPath)
+            Catch ex As Exception
+                errors.Add($"{fileName}：{ex.Message}")
+            End Try
+        Next
+
+        Try
+            If Not Directory.EnumerateFileSystemEntries(待安装文件夹路径).Any() Then Directory.Delete(待安装文件夹路径)
+        Catch
+            ' 暂存目录清理失败不影响已经完成的插件替换。
+        End Try
+        Return errors
+    End Function
 
     Public Shared Function 获取插件列表() As List(Of 插件信息_v6)
         Dim shouldScan As Boolean
@@ -355,7 +474,9 @@ Public Class 插件管理
 
     Private Shared Sub 更新插件状态文本(info As 插件信息_v6)
         If info Is Nothing Then Exit Sub
-        If info.等待重启 Then
+        If info.有待安装更新 Then
+            info.加载状态 = "等待重启后替换"
+        ElseIf info.等待重启 Then
             info.加载状态 = If(info.已启用, "等待重启后启用", "等待重启后禁用")
         ElseIf Not info.已启用 Then
             info.加载状态 = "已禁用"
@@ -425,7 +546,8 @@ Public Class 插件管理
             .插件键 = Path.GetFileName(插件文件),
             .文件名 = Path.GetFileName(插件文件),
             .文件路径 = Path.GetFullPath(插件文件),
-            .显示名称 = Path.GetFileNameWithoutExtension(插件文件)
+            .显示名称 = Path.GetFileNameWithoutExtension(插件文件),
+            .有待安装更新 = File.Exists(Path.Combine(待安装文件夹路径, Path.GetFileName(插件文件)))
         }
 
         Try

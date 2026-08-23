@@ -14,6 +14,7 @@
 - [3. 从零创建插件项目](#create-project)
 - [4. 实现插件入口与选择官方 API](#plugin-entry)
 - [5. 宿主总入口 `IExtFFmpegFreeUIHost`](#host-interface)
+- [对执行顺序要求严格时如何选择 API](#strict-order-api-choice)
 - [插件管理、启用状态与全局顺序](#plugin-manager-order)
 
 ### 按能力选读
@@ -75,6 +76,7 @@
 | 修改某一段原生联动行为 | `host.Behaviors.Register` | [原生行为点](#behavior-extension) |
 | 完全替换原生控件或原生行为 | `ReplaceAnchor` / `ReplaceNative` + `Exclusive` | [深度定制](#behavior-extension)和[资源冲突协调](#resource-coordination) |
 | 编码完成后计算 VMAF、校验和或生成报告 | 优先使用 `RegisterStepProvider`，并将步骤的 `Placement` 设为 `AfterNative`；需要直接使用任务上下文时用 `ext.task.after-complete` | [命令步骤](#declarative-steps)和[成功后处理示例](#post-processing) |
+| 多个插件必须“前一个真正完成后，后一个才开始” | 使用同一个 Ext 异步管线阶段；外部程序优先 `RegisterStepProvider` | [严格顺序的 API 选择](#strict-order-api-choice)和[同阶段执行规则](#pipeline-ordering) |
 
 ### 0.4 推荐阅读路线
 
@@ -82,6 +84,27 @@
 2. 回到上面两张表，只选择插件真正需要的能力章节，不需要把第 6～16 节全部读完。
 3. 最后读[构建、部署与调试](#build-deploy)，用示例项目或一键部署目标做第一次运行验证。
 4. 遇到类型名称时用文末的[公共类型索引](#type-index)；遇到加载或行为问题先查[常见问题](#faq)。
+
+<a id="strict-order-api-choice"></a>
+
+### 0.5 对执行顺序要求严格时如何选择 API
+
+**直接结论：严格顺序的任务处理优先使用 Ext API；官方 API 继续用于页面入口、轻量通知和它已经完整提供的能力。** 同一个插件可以使用官方 API 注册左侧页面，同时仅对需要等待和严格排序的部分使用 Ext API。
+
+| 场景 | 优先选择 | 宿主能保证什么 |
+|---|---|---|
+| 仅在 `task.completed` 后同步记一条日志、更新页面 | 官方 `task.*` 事件 | 按插件全局顺序调用，前一个同步回调返回后才调用下一个。不会等待回调内自行启动的后台任务。 |
+| 需要等待文件、网络、异步计算，并且后续插件必须等它完成 | `host.Pipeline.Register` 的同一个异步 `StageId` | 对同一任务按全局插件顺序逐个 `Await`；上一个处理器成功返回后才进入下一个。 |
+| 需要运行 VMAF、校验工具或其他 EXE，它是编码计划的一部分 | `host.Commands.RegisterStepProvider` | 按计划逐步执行并等待进程退出；日志、退出码、暂停、停止和取消由队列统一管理。 |
+| 必须修改原生行为的前后关系 | `host.Behaviors.Register` | 先保持 `BeforeNative → ReplaceNative → AfterNative` 的固定语义，各阶段内再按全局顺序和 `Order` 执行。 |
+
+使用严格顺序时还必须同时满足以下条件：
+
+1. 若希望通过“插件管理”列表调整依赖顺序，相关插件必须选择**同一条处理链、同一个阶段**。不同阶段只能依赖第 9 节记录的固定生命周期；插件管理器不会把官方 `task.completed` 与 Ext `ext.task.after-complete` 交叉重排。
+2. Ext 回调必须返回代表真实工作的 `ValueTask`，并在内部 `Await` 全部工作。不要使用 `async void`，也不要用 `_ = Task.Run(...)` 启动后台任务后立即返回。
+3. 这个顺序保证是“**同一任务、同一阶段**”内的。多个编码任务仍可并行调用同一插件；若某个外部资源全局只允许一个任务使用，插件还需要自行使用 `SemaphoreSlim` 或专用队列限制并发。
+
+例如“评分完成后才删除源文件”：若评分是外部程序，最稳妥的做法是把评分注册为 `AfterNative` 命令步骤，删除逻辑再放到 `ext.task.after-complete`。宿主只会在评分进程成功退出、全部命令步骤完成后进入 `after-complete`；评分失败时任务转为错误，不会进入成功删除逻辑。如果两项都是 Ext 管线回调，则让它们都注册到 `ext.task.after-complete`，并在插件管理中将评分插件放在删除插件之前。
 
 Ext Plugin API v2 仍处于实验阶段。公开的锚点 ID、阶段 ID 和合同类型会作为兼容性契约维护；如果以后必须进行破坏性修改，应提升 API 主版本号。
 
@@ -827,6 +850,8 @@ if (host.Pipeline.AvailableStages.Contains(
 | `Order` | 同一阶段内从小到大执行。 |
 | `Callback` | 签名为 `ValueTask Callback(ExtPluginPipelineContext, CancellationToken)`。 |
 
+<a id="pipeline-ordering"></a>
+
 ### 7.2 同阶段多个插件如何执行
 
 对同一个上下文，同一阶段的处理器不是并行执行，而是按下面的稳定顺序逐个等待：
@@ -854,6 +879,35 @@ if (host.Pipeline.AvailableStages.Contains(
 新安装且从未排序的环境中，所有插件的全局优先级相同，Ext 宿主继续按原有 `Order → PluginId → HandlerId` 规则执行，以兼容旧插件。第一次手动调整列表后，全局顺序成为第一排序键，并写入 `Plugin/ExtPluginManager.json`。排序对已经加载的回调立即生效；若顺序改变了启动时的资源抢占结果或插件当前加载失败，仍需重启后重新加载。
 
 官方队列订阅类型是同步 `Action`。宿主能保证“前一个回调返回后再调用下一个”，但无法等待插件在回调内部自行启动且未等待的后台任务。需要确保评分完成后才能删除源文件时，应把这类工作放入可等待的 Ext 异步阶段，或者让官方回调在工作真正完成后才返回。
+
+#### 严格顺序的回调规则
+
+对顺序有硬性要求时，处理器必须把它的真实完成状态交给宿主等待。下面的写法会等待评分完成，因此同阶段中排在后面的插件不会提前执行：
+
+```csharp
+private static async ValueTask ScoreAsync(
+    ExtPluginPipelineContext context,
+    CancellationToken cancellationToken)
+{
+    await CalculateScoreAsync(
+        context.OutputPath,
+        cancellationToken).ConfigureAwait(false);
+}
+```
+
+下面的写法不具有这个保证，因为回调在真实工作结束前就已经返回：
+
+```csharp
+private static ValueTask ScoreIncorrectlyAsync(
+    ExtPluginPipelineContext context,
+    CancellationToken cancellationToken)
+{
+    _ = Task.Run(() => CalculateScoreAsync(context.OutputPath, cancellationToken));
+    return ValueTask.CompletedTask;
+}
+```
+
+对同一任务，第一种写法会按“插件全局顺序 → `Handler.Order` → 插件 ID → 处理器 ID”串行等待。不同任务仍可并行，详见[14. 取消、并发与线程安全](#concurrency)。
 
 当前实现采用失败即停：
 
