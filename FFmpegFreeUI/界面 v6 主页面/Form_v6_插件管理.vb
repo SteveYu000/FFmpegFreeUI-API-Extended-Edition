@@ -497,7 +497,7 @@ Public Class Form_v6_插件管理
 
         Dim result = ExOverlayMsgBox(
             FormMain_v6,
-            "插件的启用状态已经保存。由于官方插件没有卸载协议，需重启程序才能安全生效。",
+            "插件的启用状态已经保存，需重启程序才能生效。",
             {"立即重启", "稍后"},
             "需要重启",
             MsgBoxStyle.Question,
