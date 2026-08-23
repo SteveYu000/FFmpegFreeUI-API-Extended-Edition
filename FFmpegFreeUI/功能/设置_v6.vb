@@ -54,6 +54,7 @@ Public Class 设置_v6
     Public Property 用户统计_首次成功提示已显示 As Boolean = False
     Public Property 用户统计_已提示编码任务百次档位 As Long = 0
     Public Property 用户统计_已提示任务时长240小时档位 As Long = 0
+    Public Property 插件管理_PowerShell重启说明已显示 As Boolean = False
 
     Public Property 是否监听端口 As Boolean = False
     Public Property 监听的端口 As String = "10591"

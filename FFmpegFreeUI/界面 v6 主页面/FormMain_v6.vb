@@ -119,6 +119,25 @@ Public Class FormMain_v6
 
     Public Sub 请求重启应用()
         If IsDisposed OrElse Disposing OrElse 重启助手已启动 Then Exit Sub
+        If Not 设置_v6.实例对象.插件管理_PowerShell重启说明已显示 Then
+            Dim result = ExOverlayMsgBox(
+                Me,
+                "为确保单实例程序能够可靠重启，FFmpegFreeUI 会在后台以隐藏窗口方式运行 Windows PowerShell，等待当前进程完全退出后再启动新实例。" &
+                Environment.NewLine & Environment.NewLine &
+                "部分杀毒软件可能会对隐藏运行 PowerShell 这一行为弹出警告或误报，这是正常现象。该重启过程不会下载或运行外部脚本。",
+                {"了解并继续", "取消重启"},
+                "首次使用重启功能",
+                MsgBoxStyle.Information,
+                1)
+            If result <> 0 Then Exit Sub
+
+            设置_v6.实例对象.插件管理_PowerShell重启说明已显示 = True
+            Try
+                设置_v6.后台保存设置()
+            Catch
+                ' 正常退出时还会再次保存；提示记录写入失败不应阻止本次重启。
+            End Try
+        End If
         重启请求待执行 = True
         Close()
     End Sub
