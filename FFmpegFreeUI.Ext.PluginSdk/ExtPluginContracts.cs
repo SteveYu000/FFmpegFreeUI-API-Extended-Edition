@@ -20,6 +20,10 @@ public interface IExtFFmpegFreeUIHost
     Version ApiVersion { get; }
     string HostVersion { get; }
     IExtPluginUiRegistry Ui { get; }
+    /// <summary>v2.4：主导航和参数面板一级导航中的插件页面入口。</summary>
+    IExtPluginPageEntryRegistry PageEntries { get; }
+    /// <summary>v2.4：编码队列顶部工具栏中的插件控件。</summary>
+    IExtPluginEncodingQueueToolbarRegistry EncodingQueueToolbar { get; }
     IExtPluginPipelineRegistry Pipeline { get; }
     IExtPluginBehaviorRegistry Behaviors { get; }
     IExtPluginResourceRegistry Resources { get; }
@@ -752,7 +756,7 @@ public enum ExtPluginTaskStatus
 /// <summary>稳定的 API 与发现机制常量。</summary>
 public static class ExtFFmpegFreeUIPluginApi
 {
-    public static Version Version { get; } = new(2, 3, 0);
+    public static Version Version { get; } = new(2, 4, 0);
 }
 
 /// <summary>宿主当前提供的 UI 锚点 ID。</summary>

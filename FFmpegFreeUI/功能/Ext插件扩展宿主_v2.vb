@@ -13,7 +13,7 @@ Imports LakeUI
 ''' </summary>
 Friend Module Ext插件扩展宿主_v2
 
-    Private ReadOnly 支持API版本 As New Version(2, 3, 0)
+    Private ReadOnly 支持API版本 As New Version(2, 4, 0)
     Private ReadOnly 同步锁 As New Object
     Private ReadOnly 界面扩展列表 As New List(Of 已注册界面扩展)
     Private ReadOnly 安全下拉项列表 As New List(Of 已注册安全下拉项)
@@ -199,11 +199,44 @@ Friend Module Ext插件扩展宿主_v2
         注册界面锚点(id, control, surface, Ext插件界面锚点位置_v2.装饰目标控件)
     End Sub
 
+    ''' <summary>v2.4：注册主导航或参数面板一级导航中的稳定相对插入目标。</summary>
+    Friend Sub 注册插件页面目标(targetId As String,
+                           displayName As String,
+                           surfaceName As String,
+                           tabListControl As Control,
+                           targetPageObject As Object,
+                           parameterSurface As Control,
+                           configurePage As Action(Of Control))
+        Ext插件页面与工具栏宿主_v2.注册页面目标(
+            targetId,
+            displayName,
+            surfaceName,
+            tabListControl,
+            targetPageObject,
+            parameterSurface,
+            configurePage)
+    End Sub
+
+    ''' <summary>v2.4：注册编码队列工具栏中一个原生按钮的稳定相对插入目标。</summary>
+    Friend Sub 注册插件工具栏目标(targetId As String,
+                             displayName As String,
+                             toolbarControl As Control,
+                             targetControl As Control,
+                             refreshLayout As Action)
+        Ext插件页面与工具栏宿主_v2.注册工具栏目标(
+            targetId,
+            displayName,
+            toolbarControl,
+            targetControl,
+            refreshLayout)
+    End Sub
+
     Friend Sub 还原参数面板插件状态(surface As Form_v6_参数面板, values As IDictionary(Of String, String))
         If surface Is Nothing Then Exit Sub
         Dim state = 获取参数面板状态(surface)
         Dim contexts As List(Of 插件界面上下文)
         Dim choiceContexts As List(Of 安全下拉项上下文)
+        Dim layoutContexts As List(Of IExt参数面板状态接收器_v2)
         SyncLock 同步锁
             state.Values.Clear()
             If values IsNot Nothing Then
@@ -215,12 +248,16 @@ Friend Module Ext插件扩展宿主_v2
             End If
             contexts = state.Contexts.ToList()
             choiceContexts = state.ChoiceContexts.ToList()
+            layoutContexts = state.LayoutContexts.ToList()
         End SyncLock
 
         For Each context In contexts
             context.通知状态已还原()
         Next
         For Each context In choiceContexts
+            context.通知状态已还原()
+        Next
+        For Each context In layoutContexts
             context.通知状态已还原()
         Next
     End Sub
@@ -1426,6 +1463,36 @@ Friend Module Ext插件扩展宿主_v2
         End SyncLock
     End Sub
 
+    Friend Function 读取布局页面状态(surface As Form_v6_参数面板, pluginId As String) As String
+        Return 读取界面状态(surface, pluginId)
+    End Function
+
+    Friend Sub 写入布局页面状态(surface As Form_v6_参数面板, pluginId As String, value As String)
+        写入界面状态(surface, pluginId, value)
+    End Sub
+
+    Friend Function 规范化布局状态Json(value As String) As String
+        Return 规范化状态Json(value)
+    End Function
+
+    Friend Sub 注册布局页面状态上下文(surface As Form_v6_参数面板,
+                                context As IExt参数面板状态接收器_v2)
+        If surface Is Nothing OrElse context Is Nothing Then Exit Sub
+        Dim state = 获取参数面板状态(surface)
+        SyncLock 同步锁
+            If Not state.LayoutContexts.Contains(context) Then state.LayoutContexts.Add(context)
+        End SyncLock
+    End Sub
+
+    Friend Sub 注销布局页面状态上下文(surface As Form_v6_参数面板,
+                                context As IExt参数面板状态接收器_v2)
+        If surface Is Nothing OrElse context Is Nothing Then Exit Sub
+        Dim state = 获取参数面板状态(surface)
+        SyncLock 同步锁
+            state.LayoutContexts.Remove(context)
+        End SyncLock
+    End Sub
+
     Private Function 规范化状态Json(value As String) As String
         If String.IsNullOrWhiteSpace(value) Then Return "{}"
         Using document = JsonDocument.Parse(value)
@@ -1455,6 +1522,8 @@ Friend Module Ext插件扩展宿主_v2
         Private ReadOnly _pluginId As String
         Private ReadOnly _displayName As String
         Private ReadOnly _ui As IExtPluginUiRegistry
+        Private ReadOnly _pageEntries As IExtPluginPageEntryRegistry
+        Private ReadOnly _encodingQueueToolbar As IExtPluginEncodingQueueToolbarRegistry
         Private ReadOnly _pipeline As IExtPluginPipelineRegistry
         Private ReadOnly _behaviors As IExtPluginBehaviorRegistry
         Private ReadOnly _resources As IExtPluginResourceRegistry
@@ -1468,6 +1537,8 @@ Friend Module Ext插件扩展宿主_v2
             _pluginId = pluginId
             _displayName = displayName
             _ui = New 插件界面注册表(pluginId, AddressOf 跟踪注册)
+            _pageEntries = New Ext插件页面入口注册表_v2(pluginId, AddressOf 跟踪注册)
+            _encodingQueueToolbar = New Ext编码队列工具栏注册表_v2(pluginId, AddressOf 跟踪注册)
             _pipeline = New 插件处理注册表(pluginId, AddressOf 跟踪注册)
             _behaviors = New 插件行为注册表(pluginId, AddressOf 跟踪注册)
             _resources = New 插件资源注册表(pluginId, AddressOf 跟踪注册)
@@ -1491,6 +1562,18 @@ Friend Module Ext插件扩展宿主_v2
         Public ReadOnly Property Ui As IExtPluginUiRegistry Implements IExtFFmpegFreeUIHost.Ui
             Get
                 Return _ui
+            End Get
+        End Property
+
+        Public ReadOnly Property PageEntries As IExtPluginPageEntryRegistry Implements IExtFFmpegFreeUIHost.PageEntries
+            Get
+                Return _pageEntries
+            End Get
+        End Property
+
+        Public ReadOnly Property EncodingQueueToolbar As IExtPluginEncodingQueueToolbarRegistry Implements IExtFFmpegFreeUIHost.EncodingQueueToolbar
+            Get
+                Return _encodingQueueToolbar
             End Get
         End Property
 
@@ -1835,6 +1918,7 @@ Friend Module Ext插件扩展宿主_v2
         Public ReadOnly Values As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
         Public ReadOnly Contexts As New List(Of 插件界面上下文)
         Public ReadOnly ChoiceContexts As New List(Of 安全下拉项上下文)
+        Public ReadOnly LayoutContexts As New List(Of IExt参数面板状态接收器_v2)
     End Class
 
     Private NotInheritable Class 已注册界面扩展

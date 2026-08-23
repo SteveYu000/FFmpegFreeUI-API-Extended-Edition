@@ -27,45 +27,45 @@ Public Class Form_v6_参数面板
 
     Public Shared ReadOnly 共享界面_画面区域选择窗口 As New Form_v6_参数面板_画面区域选择窗口
     Public 抑制自动刷新 As Boolean = False
-    Private Const 参数总览页索引 As Integer = 0
-    Private Const 滤镜排序页索引 As Integer = 15
+    Private ReadOnly 原生参数选项卡 As New Dictionary(Of String, ModernTabListControl.ModernTabPage)(StringComparer.OrdinalIgnoreCase)
     Private _正在刷新聚合页面 As Boolean
     Private _插件参数面板目录已注册 As Boolean
 
 
     Private Sub Form_v6_参数面板_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.ModernTabListControl1.Items(0).BoundControl = 私有界面_参数总览
+        确保缓存原生参数选项卡()
+        绑定原生参数选项卡("overview", 私有界面_参数总览)
         绑定选项卡(私有界面_参数总览.ModernPanel1)
-        Me.ModernTabListControl1.Items(1).BoundControl = 私有界面_预设管理
+        绑定原生参数选项卡("presets", 私有界面_预设管理)
         绑定选项卡(私有界面_预设管理.ModernPanel1)
         '==================================================
-        Me.ModernTabListControl1.Items(3).BoundControl = 私有界面_输出文件设置
+        绑定原生参数选项卡("output", 私有界面_输出文件设置)
         绑定选项卡(私有界面_输出文件设置.ModernPanel1)
-        Me.ModernTabListControl1.Items(4).BoundControl = 私有界面_解码参数
+        绑定原生参数选项卡("decoder", 私有界面_解码参数)
         绑定选项卡(私有界面_解码参数.ModernPanel1)
         '==================================================
-        Me.ModernTabListControl1.Items(6).BoundControl = 私有界面_视频编码器
+        绑定原生参数选项卡("video-encoder", 私有界面_视频编码器)
         绑定选项卡(私有界面_视频编码器.ModernPanel1)
-        Me.ModernTabListControl1.Items(7).BoundControl = 私有界面_画面帧
+        绑定原生参数选项卡("video-frame", 私有界面_画面帧)
         私有界面_画面帧.私有窗口_着色器超分.所属参数面板对象 = Me
         绑定选项卡(私有界面_画面帧.ModernPanel1)
-        Me.ModernTabListControl1.Items(8).BoundControl = 私有界面_质量
+        绑定原生参数选项卡("video-quality", 私有界面_质量)
         绑定选项卡(私有界面_质量.ModernPanel1)
-        Me.ModernTabListControl1.Items(9).BoundControl = 私有界面_色彩管理
+        绑定原生参数选项卡("color", 私有界面_色彩管理)
         绑定选项卡(私有界面_色彩管理.ModernPanel1)
-        Me.ModernTabListControl1.Items(10).BoundControl = 私有界面_视频帧服务器
+        绑定原生参数选项卡("frame-server", 私有界面_视频帧服务器)
         私有界面_视频帧服务器.所属参数面板对象 = Me
         绑定选项卡(私有界面_视频帧服务器.ModernPanel1)
         '==================================================
-        Me.ModernTabListControl1.Items(12).BoundControl = 私有界面_音频参数
+        绑定原生参数选项卡("audio", 私有界面_音频参数)
         绑定选项卡(私有界面_音频参数.ModernPanel1)
         '==================================================
-        Me.ModernTabListControl1.Items(14).BoundControl = 私有界面_剪辑区间
+        绑定原生参数选项卡("trim", 私有界面_剪辑区间)
         绑定选项卡(私有界面_剪辑区间.ModernPanel1)
-        Me.ModernTabListControl1.Items(15).BoundControl = 私有界面_滤镜排序
+        绑定原生参数选项卡("filter-order", 私有界面_滤镜排序)
         绑定选项卡(私有界面_滤镜排序.ModernPanel1)
         '==================================================
-        Me.ModernTabListControl1.Items(16).BoundControl = 私有界面_自定义参数
+        绑定原生参数选项卡("custom", 私有界面_自定义参数)
         绑定选项卡(私有界面_自定义参数.ModernPanel1)
         If SP_UnLock AndAlso 设置_v6.实例对象.窗口样式 = 2 AndAlso 设置_v6.实例对象.SP_毛玻璃模式 > 0 Then
             私有界面_自定义参数.ModernTabControl1.TabStripBackColor = Color.Transparent
@@ -84,10 +84,10 @@ Public Class Form_v6_参数面板
         Me.私有界面_自定义参数.ModernTabControl1.Items(5).BoundControl = 私有界面_完全自己写模式
         绑定选项卡(私有界面_完全自己写模式.ModernPanel1)
         '==================================================
-        Me.ModernTabListControl1.Items(17).BoundControl = 私有界面_流控制
+        绑定原生参数选项卡("stream-control", 私有界面_流控制)
         绑定选项卡(私有界面_流控制.ModernPanel1)
         '==================================================
-        Me.ModernTabListControl1.Items(19).BoundControl = 私有界面_附加内容
+        绑定原生参数选项卡("additional", 私有界面_附加内容)
         绑定选项卡(私有界面_附加内容.ModernPanel1)
         If SP_UnLock AndAlso 设置_v6.实例对象.窗口样式 = 2 AndAlso 设置_v6.实例对象.SP_毛玻璃模式 > 0 Then
             私有界面_附加内容.ModernTabControl1.TabStripBackColor = Color.Transparent
@@ -106,7 +106,7 @@ Public Class Form_v6_参数面板
         私有界面_附件.所属参数面板对象 = Me
         绑定选项卡(私有界面_附件.ModernPanel1)
         '==================================================
-        Me.ModernTabListControl1.SelectedIndex = 0
+        Me.ModernTabListControl1.SelectedIndex = Me.ModernTabListControl1.Items.IndexOf(原生参数选项卡("overview"))
         Me.私有界面_自定义参数.ModernTabControl1.SelectedIndex = 0
         Me.私有界面_附加内容.ModernTabControl1.SelectedIndex = 0
         '==================================================
@@ -130,6 +130,40 @@ Public Class Form_v6_参数面板
         End If
     End Sub
 
+    Private Sub 确保缓存原生参数选项卡()
+        If 原生参数选项卡.Count > 0 Then Exit Sub
+
+        Dim mappings As (Id As String, Index As Integer)() = {
+            ("overview", 0),
+            ("presets", 1),
+            ("output", 3),
+            ("decoder", 4),
+            ("video-encoder", 6),
+            ("video-frame", 7),
+            ("video-quality", 8),
+            ("color", 9),
+            ("frame-server", 10),
+            ("audio", 12),
+            ("trim", 14),
+            ("filter-order", 15),
+            ("custom", 16),
+            ("stream-control", 17),
+            ("additional", 19)
+        }
+        For Each mapping In mappings
+            原生参数选项卡.Add(mapping.Id, ModernTabListControl1.Items(mapping.Index))
+        Next
+    End Sub
+
+    Private Sub 绑定原生参数选项卡(pageId As String, page As Control)
+        确保缓存原生参数选项卡()
+        原生参数选项卡(pageId).BoundControl = page
+    End Sub
+
+    Private Sub 配置插件参数页面背景(page As Control)
+        FormMain_v6.配置插件页面背景(page)
+    End Sub
+
     Public Shared Sub 弹出画面区域选择窗口(完成按钮返回的控件 As Control, 标题栏 As String)
         If 共享界面_画面区域选择窗口.目标控件 IsNot Nothing Then
             ExFloatingTip("画面区域选择窗口正在使用中，请关闭后再试，为了节约性能这个窗口只能打开一个", 3000)
@@ -142,23 +176,23 @@ Public Class Form_v6_参数面板
 
     Public Sub 请求刷新参数状态()
         If 抑制自动刷新 OrElse IsDisposed Then Exit Sub
-        Select Case ModernTabListControl1.SelectedIndex
-            Case 参数总览页索引
-                刷新参数总览页()
-            Case 滤镜排序页索引
-                刷新滤镜排序页()
-        End Select
+        刷新当前聚合页面()
     End Sub
 
     Private Sub ModernTabListControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ModernTabListControl1.SelectedIndexChanged
         If 抑制自动刷新 OrElse IsDisposed OrElse _正在刷新聚合页面 Then Exit Sub
 
-        Select Case ModernTabListControl1.SelectedIndex
-            Case 参数总览页索引
-                刷新参数总览页()
-            Case 滤镜排序页索引
-                刷新滤镜排序页()
-        End Select
+        刷新当前聚合页面()
+    End Sub
+
+    Private Sub 刷新当前聚合页面()
+        If ModernTabListControl1.SelectedIndex < 0 OrElse ModernTabListControl1.SelectedIndex >= ModernTabListControl1.Items.Count Then Exit Sub
+        Dim selectedControl = ModernTabListControl1.Items(ModernTabListControl1.SelectedIndex).BoundControl
+        If selectedControl Is 私有界面_参数总览 Then
+            刷新参数总览页()
+        ElseIf selectedControl Is 私有界面_滤镜排序 Then
+            刷新滤镜排序页()
+        End If
     End Sub
 
     Private Sub 刷新参数总览页()
@@ -188,6 +222,7 @@ Public Class Form_v6_参数面板
     Friend Sub 确保注册插件参数面板目录()
         If _插件参数面板目录已注册 Then Exit Sub
         _插件参数面板目录已注册 = True
+        确保缓存原生参数选项卡()
 
         Dim pages As (Id As String, DisplayName As String, Page As Control)() = {
             ("overview", "参数总览", 私有界面_参数总览),
@@ -231,6 +266,34 @@ Public Class Form_v6_参数面板
             Dim pageRoot = 获取插件页面根容器(page.Page)
             Ext插件扩展桥接_v2.注册参数面板页面(page.Id, page.DisplayName, pageRoot, Me)
             注册插件页面控件(page.Id, pageRoot, "", visited)
+        Next
+
+        Dim navigationPages As (Id As String, DisplayName As String)() = {
+            ("overview", "参数总览"),
+            ("presets", "预设管理"),
+            ("output", "输出文件设置"),
+            ("decoder", "解码参数"),
+            ("video-encoder", "视频编码器"),
+            ("video-frame", "画面与帧"),
+            ("video-quality", "视频质量"),
+            ("color", "色彩管理"),
+            ("frame-server", "视频帧服务器"),
+            ("audio", "音频参数"),
+            ("trim", "剪辑区间"),
+            ("filter-order", "滤镜排序"),
+            ("custom", "自定义参数"),
+            ("stream-control", "流控制"),
+            ("additional", "附加内容")
+        }
+        For Each page In navigationPages
+            Ext插件扩展桥接_v2.注册插件页面目标(
+                Ext插件页面目标_v2.参数面板(page.Id),
+                page.DisplayName,
+                "parameters",
+                ModernTabListControl1,
+                原生参数选项卡(page.Id),
+                Me,
+                AddressOf 配置插件参数页面背景)
         Next
     End Sub
 

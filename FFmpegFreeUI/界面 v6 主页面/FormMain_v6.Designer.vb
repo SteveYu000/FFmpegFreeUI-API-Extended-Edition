@@ -55,7 +55,7 @@ Partial Class FormMain_v6
         ModernTabListControl1.Controls.Add(ModernTextBox1)
         ModernTabListControl1.Dock = DockStyle.Fill
         ModernTabPage1.IsDescription = True
-        ModernTabPage1.Text = "FFmpegFreeUI API Extended Edition"
+        ModernTabPage1.Text = "FFmpegFreeUI"
         ModernTabPage2.Text = "起始页面"
         ModernTabPage3.Text = "编码队列"
         ModernTabPage4.IsSeparator = True

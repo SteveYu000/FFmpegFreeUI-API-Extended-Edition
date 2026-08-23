@@ -7,6 +7,7 @@ Imports LakeUI
 
 Public Class FormMain_v6
     Private ReadOnly 插件选项卡页 As New Dictionary(Of String, ModernTabListControl.ModernTabPage)(StringComparer.CurrentCultureIgnoreCase)
+    Private 插件主导航目标已注册 As Boolean
     Private 退出确认已完成 As Boolean = False
     Private 退出时清除所有任务 As Boolean = True
     Private 退出里程碑检查进行中 As Boolean = False
@@ -83,7 +84,9 @@ Public Class FormMain_v6
 
         其他初始化.执行()
 
+        确保注册插件主导航目标()
         Form_v6_参数面板.确保注册插件参数面板目录()
+        Form_v6_编码队列.确保注册插件工具栏目标()
         插件管理.启动时加载插件()
         If 设置_v6.实例对象.是否监听端口 Then 端口监听_v6.启动客户端()
 
@@ -160,8 +163,42 @@ Public Class FormMain_v6
             插件选项卡页(标题) = 选项卡
         End If
 
-        Dim 根面板 = 查找可绑定背景映射的插件ModernPanel(面板)
+        配置插件页面背景(面板)
+    End Sub
+
+    Public Sub 配置插件页面背景(页面 As Control)
+        Dim 根面板 = 查找可绑定背景映射的插件ModernPanel(页面)
         If 根面板 IsNot Nothing Then 绑定选项卡(根面板)
+    End Sub
+
+    Private Sub 确保注册插件主导航目标()
+        If 插件主导航目标已注册 Then Exit Sub
+        插件主导航目标已注册 = True
+
+        Dim targets As (Id As String, DisplayName As String, Index As Integer)() = {
+            (Ext插件页面目标_v2.主导航_起始页面, "起始页面", 1),
+            (Ext插件页面目标_v2.主导航_编码队列, "编码队列", 2),
+            (Ext插件页面目标_v2.主导航_准备文件, "准备文件", 4),
+            (Ext插件页面目标_v2.主导航_参数面板, "参数面板", 5),
+            (Ext插件页面目标_v2.主导航_Agent, "Agent 智能体", 6),
+            (Ext插件页面目标_v2.主导航_Studios, "3FUI Studios", 7),
+            (Ext插件页面目标_v2.主导航_媒体信息, "ffprobe 媒体信息", 9),
+            (Ext插件页面目标_v2.主导航_调试播放器, "ffplay 调试播放器", 10),
+            (Ext插件页面目标_v2.主导航_性能监控, "性能监控", 11),
+            (Ext插件页面目标_v2.主导航_集成工具, "集成工具", 12),
+            (Ext插件页面目标_v2.主导航_软件设置, "软件设置", 14),
+            (Ext插件页面目标_v2.主导航_支持者, "支持者", 15),
+            (Ext插件页面目标_v2.主导航_插件管理, "插件管理", 17)
+        }
+        For Each target In targets
+            Ext插件扩展桥接_v2.注册插件页面目标(
+                target.Id,
+                target.DisplayName,
+                "main",
+                ModernTabListControl1,
+                ModernTabListControl1.Items(target.Index),
+                configurePage:=AddressOf 配置插件页面背景)
+        Next
     End Sub
 
     Private Function 获取插件选项卡插入位置() As Integer
@@ -213,15 +250,20 @@ Public Class FormMain_v6
     End Function
 
     Private Sub ModernTabListControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ModernTabListControl1.SelectedIndexChanged
-        Select Case ModernTabListControl1.SelectedIndex
-            Case 6
-                Form_v6_性能监控.停止()
-                Form_v6_Agent.检查并刷新模型列表()
-            Case 11
-                Form_v6_性能监控.开始()
-            Case Else
-                Form_v6_性能监控.停止()
-        End Select
+        Dim selectedControl As Control = Nothing
+        If ModernTabListControl1.SelectedIndex >= 0 AndAlso
+           ModernTabListControl1.SelectedIndex < ModernTabListControl1.Items.Count Then
+            selectedControl = ModernTabListControl1.Items(ModernTabListControl1.SelectedIndex).BoundControl
+        End If
+
+        If selectedControl Is Form_v6_Agent Then
+            Form_v6_性能监控.停止()
+            Form_v6_Agent.检查并刷新模型列表()
+        ElseIf selectedControl Is Form_v6_性能监控 Then
+            Form_v6_性能监控.开始()
+        Else
+            Form_v6_性能监控.停止()
+        End If
     End Sub
 
     <CodeAnalysis.SuppressMessage("Performance", "CA1861:不要将常量数组作为参数", Justification:="<挂起>")>

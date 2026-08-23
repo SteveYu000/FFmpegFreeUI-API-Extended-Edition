@@ -16,10 +16,10 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/SteveYu000/FFmpegFreeUI-API-Extended-Edition</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>2.3.0</Version>
+    <Version>2.4.0</Version>
     <!-- 2.x 仅追加契约成员，保持程序集版本可兼容已编译的 2.0 插件。 -->
     <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.3.0.0</FileVersion>
+    <FileVersion>2.4.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

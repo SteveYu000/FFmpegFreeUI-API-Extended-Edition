@@ -14,6 +14,7 @@ Public Class Form_v6_编码队列
     Private 上次列宽有效总宽度 As Integer = -1
     Private 上次列宽Dpi As Single = -1
     Private 正在刷新列表 As Boolean = False
+    Private 插件工具栏目标已注册 As Boolean
 
     Private Sub Form_v6_编码队列_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         UltraDetailListView1.Items.Clear()
@@ -140,12 +141,43 @@ Public Class Form_v6_编码队列
     Private Sub 调整顶部按钮组居中()
         If Panel1 Is Nothing OrElse JustEmptyControl1 Is Nothing Then Exit Sub
 
-        Dim 按钮组宽度 = ModernButton1.Width + ModernButton2.Width + ModernButton3.Width + ModernButton4.Width + ModernButton5.Width + ModernButton6.Width + ModernButton7.Width
+        Dim leftDocked = Panel1.Controls.Cast(Of Control)().
+            Where(Function(control) control.Dock = DockStyle.Left AndAlso control.Visible).
+            OrderByDescending(Function(control) Panel1.Controls.GetChildIndex(control)).
+            ToList()
+        Dim spacerIndex = leftDocked.IndexOf(JustEmptyControl1)
+        If spacerIndex < 0 Then Exit Sub
+
+        Dim 已占用左侧宽度 = Panel1.Padding.Left + leftDocked.Take(spacerIndex).Sum(Function(control) control.Width)
+        Dim 按钮组宽度 = leftDocked.Skip(spacerIndex + 1).Sum(Function(control) control.Width)
         Dim 按钮组目标左侧 = CInt(Math.Round((Panel1.ClientSize.Width - 按钮组宽度) / 2.0))
-        Dim 已占用左侧宽度 = Panel1.Padding.Left + ModernButton8.Width
         Dim 新宽度 = Math.Max(0, 按钮组目标左侧 - 已占用左侧宽度)
 
         If JustEmptyControl1.Width <> 新宽度 Then JustEmptyControl1.Width = 新宽度
+    End Sub
+
+    Friend Sub 确保注册插件工具栏目标()
+        If 插件工具栏目标已注册 Then Exit Sub
+        插件工具栏目标已注册 = True
+
+        Dim targets As (Id As String, DisplayName As String, Button As Control)() = {
+            (Ext插件工具栏目标_v2.任务管理菜单, "任务管理菜单", ModernButton8),
+            (Ext插件工具栏目标_v2.开始, "开始", ModernButton1),
+            (Ext插件工具栏目标_v2.暂停, "暂停", ModernButton2),
+            (Ext插件工具栏目标_v2.恢复, "恢复", ModernButton3),
+            (Ext插件工具栏目标_v2.停止, "停止", ModernButton4),
+            (Ext插件工具栏目标_v2.移除, "移除", ModernButton5),
+            (Ext插件工具栏目标_v2.重置, "重置", ModernButton6),
+            (Ext插件工具栏目标_v2.定位, "定位", ModernButton7)
+        }
+        For Each target In targets
+            Ext插件扩展桥接_v2.注册插件工具栏目标(
+                target.Id,
+                target.DisplayName,
+                Panel1,
+                target.Button,
+                AddressOf 调整顶部按钮组居中)
+        Next
     End Sub
 
     Private Sub 绑定菜单事件()

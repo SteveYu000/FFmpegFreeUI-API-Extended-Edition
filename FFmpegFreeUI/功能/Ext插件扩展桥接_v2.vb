@@ -160,6 +160,39 @@ Friend Module Ext插件处理阶段_v2
     Friend Const 任务结束之后 As String = "ext.task.after-finish"
 End Module
 
+''' <summary>核心内部使用的 v2.4 稳定页面目标 ID；公开常量位于 Ext SDK。</summary>
+Friend Module Ext插件页面目标_v2
+    Friend Const 主导航_起始页面 As String = "ext.navigation.main.start"
+    Friend Const 主导航_编码队列 As String = "ext.navigation.main.encoding-queue"
+    Friend Const 主导航_准备文件 As String = "ext.navigation.main.prepare-files"
+    Friend Const 主导航_参数面板 As String = "ext.navigation.main.parameters"
+    Friend Const 主导航_Agent As String = "ext.navigation.main.agent"
+    Friend Const 主导航_Studios As String = "ext.navigation.main.studios"
+    Friend Const 主导航_媒体信息 As String = "ext.navigation.main.media-info"
+    Friend Const 主导航_调试播放器 As String = "ext.navigation.main.debug-player"
+    Friend Const 主导航_性能监控 As String = "ext.navigation.main.performance"
+    Friend Const 主导航_集成工具 As String = "ext.navigation.main.integrated-tools"
+    Friend Const 主导航_软件设置 As String = "ext.navigation.main.settings"
+    Friend Const 主导航_支持者 As String = "ext.navigation.main.supporters"
+    Friend Const 主导航_插件管理 As String = "ext.navigation.main.plugin-manager"
+
+    Friend Function 参数面板(pageId As String) As String
+        Return "ext.navigation.parameters." & If(pageId, "").Trim().ToLowerInvariant()
+    End Function
+End Module
+
+''' <summary>核心内部使用的 v2.4 编码队列工具栏目标 ID；公开常量位于 Ext SDK。</summary>
+Friend Module Ext插件工具栏目标_v2
+    Friend Const 任务管理菜单 As String = "ext.toolbar.encoding-queue.task-menu"
+    Friend Const 开始 As String = "ext.toolbar.encoding-queue.start"
+    Friend Const 暂停 As String = "ext.toolbar.encoding-queue.pause"
+    Friend Const 恢复 As String = "ext.toolbar.encoding-queue.resume"
+    Friend Const 停止 As String = "ext.toolbar.encoding-queue.stop"
+    Friend Const 移除 As String = "ext.toolbar.encoding-queue.remove"
+    Friend Const 重置 As String = "ext.toolbar.encoding-queue.reset"
+    Friend Const 定位 As String = "ext.toolbar.encoding-queue.locate"
+End Module
+
 ''' <summary>核心内部使用的稳定行为点 ID。</summary>
 Friend Module Ext插件行为点_v2
     Friend Const 视频质量模式已变更 As String = "ext.parameters.video.quality.mode.changed"
@@ -235,6 +268,40 @@ Friend Module Ext插件扩展桥接_v2
             valuePropertyName,
             control,
             surface)
+    End Sub
+
+    Friend Sub 注册插件页面目标(targetId As String,
+                           displayName As String,
+                           surfaceName As String,
+                           tabListControl As Control,
+                           targetPage As Object,
+                           Optional parameterSurface As Control = Nothing,
+                           Optional configurePage As Action(Of Control) = Nothing)
+        If Not 可用 Then Exit Sub
+        调用可选宿主(
+            NameOf(注册插件页面目标),
+            targetId,
+            displayName,
+            surfaceName,
+            tabListControl,
+            targetPage,
+            parameterSurface,
+            configurePage)
+    End Sub
+
+    Friend Sub 注册插件工具栏目标(targetId As String,
+                             displayName As String,
+                             toolbarControl As Control,
+                             targetControl As Control,
+                             Optional refreshLayout As Action = Nothing)
+        If Not 可用 Then Exit Sub
+        调用可选宿主(
+            NameOf(注册插件工具栏目标),
+            targetId,
+            displayName,
+            toolbarControl,
+            targetControl,
+            refreshLayout)
     End Sub
 
     Friend Sub 还原参数面板插件状态(surface As Control, values As IDictionary(Of String, String))
@@ -441,7 +508,7 @@ Friend Module Ext插件扩展桥接_v2
     End Function
 
     ''' <summary>
-    ''' 调用 v2.3 新增的宿主入口。若用户误配了 v2.2 Host，则安全跳过新能力，
+    ''' 调用 v2.3 及后续版本新增的宿主入口。若用户误配了旧 Host，则安全跳过新能力，
     ''' 但保留旧插件和旧处理链；当前发行包仍应始终配套部署同版本 SDK/Host。
     ''' </summary>
     Private Function 调用可选宿主(methodName As String, ParamArray arguments As Object()) As Object
