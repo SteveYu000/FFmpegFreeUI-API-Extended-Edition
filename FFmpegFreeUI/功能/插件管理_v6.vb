@@ -26,6 +26,7 @@ Public NotInheritable Class 插件信息_v6
     Public Property ExtSDK程序集版本 As String = ""
     Public Property ExtAPI最低版本 As String = ""
     Public Property Ext插件标识 As New List(Of String)
+    Public Property Ext设置页插件标识 As New List(Of String)
     Public Property 已启用 As Boolean = True
     Public Property 处理顺序 As Integer
     Public Property 启动时已启用 As Boolean
@@ -54,6 +55,7 @@ Public NotInheritable Class 插件信息_v6
             .ExtSDK程序集版本 = ExtSDK程序集版本,
             .ExtAPI最低版本 = ExtAPI最低版本,
             .Ext插件标识 = Ext插件标识.ToList(),
+            .Ext设置页插件标识 = Ext设置页插件标识.ToList(),
             .已启用 = 已启用,
             .处理顺序 = 处理顺序,
             .启动时已启用 = 启动时已启用,
@@ -99,6 +101,7 @@ Public Class 插件管理
     Private Shared ReadOnly 插件状态锁 As New Object
     Private Shared ReadOnly 插件目录 As New Dictionary(Of String, 插件信息_v6)(StringComparer.OrdinalIgnoreCase)
     Private Shared ReadOnly Ext插件标识到文件键 As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+    Private Shared ReadOnly Ext插件设置页工厂表 As New Dictionary(Of String, Func(Of Control))(StringComparer.OrdinalIgnoreCase)
     Private Shared 当前配置 As New 插件管理配置文件_v6
     Private Shared 配置已读取 As Boolean
     Private Shared 目录已扫描 As Boolean
@@ -385,10 +388,73 @@ Public Class 插件管理
             Dim info As 插件信息_v6 = Nothing
             If 插件目录.TryGetValue(key, info) Then
                 If Not info.Ext插件标识.Contains(id, StringComparer.OrdinalIgnoreCase) Then info.Ext插件标识.Add(id)
+                If Ext插件设置页工厂表.ContainsKey(id) AndAlso
+                   Not info.Ext设置页插件标识.Contains(id, StringComparer.OrdinalIgnoreCase) Then
+                    info.Ext设置页插件标识.Add(id)
+                End If
                 If Not String.IsNullOrWhiteSpace(displayName) Then info.显示名称 = displayName.Trim()
             End If
         End SyncLock
     End Sub
+
+    Public Shared Sub 注册Ext插件设置入口(pluginId As String, createPage As Func(Of Control))
+        Dim id = If(pluginId, "").Trim()
+        If id = "" Then Throw New ArgumentException("插件 ID 不能为空", NameOf(pluginId))
+        If createPage Is Nothing Then Throw New ArgumentNullException(NameOf(createPage))
+
+        SyncLock 插件状态锁
+            If Ext插件设置页工厂表.ContainsKey(id) Then
+                Throw New InvalidOperationException($"插件 {id} 已注册设置页")
+            End If
+            Ext插件设置页工厂表.Add(id, createPage)
+
+            Dim key As String = Nothing
+            Dim info As 插件信息_v6 = Nothing
+            If Ext插件标识到文件键.TryGetValue(id, key) AndAlso 插件目录.TryGetValue(key, info) AndAlso
+               Not info.Ext设置页插件标识.Contains(id, StringComparer.OrdinalIgnoreCase) Then
+                info.Ext设置页插件标识.Add(id)
+            End If
+        End SyncLock
+        通知插件列表变化()
+    End Sub
+
+    Public Shared Sub 注销Ext插件设置入口(pluginId As String)
+        Dim id = If(pluginId, "").Trim()
+        If id = "" Then Exit Sub
+
+        Dim changed As Boolean
+        SyncLock 插件状态锁
+            changed = Ext插件设置页工厂表.Remove(id)
+            Dim key As String = Nothing
+            Dim info As 插件信息_v6 = Nothing
+            If Ext插件标识到文件键.TryGetValue(id, key) AndAlso 插件目录.TryGetValue(key, info) Then
+                info.Ext设置页插件标识.RemoveAll(
+                    Function(value) String.Equals(value, id, StringComparison.OrdinalIgnoreCase))
+            End If
+        End SyncLock
+        If changed Then 通知插件列表变化()
+    End Sub
+
+    Public Shared Function 创建Ext插件设置页(pluginId As String) As Control
+        Dim id = If(pluginId, "").Trim()
+        If id = "" Then Throw New ArgumentException("插件 ID 不能为空", NameOf(pluginId))
+
+        Dim factory As Func(Of Control) = Nothing
+        SyncLock 插件状态锁
+            If Not Ext插件设置页工厂表.TryGetValue(id, factory) Then
+                Throw New InvalidOperationException($"插件 {id} 当前没有可用的设置页")
+            End If
+        End SyncLock
+
+        Dim page = factory.Invoke()
+        If page Is Nothing OrElse page.IsDisposed Then
+            Throw New InvalidOperationException($"插件 {id} 的设置页工厂没有返回有效控件")
+        End If
+        If page.Parent IsNot Nothing Then
+            Throw New InvalidOperationException($"插件 {id} 的设置页必须是尚未加入其他容器的新控件")
+        End If
+        Return page
+    End Function
 
     Private Shared Sub 扫描插件目录(作为启动扫描 As Boolean)
         确保读取配置()
@@ -433,6 +499,7 @@ Public Class 插件管理
                     info.加载状态 = previous.加载状态
                     info.加载错误 = previous.加载错误
                     info.Ext插件标识 = previous.Ext插件标识.ToList()
+                    info.Ext设置页插件标识 = previous.Ext设置页插件标识.ToList()
                     If previous.Ext插件标识.Count > 0 AndAlso Not String.IsNullOrWhiteSpace(previous.显示名称) Then info.显示名称 = previous.显示名称
                 Else
                     info.启动时已启用 = If(作为启动扫描, info.已启用, False)
@@ -608,7 +675,8 @@ Public Class 插件管理
                         "ExtPluginPageEntryArea", "ExtPluginRelativePosition",
                         "ExtPluginPageTargetDescriptor", "ExtPluginToolbarTargetDescriptor", "ExtPluginPageExtension",
                         "IExtPluginPageContext", "ExtPluginToolbarControlExtension", "IExtPluginToolbarContext",
-                        "ExtFFmpegFreeUIPageTargets", "ExtFFmpegFreeUIToolbarTargets"
+                        "ExtFFmpegFreeUIPageTargets", "ExtFFmpegFreeUIToolbarTargets",
+                        "IExtPluginSettingsRegistry", "ExtPluginSettingsPageExtension", "IExtPluginSettingsPageContext"
                     }
                     For Each handle In metadata.TypeReferences
                         Dim reference = metadata.GetTypeReference(handle)
@@ -622,6 +690,7 @@ Public Class 插件管理
                             Dim memberName = metadata.GetString(member.Name)
                             If String.Equals(memberName, "PageEntries", StringComparison.Ordinal) OrElse
                                String.Equals(memberName, "EncodingQueueToolbar", StringComparison.Ordinal) OrElse
+                               String.Equals(memberName, "PluginSettings", StringComparison.Ordinal) OrElse
                                String.Equals(memberName, "RegisterPage", StringComparison.Ordinal) OrElse
                                String.Equals(memberName, "RegisterControl", StringComparison.Ordinal) Then
                                 requiresV24 = True

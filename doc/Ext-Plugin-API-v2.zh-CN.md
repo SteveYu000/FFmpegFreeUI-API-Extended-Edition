@@ -9,18 +9,19 @@
 ### 首次接入
 
 - [0. 接口速览](#quick-interface-selection)
+    - [对执行顺序要求严格时如何选择 API](#strict-order-api-choice)
 - [1. 运行时组成与安装目录](#runtime-layout)
 - [2. 开发环境与示例](#development-environment)
 - [3. 从零创建插件项目](#create-project)
 - [4. 实现插件入口与选择官方 API](#plugin-entry)
 - [5. 宿主总入口 `IExtFFmpegFreeUIHost`](#host-interface)
-- [对执行顺序要求严格时如何选择 API](#strict-order-api-choice)
-- [插件管理、启用状态与全局顺序](#plugin-manager-order)
+- [7.2 插件管理、启用状态与全局顺序](#plugin-manager-order)
 
 ### 按能力选读
 
 - [6. UI：修改原生参数与增加控件](#ui-extension)
-- [页面入口与编码队列工具栏](#page-entry-and-toolbar)
+    - [页面入口与编码队列工具栏](#page-entry-and-toolbar)
+    - [插件管理内设置页](#plugin-settings-page)
 - [7. 命令与任务：处理链和声明式命令](#pipeline-and-commands)
 - [8. 深度定制：原生行为点与 UI 替换](#behavior-extension)
 - [9. 处理链生命周期与全部阶段](#pipeline-lifecycle)
@@ -46,15 +47,16 @@
 
 | 接口 | 主要成员 | 用途 | 详细说明 |
 |---|---|---|---|
-| `IExtFFmpegFreeUIPlugin` | `Id`、`DisplayName`、`Initialize(host)` | 插件入口。宿主发现插件后调用 `Initialize`，插件在这里注册所需能力。 | [第 4 节](#plugin-entry) |
-| `IExtFFmpegFreeUIHost` | `ApiVersion`、`HostVersion`、`PageEntries`、`EncodingQueueToolbar`、`Ui`、`ParameterPanel`、`Commands`、`Pipeline`、`Behaviors`、`Resources`、`Log` | 全部 Ext 能力的总入口。先检查 `ApiVersion`，再使用需要的注册表。 | [第 5 节](#host-interface) |
+| `IExtFFmpegFreeUIPlugin` | `Id`、`DisplayName`、`Initialize(host)` | 插件递给 FFmpegFreeUI 的入口。宿主发现插件后调用 `Initialize`，插件在这里注册所需能力。 | [第 4 节](#plugin-entry) |
+| `IExtFFmpegFreeUIHost` | `ApiVersion`、`HostVersion`、`PageEntries`、`EncodingQueueToolbar`、`PluginSettings`、`Ui`、`ParameterPanel`、`Commands`、`Pipeline`、`Behaviors`、`Resources`、`Log` | FFmpegFreeUI 递给插件的功能入口。先检查 `ApiVersion`，再使用需要的注册表。 | [第 5 节](#host-interface) |
 
-### 0.2 八类能力与接口对应表
+### 0.2 九类能力与接口对应表
 
 | 能力 | 从 `host` 进入 | 主要接口、成员和类型 | 用途 | 详细说明 |
 |---|---|---|---|---|
 | 插件页面入口 | `host.PageEntries` | `AvailableTargets`、`RegisterPage`；页面目标、扩展和上下文 | 在左侧主导航或参数面板一级导航的任意原生选项卡上方/下方插入页面。 | [页面入口](#page-entries) |
 | 编码队列工具栏 | `host.EncodingQueueToolbar` | `AvailableTargets`、`RegisterControl`；工具栏目标、控件扩展和上下文 | 在编码队列任意原生按钮左侧/右侧插入自定义控件。 | [编码队列工具栏](#encoding-queue-toolbar) |
+| 插件设置页 | `host.PluginSettings` | `RegisterPage`；设置页扩展和上下文 | 在插件管理器中提供可选设置入口，不占用主导航。每个 Ext 插件最多注册一个。 | [插件管理内设置页](#plugin-settings-page) |
 | 参数面板目录 | `host.ParameterPanel` | `IExtPluginParameterPanelCatalog.AvailablePages`、`AvailableControls`；页面/控件描述符；`ExtPluginControlAccess.TryGetValue`、`TrySetValue`、`TryGetProperty`、`TrySetProperty` | 找到原有参数页和控件，知道控件的稳定锚点、资源 ID 和默认值属性；取得真实控件后读取或修改公开属性。 | [参数面板目录与全部控件](#parameter-panel-catalog) |
 | 安全 UI 扩展 | `host.Ui` | `IExtPluginUiRegistry.AvailableAnchors`、`AvailableChoiceAnchors`、`Register`、`RegisterChoice`；`ExtPluginUiExtension`、`ExtPluginUiChoiceExtension`、两个 UI 上下文 | 在原页面增加控件、装饰或替换原控件，或者给宿主管理的下拉框增加稳定选项。 | [第 6 节](#ui-extension) |
 | 声明式命令 | `host.Commands` | `IExtPluginCommandRegistry.RegisterParameterProvider`、`RegisterStepProvider`；`ExtPluginCommandContext.Arguments`、`Steps`；参数和步骤类型 | 让插件参数同时进入预览、命令模板和实际 FFmpeg 命令；或者增加由队列统一执行的外部程序步骤。 | [声明式参数](#declarative-arguments) / [外部命令步骤](#declarative-steps) |
@@ -72,6 +74,7 @@
 | 在最左侧任意原生选项卡上方/下方插入一个或多个页面 | `host.PageEntries.RegisterPage` | [页面入口](#page-entries) |
 | 在参数面板一级选项卡任意位置插入一个或多个页面 | `host.PageEntries.RegisterPage` | [页面入口](#page-entries) |
 | 在编码队列顶部任意按钮左侧/右侧插入控件 | `host.EncodingQueueToolbar.RegisterControl` | [编码队列工具栏](#encoding-queue-toolbar) |
+| 插件只需要一个设置页，不希望占用最左侧导航 | `host.PluginSettings.RegisterPage` | [插件管理内设置页](#plugin-settings-page) |
 | 在原有参数页顶部或底部增加输入框、按钮或整块面板 | `host.ParameterPanel` + `host.Ui.Register` | [任意参数页增加控件](#insert-controls-on-page) |
 | 查找、读取或修改现有的视频/音频参数控件 | `host.ParameterPanel` + `host.Ui.Register` + `ExtPluginControlAccess` | [参数面板目录与全部控件](#parameter-panel-catalog)；写操作再看[资源租约](#resource-coordination) |
 | 给原生下拉框增加新选项 | `host.Ui.RegisterChoice` | [安全下拉选项](#safe-choice-extension) |
@@ -168,7 +171,10 @@ Plugin\
 
 相关源码：
 
-- SDK 合同：[`FFmpegFreeUI.Ext.PluginSdk/ExtPluginContracts.cs`](../FFmpegFreeUI.Ext.PluginSdk/ExtPluginContracts.cs)
+- SDK 核心合同：[`FFmpegFreeUI.Ext.PluginSdk/ExtPluginCoreContracts.cs`](../FFmpegFreeUI.Ext.PluginSdk/ExtPluginCoreContracts.cs)
+- 页面入口合同：[`FFmpegFreeUI.Ext.PluginSdk/ExtPluginPageEntryContracts.cs`](../FFmpegFreeUI.Ext.PluginSdk/ExtPluginPageEntryContracts.cs)
+- 编码队列工具栏合同：[`FFmpegFreeUI.Ext.PluginSdk/ExtPluginEncodingQueueToolbarContracts.cs`](../FFmpegFreeUI.Ext.PluginSdk/ExtPluginEncodingQueueToolbarContracts.cs)
+- 插件设置页合同：[`FFmpegFreeUI.Ext.PluginSdk/ExtPluginSettingsContracts.cs`](../FFmpegFreeUI.Ext.PluginSdk/ExtPluginSettingsContracts.cs)
 - 可选桥接：[`FFmpegFreeUI/功能/Ext插件扩展桥接_v2.vb`](../FFmpegFreeUI/功能/Ext插件扩展桥接_v2.vb)
 - 宿主实现：[`FFmpegFreeUI/功能/Ext插件扩展宿主_v2.vb`](../FFmpegFreeUI/功能/Ext插件扩展宿主_v2.vb)
 - PluginHost 项目：[`FFmpegFreeUI.Ext.PluginHost/FFmpegFreeUI.Ext.PluginHost.vbproj`](../FFmpegFreeUI.Ext.PluginHost/FFmpegFreeUI.Ext.PluginHost.vbproj)
@@ -498,6 +504,7 @@ End Class
 | `HostVersion` | FFmpegFreeUI 主程序集版本字符串，可用于诊断，不建议依赖字符串比较实现功能开关。 |
 | `PageEntries` | v2.4 主导航和参数面板一级导航中的插件页面入口注册表。 |
 | `EncodingQueueToolbar` | v2.4 编码队列顶部工具栏的插件控件注册表。 |
+| `PluginSettings` | v2.4 插件管理页面中的可选插件设置页注册表。 |
 | `Ui` | UI 扩展注册表。 |
 | `Pipeline` | 处理链注册表。 |
 | `Behaviors` | 原生稳定行为点注册表。 |
@@ -516,6 +523,10 @@ if (host.ApiVersion < new Version(2, 4, 0))
 
 var pageTargets = host.PageEntries.AvailableTargets;
 var toolbarTargets = host.EncodingQueueToolbar.AvailableTargets;
+
+// 只有插件确实需要设置页面时才注册；每个 Ext 插件最多一个。
+host.PluginSettings.RegisterPage(
+    new ExtPluginSettingsPageExtension(CreateSettingsPage));
 ```
 
 已编译的 v2.2、v2.3 插件只消费旧成员，仍可直接运行；v2.4 插件通过 `ApiVersion` 声明最低能力要求。SDK 程序集版本继续保持 `2.0.0.0`，让旧插件的程序集引用可以绑定到新 SDK；NuGet/FileVersion `2.4.0` 表示实际提供的能力版本。第三方不应自行实现宿主接口，测试替身重新编译时需要补充新增成员。
@@ -543,6 +554,7 @@ var toolbarTargets = host.EncodingQueueToolbar.AvailableTargets;
 | 在任意参数页顶部或底部增加控件 | `ParameterPanel` + `Register` | 6.8 |
 | 在主导航或参数导航插入页面入口 | `PageEntries` | 6.9.1 |
 | 在编码队列工具栏插入控件 | `EncodingQueueToolbar` | 6.9.2 |
+| 只在插件管理器中提供一个设置页 | `PluginSettings` | 6.10 |
 
 优先级原则：能用 `RegisterChoice` 或插入型锚点完成的功能，不要直接修改 `AnchorControl`。安全 API 由宿主维护稳定 ID、顺序、注销清理和预设回退；原始控件仅作为兼容旧插件及少数深度场景的逃生口。
 
@@ -830,8 +842,8 @@ v2.4 将这两类能力分成两个独立注册表：`host.PageEntries` 只负�
 | 需求 | 使用接口 |
 |---|---|
 | 在现有参数页**内部**增加一行控件 | `host.ParameterPanel` + `host.Ui.Register` |
-| 在左侧主导航中增加一个可进入的新页面 | `host.PageEntries.RegisterPage`，目标区域为 `MainNavigation` |
-| 在参数面板的一级选项卡中增加一个新页面 | `host.PageEntries.RegisterPage`，目标区域为 `ParameterPanelNavigation` |
+| 在主窗口左侧 TabList 中增加一个可进入的新页面 | `host.PageEntries.RegisterPage`，目标区域为 `MainTabList` |
+| 在参数面板左侧 TabList 中增加一个新页面 | `host.PageEntries.RegisterPage`，目标区域为 `ParameterPanelTabList` |
 | 在编码队列顶部按钮组增加按钮、下拉框或其他控件 | `host.EncodingQueueToolbar.RegisterControl` |
 
 每个目标都使用稳定的 `ext.` ID。先枚举实际可用目标，再用 SDK 常量注册；不要读取导航索引、按钮名称或反射宿主私有字段：
@@ -948,6 +960,46 @@ if (host.EncodingQueueToolbar.AvailableTargets.Any(x =>
 工具栏工厂可以返回按钮、下拉框、标签或包含多个子控件的小型容器。宿主会将其高度统一为 `IExtPluginToolbarContext.RecommendedHeight`，清除外边距，并在插入/移除后重新计算原生按钮组居中位置；插件负责设置合适的宽度。`DeviceDpi` 可用于 DPI 尺寸计算，`ToolbarControl` 和 `TargetControl` 只应用于读取布局信息，不要修改或重新挂载原生控件。`ExtensionControl` 与页面上下文相同，在工厂执行期间为 `null`，返回后可在 `Cleanup` 中使用。
 
 同一目标、同一侧的工具栏控件按 `Order → PluginId → Id` 排列。控件数量虽不受 API 限制，但顶栏宽度有限，应保持紧凑；耗时工作不要阻塞点击事件所在的 UI 线程。注册返回的 `IDisposable` 被释放或插件作用域结束时，宿主会移除页面/控件并调用 `Cleanup`。当前插件管理器不热卸载程序集，正常安装、替换、启用或停用插件仍应重启应用。
+
+<a id="plugin-settings-page"></a>
+
+### 6.10 v2.4 插件管理内设置页
+
+如果插件只需要一个配置页面，不需要长期占用主窗口最左侧导航，使用 `host.PluginSettings.RegisterPage(...)`。注册成功后，插件管理器会点亮该插件详情标题右侧的设置齿轮；没有注册、插件未加载或加载失败时，齿轮保持灰色且不可点击。
+
+```csharp
+private IDisposable? _settingsRegistration;
+
+public void Initialize(IExtFFmpegFreeUIHost host)
+{
+    _settingsRegistration = host.PluginSettings.RegisterPage(
+        new ExtPluginSettingsPageExtension(context =>
+        {
+            return new MyPluginSettingsControl
+            {
+                Dock = DockStyle.Fill
+            };
+        })
+        {
+            Cleanup = context =>
+            {
+                // 解除设置页对外部对象的事件订阅；不要再次 Dispose PageControl。
+            }
+        });
+}
+```
+
+约定如下：
+
+- 每个 `IExtFFmpegFreeUIPlugin.Id` 最多注册一个设置页；重复注册会抛出异常。
+- `CreatePage` 在用户点击齿轮时于 UI 线程调用，每次都应返回一个未被其他容器占用、尚未释放的新 `Control`；推荐使用 `UserControl` 或 `Panel`。
+- 设置页会填满插件管理器的内容区域。用户点击“返回插件详情”时，页面控件会被释放；下次进入会重新调用工厂。
+- `IExtPluginSettingsPageContext.PageControl` 在工厂执行期间为 `null`，工厂返回后可在 `Cleanup` 中读取。
+- 宿主只负责入口和页面生命周期，不替插件保存全局配置。插件应把设置写入自己的配置文件，并在创建新页面时重新读取；不要把全局插件配置写入随编码预设保存的 `StateJson`。
+- 设置页中的耗时读取、联网检查或模型扫描应异步执行，不要阻塞 UI 线程。
+- 纯官方 API 插件不能直接注册此入口；同一 DLL 同时提供官方 `Entry` 与 Ext 入口时，可以由 Ext 入口注册设置页。
+
+注册返回值由宿主自动跟踪，插件也可以保存并提前释放。释放注册会使齿轮立即变灰，并关闭已经创建的设置页。
 
 <a id="pipeline-and-commands"></a>
 <a id="pipeline-registration"></a>
@@ -1756,6 +1808,10 @@ dotnet build .\Samples\FFmpegFreeUI.Ext.PluginApi.Sample\FFmpegFreeUI.Ext.Plugin
 
 使用 `host.EncodingQueueToolbar.RegisterControl`，从 `ExtFFmpegFreeUIToolbarTargets` 选择按钮；横向工具栏中的 `Before` / `After` 分别是左侧/右侧。工厂可返回任意普通 WinForms 控件，宿主统一高度并重新居中，插件应控制宽度且不要阻塞 UI 线程。
 
+### 插件只有设置页面，怎么避免占用主导航
+
+使用 `host.PluginSettings.RegisterPage`。插件加载并成功注册后，插件管理详情卡片中的齿轮会变为可用；点击后在插件管理页面内部显示设置页。每个 Ext 插件只能注册一个，退出设置页时控件会被释放，插件自己的全局配置应自行持久化。
+
 ### 编码完成后计算 VMAF 或校验和用哪个阶段
 
 使用 `ext.task.after-complete`。它在全部原生及声明式插件步骤成功后调用一次，并在后处理成功之前不把任务标记为完成。使用 `ReportProgress` 展示进度，使用 `ReportResult` 发布最终分数。
@@ -1793,7 +1849,7 @@ dotnet build .\Samples\FFmpegFreeUI.Ext.PluginApi.Sample\FFmpegFreeUI.Ext.Plugin
 | 分类 | 类型 | 核心用途 | 详细说明 |
 |---|---|---|---|
 | 入口与宿主 | `IExtFFmpegFreeUIPlugin` | 插件入口：`Id`、`DisplayName`、`Initialize`。 | [第 4 节](#plugin-entry) |
-| 入口与宿主 | `IExtFFmpegFreeUIHost` | 版本、日志以及八类能力注册表的总入口。 | [第 5 节](#host-interface) |
+| 入口与宿主 | `IExtFFmpegFreeUIHost` | 版本、日志以及九类能力注册表的总入口。 | [第 5 节](#host-interface) |
 | 入口与宿主 | `ExtPluginLogLevel` | `Trace`、`Information`、`Warning`、`Error`。 | [第 5 节](#host-interface) |
 | 入口与宿主 | `ExtFFmpegFreeUIPluginApi` | 当前 SDK 声明的 API `Version`。 | [第 5 节](#host-interface) |
 | 参数与 UI | `IExtPluginParameterPanelCatalog` | 枚举当前全部参数页和原生控件描述符。 | [参数面板目录](#parameter-panel-catalog) |
@@ -1814,6 +1870,8 @@ dotnet build .\Samples\FFmpegFreeUI.Ext.PluginApi.Sample\FFmpegFreeUI.Ext.Plugin
 | 编码队列工具栏 | `ExtPluginToolbarControlExtension` / `IExtPluginToolbarContext` | 在原生按钮左侧或右侧插入自定义控件。 | [编码队列工具栏](#encoding-queue-toolbar) |
 | 编码队列工具栏 | `ExtPluginToolbarTargetDescriptor` / `ExtFFmpegFreeUIToolbarTargets` | 当前宿主公开的顶栏目标及全部稳定目标 ID。 | [编码队列工具栏](#encoding-queue-toolbar) |
 | 页面入口与工具栏 | `ExtPluginRelativePosition` | 页面中表示上/下，横向工具栏中表示左/右。 | [第 6.9 节](#page-entry-and-toolbar) |
+| 插件设置页 | `IExtPluginSettingsRegistry` | 在插件管理器中注册当前插件唯一的可选设置页。 | [插件管理内设置页](#plugin-settings-page) |
+| 插件设置页 | `ExtPluginSettingsPageExtension` / `IExtPluginSettingsPageContext` | 定义设置页工厂、清理逻辑，并提供当前插件和页面实例。 | [插件管理内设置页](#plugin-settings-page) |
 | 声明式命令 | `IExtPluginCommandRegistry` | 注册 FFmpeg 参数提供器和外部命令步骤提供器。 | [第 7 节](#pipeline-and-commands) |
 | 声明式命令 | `ExtPluginCommandParameterCallback` / `ExtPluginCommandStepCallback` | 参数或步骤提供器使用的同步、可重复调用回调。 | [参数](#declarative-arguments) / [步骤](#declarative-steps) |
 | 声明式命令 | `ExtPluginCommandParameterProvider` / `ExtPluginCommandStepProvider` | 定义提供器 ID、顺序以及可重复调用的计划生成回调。 | [参数](#declarative-arguments) / [步骤](#declarative-steps) |

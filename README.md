@@ -16,6 +16,7 @@ Ext Plugin API v2 补充官方插件 API 尚未提供的能力，主要包括：
 - 在每个参数页顶部或底部插入输入框、下拉框、按钮及任意 WinForms 控件，并把插件状态随 v6 预设保存；
 - 在左侧主导航或参数面板一级导航的任意原生选项卡上方/下方插入任意数量的插件页面；
 - 在编码队列顶部任意原生按钮的左侧/右侧插入自定义 WinForms 控件；
+- 在插件管理器中提供可选设置页，不占用主窗口最左侧导航；
 - 声明式追加 FFmpeg 参数，使参数预览、命令模板和实际执行使用同一结果；
 - 把插件自定义外部命令注册为可预览、可取消、受退出码和日志统一管理的队列步骤；
 - 在预设、队列、任务准备、命令构建、外部进程和任务终态阶段注册有序处理器；
@@ -33,7 +34,7 @@ Ext Plugin API v2 是可选组件。只有程序根目录同时存在 `FFmpegFre
 
 ### 插件管理与处理顺序
 
-主页面的“插件管理”可查看 `Plugin` 目录中的全部 `*.3fui.dll`、启用状态、官方/Ext/双接口类型、插件与程序集版本、Ext SDK 程序集引用版本、推断的最低 Ext API 版本及加载错误。拖动列表或使用上移/下移即可设置插件优先级；同一官方队列事件及同一 Ext 处理阶段按列表从上到下串行进入插件，顺序修改对下一次调用立即生效。
+主页面的“插件管理”可查看 `Plugin` 目录中的全部 `*.3fui.dll`、启用状态、官方/Ext/双接口类型、插件与程序集版本、Ext SDK 程序集引用版本、推断的最低 Ext API 版本及加载错误。Ext 插件还可以选择在详情卡片中注册设置齿轮，在插件管理页面内部显示自己的设置页。拖动列表或使用上移/下移即可设置插件优先级；同一官方队列事件及同一 Ext 处理阶段按列表从上到下串行进入插件，顺序修改对下一次调用立即生效。
 
 由于官方插件没有统一的卸载协议，且程序集加载后不能从默认加载上下文安全移除，启用/禁用及新放入的 DLL 统一在重启后生效。配置保存在 `Plugin/ExtPluginManager.json`。从未设置过全局顺序时，Ext 处理器仍优先使用其原有 `Order`，以兼容旧插件；开发者手动排序后，列表优先级高于插件内部的 `Order`。
 
@@ -43,7 +44,7 @@ Ext Plugin API v2 是可选组件。只有程序根目录同时存在 `FFmpegFre
 
 完整的接入方法、UI 锚点、处理阶段和可修改字段，请阅读 [Ext Plugin API v2 中文开发指南](doc/Ext-Plugin-API-v2.zh-CN.md)。
 
-仓库同时提供 [C# v2.4 综合示例](Samples/FFmpegFreeUI.Ext.PluginApi.Sample) 和 [VB.NET v2.2 兼容基线示例](Samples/FFmpegFreeUI.Ext.PluginApi.VbVmafSample)。C# 示例覆盖导航页面、编码队列工具栏控件、动态参数控件、声明式参数和自定义命令步骤；两者分别以 SHA-256 与 VMAF 展示成功后处理。
+仓库同时提供 [C# v2.4 综合示例](Samples/FFmpegFreeUI.Ext.PluginApi.Sample) 和 [VB.NET v2.2 兼容基线示例](Samples/FFmpegFreeUI.Ext.PluginApi.VbVmafSample)。C# 示例覆盖导航页面、编码队列工具栏控件、插件管理内设置页、动态参数控件、声明式参数和自定义命令步骤；两者分别以 SHA-256 与 VMAF 展示成功后处理。
 
 SDK 已发布到 [NuGet.org](https://www.nuget.org/packages/FFmpegFreeUI.Ext.PluginSdk)，独立插件推荐直接使用 `PackageReference`；源码引用和 DLL + XML 文档引用继续用于 SDK 联调与离线开发。`ExtDeployFFmpegFreeUIPlugin` MSBuild 目标可用一条命令完成插件还原、编译与依赖部署，具体配置见开发指南第 2、3、17 节。
 

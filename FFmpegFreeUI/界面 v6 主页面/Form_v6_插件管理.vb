@@ -1,9 +1,13 @@
 Imports System.Diagnostics
 Imports System.IO
+Imports System.Net
 Imports LakeUI
 
 Public Class Form_v6_插件管理
     Inherits Form
+
+    Private Const 页面标题文本 As String = "<span style=""font-size:13; color:Silver"">插件管理</span>   查看插件状态、接口兼容性和事件处理顺序"
+    Private Const 设置页面标题文本 As String = "<span style=""font-size:13; color:Silver"">插件管理</span>   插件设置"
 
     Public ReadOnly ModernPanel1 As New ModernPanel()
     Private WithEvents UDLV_插件列表 As New UltraDetailListView()
@@ -14,12 +18,20 @@ Public Class Form_v6_插件管理
     Private WithEvents MB_打开目录 As New ModernButton()
     Private WithEvents MB_重启应用 As New ModernButton()
     Private WithEvents MB_空状态打开目录 As New ModernButton()
+    Private WithEvents MB_返回插件详情 As New ModernButton()
     Private ReadOnly P_空状态 As New ModernPanel()
     Private ReadOnly HCL_页面标题 As New HtmlColorLabel()
     Private ReadOnly HCL_概览 As New HtmlColorLabel()
-    Private ReadOnly 详情视图 As New 插件详情视图_v6()
+    Private WithEvents 详情视图 As New 插件详情视图_v6()
     Private ReadOnly HCL_说明 As New HtmlColorLabel()
+    Private ReadOnly HCL_插件设置标题 As New HtmlColorLabel()
+    Private ReadOnly P_插件设置内容 As New ModernPanel()
     Private ReadOnly 快照 As New Dictionary(Of String, 插件信息_v6)(StringComparer.OrdinalIgnoreCase)
+    Private 管理工具栏 As Control
+    Private 管理内容布局 As Control
+    Private 插件设置布局 As Control
+    Private 当前插件设置页 As Control
+    Private 当前设置页插件标识 As String = ""
     Private 正在填充列表 As Boolean
     Private 忽略管理器通知 As Boolean
 
@@ -30,7 +42,10 @@ Public Class Form_v6_插件管理
     End Sub
 
     Protected Overrides Sub Dispose(disposing As Boolean)
-        If disposing Then RemoveHandler 插件管理.插件列表已变化, AddressOf 插件列表变化
+        If disposing Then
+            关闭当前插件设置页()
+            RemoveHandler 插件管理.插件列表已变化, AddressOf 插件列表变化
+        End If
         MyBase.Dispose(disposing)
     End Sub
 
@@ -57,11 +72,12 @@ Public Class Form_v6_插件管理
         HCL_页面标题.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_页面标题.Dock = DockStyle.Top
         HCL_页面标题.ForeColor = Color.FromArgb(120, 255, 255, 255)
-        HCL_页面标题.Text = "<span style=""font-size:13; color:Silver"">插件管理</span>   查看插件状态、接口兼容性和事件处理顺序"
+        HCL_页面标题.Text = 页面标题文本
         HCL_页面标题.TextAlign = HtmlColorLabel.TextAlignEnum.MiddleLeft
 
-        Dim toolbar = 创建工具栏()
-        Dim contentLayout = 创建内容布局()
+        管理工具栏 = 创建工具栏()
+        管理内容布局 = 创建内容布局()
+        插件设置布局 = 创建插件设置布局()
 
         HCL_说明.AutoSize = True
         HCL_说明.AutoSizeMode = AutoSizeMode.GrowAndShrink
@@ -71,9 +87,10 @@ Public Class Form_v6_插件管理
         HCL_说明.Text = "可将 *.3fui.dll 拖放到本页安装；同一事件按列表从上到下依次处理，拖动或上移/下移立即生效。"
         HCL_说明.TextAlign = HtmlColorLabel.TextAlignEnum.MiddleLeft
 
-        ModernPanel1.Controls.Add(contentLayout)
+        ModernPanel1.Controls.Add(插件设置布局)
+        ModernPanel1.Controls.Add(管理内容布局)
         ModernPanel1.Controls.Add(HCL_说明)
-        ModernPanel1.Controls.Add(toolbar)
+        ModernPanel1.Controls.Add(管理工具栏)
         ModernPanel1.Controls.Add(HCL_页面标题)
         Controls.Add(ModernPanel1)
         注册插件拖放目标(Me)
@@ -185,6 +202,45 @@ Public Class Form_v6_插件管理
         contentLayout.Controls.Add(listBody, 0, 0)
         contentLayout.Controls.Add(detailPanel, 1, 0)
         Return contentLayout
+    End Function
+
+    Private Function 创建插件设置布局() As Control
+        Dim layout As New Panel With {
+            .BackColor = Color.Transparent,
+            .Dock = DockStyle.Fill,
+            .Visible = False
+        }
+        Dim header As New Panel With {
+            .BackColor = Color.Transparent,
+            .Dock = DockStyle.Top,
+            .Height = 54,
+            .Padding = New Padding(0, 10, 0, 10)
+        }
+
+        配置按钮(MB_返回插件详情, "← 返回插件详情", 145, Color.CornflowerBlue)
+        MB_返回插件详情.Dock = DockStyle.Left
+        MB_返回插件详情.Margin = Padding.Empty
+
+        HCL_插件设置标题.AutoSizeMode = AutoSizeMode.GrowAndShrink
+        HCL_插件设置标题.Dock = DockStyle.Fill
+        HCL_插件设置标题.ForeColor = Color.FromArgb(140, 255, 255, 255)
+        HCL_插件设置标题.Padding = New Padding(16, 0, 0, 0)
+        HCL_插件设置标题.Text = "插件设置"
+        HCL_插件设置标题.TextAlign = HtmlColorLabel.TextAlignEnum.MiddleLeft
+
+        P_插件设置内容.BackColor = Color.Transparent
+        P_插件设置内容.BackColor1 = Color.FromArgb(40, 220, 220, 220)
+        P_插件设置内容.BorderRadius = 10
+        P_插件设置内容.BorderSize = 0
+        P_插件设置内容.Dock = DockStyle.Fill
+        P_插件设置内容.Padding = New Padding(20)
+        P_插件设置内容.ScrollBarMode = ModernPanel.ScrollMode.None
+
+        header.Controls.Add(HCL_插件设置标题)
+        header.Controls.Add(MB_返回插件详情)
+        layout.Controls.Add(P_插件设置内容)
+        layout.Controls.Add(header)
+        Return layout
     End Function
 
     Private Shared Sub 配置按钮(button As ModernButton, text As String, width As Integer, foreColor As Color)
@@ -317,7 +373,12 @@ Public Class Form_v6_插件管理
             正在填充列表 = False
             ModernPanel1.ResumeLayout(performLayout:=True)
         End Try
-        显示选中插件详情()
+        If 插件设置布局 IsNot Nothing AndAlso 插件设置布局.Visible AndAlso 当前设置页插件标识 <> "" AndAlso
+           Not plugins.Any(Function(item) item.Ext设置页插件标识.Contains(当前设置页插件标识, StringComparer.OrdinalIgnoreCase)) Then
+            显示插件管理视图()
+        ElseIf 插件设置布局 Is Nothing OrElse Not 插件设置布局.Visible Then
+            显示选中插件详情()
+        End If
         调整列宽()
     End Sub
 
@@ -424,7 +485,8 @@ Public Class Form_v6_插件管理
                 If(usesExt, 空值替代(plugin.ExtAPI最低版本), "不适用"),
                 If(plugin.Ext插件标识.Count = 0, "-", String.Join("、", plugin.Ext插件标识)),
                 空值替代(plugin.程序集版本)),
-            .文件路径 = 空值替代(plugin.文件路径)
+            .文件路径 = 空值替代(plugin.文件路径),
+            .设置入口可用 = plugin.已加载 AndAlso plugin.Ext设置页插件标识.Count > 0
         }
 
         Dim errors As New List(Of String)
@@ -441,6 +503,70 @@ Public Class Form_v6_插件管理
             设置详情消息(pluginData, "运行状态", "未发现加载错误。处理顺序的调整会立即用于下一次插件事件。", False)
         End If
         详情视图.显示详情(pluginData)
+    End Sub
+
+    Private Sub 详情视图_设置入口点击(sender As Object, e As EventArgs) Handles 详情视图.设置入口点击
+        Dim plugin = 获取选中插件()
+        If plugin Is Nothing OrElse Not plugin.已加载 Then Exit Sub
+        Dim pluginId = plugin.Ext设置页插件标识.FirstOrDefault()
+        If String.IsNullOrWhiteSpace(pluginId) Then Exit Sub
+
+        Dim page As Control = Nothing
+        Try
+            page = 插件管理.创建Ext插件设置页(pluginId)
+            显示插件设置页(plugin, pluginId, page)
+        Catch ex As Exception
+            page?.Dispose()
+            ExOverlayMsgBox(FormMain_v6, $"打开插件设置失败：{ex.Message}", MsgBoxStyle.Critical, "插件设置")
+        End Try
+    End Sub
+
+    Private Sub 显示插件设置页(plugin As 插件信息_v6, pluginId As String, page As Control)
+        If plugin Is Nothing Then Throw New ArgumentNullException(NameOf(plugin))
+        If page Is Nothing OrElse page.IsDisposed Then Throw New ArgumentException("插件设置页无效", NameOf(page))
+
+        关闭当前插件设置页()
+        page.Dock = DockStyle.Fill
+        page.Margin = Padding.Empty
+        P_插件设置内容.Controls.Add(page)
+        当前插件设置页 = page
+        当前设置页插件标识 = pluginId
+
+        Dim displayName = WebUtility.HtmlEncode(空值替代(plugin.显示名称))
+        HCL_插件设置标题.Text = $"<span style=""font-size:12; color:Silver"">{displayName}</span>   插件设置"
+        HCL_页面标题.Text = 设置页面标题文本
+        管理工具栏.Visible = False
+        管理内容布局.Visible = False
+        HCL_说明.Visible = False
+        插件设置布局.Visible = True
+        插件设置布局.BringToFront()
+        page.Focus()
+    End Sub
+
+    Private Sub MB_返回插件详情_Click(sender As Object, e As EventArgs) Handles MB_返回插件详情.Click
+        显示插件管理视图()
+    End Sub
+
+    Private Sub 显示插件管理视图()
+        关闭当前插件设置页()
+        If 插件设置布局 IsNot Nothing Then 插件设置布局.Visible = False
+        If 管理内容布局 IsNot Nothing Then
+            管理内容布局.Visible = True
+            管理内容布局.BringToFront()
+        End If
+        If 管理工具栏 IsNot Nothing Then 管理工具栏.Visible = True
+        HCL_说明.Visible = True
+        HCL_页面标题.Text = 页面标题文本
+        显示选中插件详情()
+    End Sub
+
+    Private Sub 关闭当前插件设置页()
+        Dim page = 当前插件设置页
+        当前插件设置页 = Nothing
+        当前设置页插件标识 = ""
+        If page Is Nothing Then Exit Sub
+        If page.Parent Is P_插件设置内容 Then P_插件设置内容.Controls.Remove(page)
+        If Not page.IsDisposed Then page.Dispose()
     End Sub
 
     Private Shared Function 创建详情信息行(interfaceType As String,

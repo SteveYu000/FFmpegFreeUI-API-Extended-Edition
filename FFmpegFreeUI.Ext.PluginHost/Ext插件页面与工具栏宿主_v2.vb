@@ -37,7 +37,7 @@ Friend Module Ext插件页面与工具栏宿主_v2
 
         Dim area = 解析页面区域(surfaceName)
         Dim parameterSurface = TryCast(parameterSurfaceControl, Form_v6_参数面板)
-        If area = ExtPluginPageEntryArea.ParameterPanelNavigation AndAlso parameterSurface Is Nothing Then
+        If area = ExtPluginPageEntryArea.ParameterPanelTabList AndAlso parameterSurface Is Nothing Then
             Throw New ArgumentException($"参数面板页面目标 {id} 没有提供参数面板实例")
         End If
 
@@ -585,9 +585,9 @@ Friend Module Ext插件页面与工具栏宿主_v2
     Private Function 解析页面区域(value As String) As ExtPluginPageEntryArea
         Select Case If(value, "").Trim().ToLowerInvariant()
             Case "main"
-                Return ExtPluginPageEntryArea.MainNavigation
+                Return ExtPluginPageEntryArea.MainTabList
             Case "parameters"
-                Return ExtPluginPageEntryArea.ParameterPanelNavigation
+                Return ExtPluginPageEntryArea.ParameterPanelTabList
             Case Else
                 Throw New ArgumentException($"未知的插件页面区域：{value}")
         End Select

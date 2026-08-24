@@ -162,22 +162,22 @@ End Module
 
 ''' <summary>核心内部使用的 v2.4 稳定页面目标 ID；公开常量位于 Ext SDK。</summary>
 Friend Module Ext插件页面目标_v2
-    Friend Const 主导航_起始页面 As String = "ext.navigation.main.start"
-    Friend Const 主导航_编码队列 As String = "ext.navigation.main.encoding-queue"
-    Friend Const 主导航_准备文件 As String = "ext.navigation.main.prepare-files"
-    Friend Const 主导航_参数面板 As String = "ext.navigation.main.parameters"
-    Friend Const 主导航_Agent As String = "ext.navigation.main.agent"
-    Friend Const 主导航_Studios As String = "ext.navigation.main.studios"
-    Friend Const 主导航_媒体信息 As String = "ext.navigation.main.media-info"
-    Friend Const 主导航_调试播放器 As String = "ext.navigation.main.debug-player"
-    Friend Const 主导航_性能监控 As String = "ext.navigation.main.performance"
-    Friend Const 主导航_集成工具 As String = "ext.navigation.main.integrated-tools"
-    Friend Const 主导航_软件设置 As String = "ext.navigation.main.settings"
-    Friend Const 主导航_支持者 As String = "ext.navigation.main.supporters"
-    Friend Const 主导航_插件管理 As String = "ext.navigation.main.plugin-manager"
+    Friend Const 主导航_起始页面 As String = "ext.tabpage.main.start"
+    Friend Const 主导航_编码队列 As String = "ext.tabpage.main.encoding-queue"
+    Friend Const 主导航_准备文件 As String = "ext.tabpage.main.prepare-files"
+    Friend Const 主导航_参数面板 As String = "ext.tabpage.main.parameters"
+    Friend Const 主导航_Agent As String = "ext.tabpage.main.agent"
+    Friend Const 主导航_Studios As String = "ext.tabpage.main.studios"
+    Friend Const 主导航_媒体信息 As String = "ext.tabpage.main.media-info"
+    Friend Const 主导航_调试播放器 As String = "ext.tabpage.main.debug-player"
+    Friend Const 主导航_性能监控 As String = "ext.tabpage.main.performance"
+    Friend Const 主导航_集成工具 As String = "ext.tabpage.main.integrated-tools"
+    Friend Const 主导航_软件设置 As String = "ext.tabpage.main.settings"
+    Friend Const 主导航_支持者 As String = "ext.tabpage.main.supporters"
+    Friend Const 主导航_插件管理 As String = "ext.tabpage.main.plugin-manager"
 
     Friend Function 参数面板(pageId As String) As String
-        Return "ext.navigation.parameters." & If(pageId, "").Trim().ToLowerInvariant()
+        Return "ext.tabpage.parameters." & If(pageId, "").Trim().ToLowerInvariant()
     End Function
 End Module
 

@@ -27,7 +27,7 @@ dotnet add package FFmpegFreeUI.Ext.PluginSdk --version 2.4.0
 
 `PrivateAssets="all"` 避免 SDK 成为传递依赖，`ExcludeAssets="runtime"` 避免把 SDK 私有副本复制进插件输出。包内同时包含 XML API 文档和通过 `buildTransitive` 自动导入的一键部署目标。
 
-v2.4 新增两套独立能力：`host.PageEntries.RegisterPage(...)` 可以相对左侧主导航或参数面板一级选项卡插入任意数量的页面；`host.EncodingQueueToolbar.RegisterControl(...)` 可以相对编码队列顶部任意原生按钮插入自定义 WinForms 控件。具体目标 ID、位置语义和示例见完整开发指南。
+v2.4 新增三套独立能力：`host.PageEntries.RegisterPage(...)` 可以相对左侧主导航或参数面板一级选项卡插入任意数量的页面；`host.EncodingQueueToolbar.RegisterControl(...)` 可以相对编码队列顶部任意原生按钮插入自定义 WinForms 控件；`host.PluginSettings.RegisterPage(...)` 可以只在插件管理器中提供一个设置页，不占用主导航。具体目标 ID、页面生命周期和示例见完整开发指南。
 
 可以为当前 PowerShell 会话配置 FFmpegFreeUI 根目录：
 

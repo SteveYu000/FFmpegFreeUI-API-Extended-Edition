@@ -45,6 +45,7 @@ public sealed partial class SamplePlugin : IExtFFmpegFreeUIPlugin
         RegisterApi23Extensions(host);
         RegisterPageEntries(host);
         RegisterEncodingQueueToolbarControls(host);
+        RegisterPluginSettings(host);
 
         // AvailableAnchors / AvailableStages 可用于兼容较旧宿主；不要反射查找宿主私有控件或方法。
         var missingAnchors = ExtFFmpegFreeUIUiAnchors.All.Except(

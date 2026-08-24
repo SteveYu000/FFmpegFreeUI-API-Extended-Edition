@@ -15,6 +15,146 @@ Friend NotInheritable Class 插件详情显示数据_v6
     Public Property 消息标题颜色 As Color = Color.FromArgb(140, 255, 255, 255)
     Public Property 消息文字颜色 As Color = Color.Silver
     Public Property 消息背景颜色 As Color = Color.FromArgb(20, 220, 220, 220)
+    Public Property 设置入口可用 As Boolean
+End Class
+
+''' <summary>插件详情标题旁的轻量设置按钮；自行绘制，避免字体图标和 LakeUI 绘制层造成裁切或覆盖。</summary>
+Friend NotInheritable Class 插件设置齿轮按钮_v6
+    Inherits Control
+
+    Private 鼠标悬停 As Boolean
+    Private 鼠标按下 As Boolean
+
+    Public Sub New()
+        SetStyle(ControlStyles.UserPaint Or
+                 ControlStyles.AllPaintingInWmPaint Or
+                 ControlStyles.OptimizedDoubleBuffer Or
+                 ControlStyles.ResizeRedraw Or
+                 ControlStyles.SupportsTransparentBackColor Or
+                 ControlStyles.Selectable, True)
+        DoubleBuffered = True
+        BackColor = Color.Transparent
+        Cursor = Cursors.Default
+        TabStop = False
+    End Sub
+
+    Protected Overrides Sub OnEnabledChanged(e As EventArgs)
+        MyBase.OnEnabledChanged(e)
+        If Not Enabled Then
+            鼠标悬停 = False
+            鼠标按下 = False
+        End If
+        Cursor = If(Enabled, Cursors.Hand, Cursors.Default)
+        Invalidate()
+    End Sub
+
+    Protected Overrides Sub OnMouseEnter(e As EventArgs)
+        MyBase.OnMouseEnter(e)
+        If Enabled Then 鼠标悬停 = True
+        Invalidate()
+    End Sub
+
+    Protected Overrides Sub OnMouseLeave(e As EventArgs)
+        MyBase.OnMouseLeave(e)
+        鼠标悬停 = False
+        鼠标按下 = False
+        Invalidate()
+    End Sub
+
+    Protected Overrides Sub OnMouseDown(e As MouseEventArgs)
+        MyBase.OnMouseDown(e)
+        If Enabled AndAlso e.Button = MouseButtons.Left Then
+            鼠标按下 = True
+            Focus()
+            Invalidate()
+        End If
+    End Sub
+
+    Protected Overrides Sub OnMouseUp(e As MouseEventArgs)
+        MyBase.OnMouseUp(e)
+        If 鼠标按下 Then
+            鼠标按下 = False
+            Invalidate()
+        End If
+    End Sub
+
+    Protected Overrides Sub OnKeyDown(e As KeyEventArgs)
+        If Enabled AndAlso (e.KeyCode = Keys.Enter OrElse e.KeyCode = Keys.Space) Then
+            OnClick(EventArgs.Empty)
+            e.Handled = True
+            Exit Sub
+        End If
+        MyBase.OnKeyDown(e)
+    End Sub
+
+    Protected Overrides Sub OnPaint(e As PaintEventArgs)
+        MyBase.OnPaint(e)
+        If ClientSize.Width <= 0 OrElse ClientSize.Height <= 0 Then Exit Sub
+
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
+        Dim backgroundColor As Color
+        If Not Enabled Then
+            backgroundColor = Color.FromArgb(115, 10, 10, 10)
+        ElseIf 鼠标按下 Then
+            backgroundColor = Color.FromArgb(80, 220, 220, 220)
+        ElseIf 鼠标悬停 Then
+            backgroundColor = Color.FromArgb(60, 220, 220, 220)
+        Else
+            backgroundColor = Color.FromArgb(36, 220, 220, 220)
+        End If
+
+        Dim buttonBounds As New Rectangle(0, 0, ClientSize.Width - 1, ClientSize.Height - 1)
+        Dim radius = Math.Max(2, CInt(Math.Min(buttonBounds.Width, buttonBounds.Height) * 0.24F))
+        Using backgroundPath = 创建圆角路径(buttonBounds, radius)
+            Using backgroundBrush As New SolidBrush(backgroundColor)
+                e.Graphics.FillPath(backgroundBrush, backgroundPath)
+            End Using
+        End Using
+
+        绘制齿轮(e.Graphics, If(Enabled, Color.CornflowerBlue, Color.FromArgb(105, 115, 120)))
+        If Focused AndAlso ShowFocusCues Then ControlPaint.DrawFocusRectangle(e.Graphics, buttonBounds)
+    End Sub
+
+    Private Sub 绘制齿轮(graphics As Graphics, iconColor As Color)
+        Dim size = Math.Min(ClientSize.Width, ClientSize.Height)
+        Dim centerX = CSng((ClientSize.Width - 1) / 2.0R)
+        Dim centerY = CSng((ClientSize.Height - 1) / 2.0R)
+        Dim outerRadius = size * 0.29F
+        Dim toothInnerRadius = size * 0.21F
+        Dim ringRadius = size * 0.19F
+        Dim hubRadius = size * 0.065F
+        Dim penWidth = Math.Max(1.4F, size * 0.052F)
+
+        Using pen As New Pen(iconColor, penWidth) With {
+            .StartCap = LineCap.Round,
+            .EndCap = LineCap.Round
+        }
+            For index = 0 To 7
+                Dim angle = index * Math.PI / 4.0R
+                graphics.DrawLine(
+                    pen,
+                    centerX + CSng(Math.Cos(angle) * toothInnerRadius),
+                    centerY + CSng(Math.Sin(angle) * toothInnerRadius),
+                    centerX + CSng(Math.Cos(angle) * outerRadius),
+                    centerY + CSng(Math.Sin(angle) * outerRadius))
+            Next
+
+            graphics.DrawEllipse(pen, centerX - ringRadius, centerY - ringRadius, ringRadius * 2.0F, ringRadius * 2.0F)
+            graphics.DrawEllipse(pen, centerX - hubRadius, centerY - hubRadius, hubRadius * 2.0F, hubRadius * 2.0F)
+        End Using
+    End Sub
+
+    Private Shared Function 创建圆角路径(bounds As Rectangle, radius As Integer) As GraphicsPath
+        Dim path As New GraphicsPath()
+        Dim safeRadius = Math.Max(1, Math.Min(radius, Math.Min(bounds.Width, bounds.Height) \ 2))
+        Dim diameter = safeRadius * 2
+        path.AddArc(bounds.Left, bounds.Top, diameter, diameter, 180, 90)
+        path.AddArc(bounds.Right - diameter, bounds.Top, diameter, diameter, 270, 90)
+        path.AddArc(bounds.Right - diameter, bounds.Bottom - diameter, diameter, diameter, 0, 90)
+        path.AddArc(bounds.Left, bounds.Bottom - diameter, diameter, diameter, 90, 90)
+        path.CloseFigure()
+        Return path
+    End Function
 End Class
 
 ''' <summary>
@@ -27,12 +167,16 @@ Friend NotInheritable Class 插件详情视图_v6
     Private ReadOnly 标题字体 As New Font("Microsoft YaHei UI", 13.0F, FontStyle.Regular)
     Private ReadOnly 名称字体 As New Font("Microsoft YaHei UI", 12.0F, FontStyle.Regular)
     Private ReadOnly 正文字体 As New Font("Microsoft YaHei UI", 9.0F, FontStyle.Regular)
+    Private WithEvents MB_插件设置 As New 插件设置齿轮按钮_v6()
+    Private ReadOnly 设置提示 As New ToolTip()
     Private 数据 As New 插件详情显示数据_v6
     Private 信息行高度 As Integer() = Array.Empty(Of Integer)()
     Private 名称高度 As Integer
     Private 路径高度 As Integer
     Private 消息框高度 As Integer
     Private 正在更新高度 As Boolean
+
+    Public Event 设置入口点击 As EventHandler
 
     Public Sub New()
         SetStyle(ControlStyles.UserPaint Or
@@ -45,11 +189,19 @@ Friend NotInheritable Class 插件详情视图_v6
         Dock = DockStyle.Top
         Margin = Padding.Empty
         TabStop = False
+        配置设置按钮()
+        Controls.Add(MB_插件设置)
         更新布局测量()
     End Sub
 
     Public Sub 显示详情(value As 插件详情显示数据_v6)
         数据 = If(value, New 插件详情显示数据_v6)
+        MB_插件设置.Enabled = 数据.设置入口可用
+        MB_插件设置.TabStop = 数据.设置入口可用
+        MB_插件设置.ForeColor = If(数据.设置入口可用, Color.CornflowerBlue, Color.FromArgb(90, 255, 255, 255))
+        MB_插件设置.AccessibleDescription = If(数据.设置入口可用, "打开当前插件的设置页", "当前插件未提供可用的设置页")
+        设置提示.SetToolTip(MB_插件设置, If(数据.设置入口可用, "打开插件设置", "插件未提供设置页"))
+        MB_插件设置.Invalidate()
         更新布局测量()
         Invalidate()
     End Sub
@@ -70,7 +222,7 @@ Friend NotInheritable Class 插件详情视图_v6
         Dim badgeHeight = 缩放(28)
         Dim badgeRect As New Rectangle(Math.Max(0, width - badgeWidth), Math.Max(0, (headerHeight - badgeHeight) \ 2), badgeWidth, badgeHeight)
 
-        绘制文本(e.Graphics, "插件详情", 标题字体, New Rectangle(0, 0, Math.Max(0, badgeRect.Left - 缩放(8)), headerHeight), Color.Silver, TextFormatFlags.VerticalCenter Or TextFormatFlags.EndEllipsis)
+        绘制文本(e.Graphics, "插件详情", 标题字体, New Rectangle(0, 0, Math.Max(0, MB_插件设置.Left - 缩放(4)), headerHeight), Color.Silver, TextFormatFlags.VerticalCenter Or TextFormatFlags.EndEllipsis)
         绘制圆角矩形(e.Graphics, badgeRect, 缩放(9), Color.FromArgb(30, 数据.状态颜色))
         绘制文本(e.Graphics, 数据.状态文本, 正文字体, badgeRect, 数据.状态颜色, TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter Or TextFormatFlags.EndEllipsis)
         y += headerHeight
@@ -115,6 +267,7 @@ Friend NotInheritable Class 插件详情视图_v6
             标题字体.Dispose()
             名称字体.Dispose()
             正文字体.Dispose()
+            设置提示.Dispose()
         End If
         MyBase.Dispose(disposing)
     End Sub
@@ -144,6 +297,37 @@ Friend NotInheritable Class 插件详情视图_v6
                 正在更新高度 = False
             End Try
         End If
+        更新设置按钮位置()
+    End Sub
+
+    Private Sub 配置设置按钮()
+        MB_插件设置.AccessibleName = "插件设置"
+        MB_插件设置.BackColor = Color.Transparent
+        MB_插件设置.ForeColor = Color.FromArgb(90, 255, 255, 255)
+        MB_插件设置.Margin = Padding.Empty
+        MB_插件设置.Name = NameOf(MB_插件设置)
+        MB_插件设置.Size = New Size(28, 28)
+        MB_插件设置.Enabled = False
+        MB_插件设置.TabStop = False
+    End Sub
+
+    Private Sub 更新设置按钮位置()
+        Dim width = Math.Max(1, ClientSize.Width)
+        Dim headerHeight = 缩放(40)
+        Dim badgeWidth = Math.Min(Math.Max(缩放(72), 测量单行宽度(数据.状态文本, 正文字体) + 缩放(20)), Math.Max(缩放(72), width \ 2))
+        Dim badgeLeft = Math.Max(0, width - badgeWidth)
+        Dim buttonSize = 缩放(28)
+        MB_插件设置.Size = New Size(buttonSize, buttonSize)
+        Dim titleWidth = 测量单行宽度("插件详情", 标题字体)
+        ' TextRenderer 的测量值包含字体边距；额外预留空间，避免标题末字触发省略号。
+        Dim preferredLeft = titleWidth + 缩放(12)
+        Dim maximumLeft = Math.Max(0, badgeLeft - 缩放(8) - buttonSize)
+        MB_插件设置.Location = New Point(Math.Min(preferredLeft, maximumLeft), Math.Max(0, (headerHeight - buttonSize) \ 2))
+    End Sub
+
+    Private Sub MB_插件设置_Click(sender As Object, e As EventArgs) Handles MB_插件设置.Click
+        If Not 数据.设置入口可用 Then Exit Sub
+        RaiseEvent 设置入口点击(Me, EventArgs.Empty)
     End Sub
 
     Private Function 测量多行高度(text As String, font As Font, width As Integer, minimum As Integer, maximum As Integer) As Integer

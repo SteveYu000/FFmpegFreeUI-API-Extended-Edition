@@ -23,6 +23,7 @@ Friend Module Ext插件扩展宿主_v2
     Private ReadOnly 命令参数提供器列表 As New List(Of 已注册命令参数提供器)
     Private ReadOnly 命令步骤提供器列表 As New List(Of 已注册命令步骤提供器)
     Private ReadOnly 界面锚点列表 As New List(Of 已注册界面锚点)
+    Private ReadOnly 插件设置页表 As New Dictionary(Of String, 已注册插件设置页)(StringComparer.OrdinalIgnoreCase)
     Private ReadOnly 参数页面目录 As New Dictionary(Of String, ExtPluginParameterPageDescriptor)(StringComparer.OrdinalIgnoreCase)
     Private ReadOnly 参数控件目录 As New Dictionary(Of String, ExtPluginParameterControlDescriptor)(StringComparer.OrdinalIgnoreCase)
     Private ReadOnly 参数面板状态表 As New ConditionalWeakTable(Of Form_v6_参数面板, 参数面板插件状态)
@@ -79,6 +80,122 @@ Friend Module Ext插件扩展宿主_v2
         If id = "" Then Throw New ArgumentException("插件 ID 不能为空", NameOf(pluginId))
         Return New 插件作用域宿主(id, If(displayName, "").Trim())
     End Function
+
+    Private Function 注册插件设置页(pluginId As String, extension As ExtPluginSettingsPageExtension) As IDisposable
+        Dim id = If(pluginId, "").Trim()
+        If id = "" Then Throw New ArgumentException("插件 ID 不能为空", NameOf(pluginId))
+        If extension Is Nothing Then Throw New ArgumentNullException(NameOf(extension))
+        If extension.CreatePage Is Nothing Then Throw New ArgumentException("插件设置页工厂不能为空", NameOf(extension))
+
+        Dim registration As New 已注册插件设置页 With {
+            .PluginId = id,
+            .Extension = extension
+        }
+        SyncLock 同步锁
+            If 插件设置页表.ContainsKey(id) Then
+                Throw New InvalidOperationException($"插件 {id} 已注册设置页；每个 Ext 插件只能注册一个设置页")
+            End If
+            插件设置页表.Add(id, registration)
+        End SyncLock
+
+        Try
+            插件管理.注册Ext插件设置入口(id, Function() 创建插件设置页实例(registration))
+        Catch
+            SyncLock 同步锁
+                插件设置页表.Remove(id)
+                registration.Disposed = True
+            End SyncLock
+            Throw
+        End Try
+
+        Return New 注销句柄(Sub() 注销插件设置页(registration))
+    End Function
+
+    Private Function 创建插件设置页实例(registration As 已注册插件设置页) As Control
+        If registration Is Nothing Then Throw New ArgumentNullException(NameOf(registration))
+
+        SyncLock 同步锁
+            If registration.Disposed Then Throw New ObjectDisposedException("插件设置页注册")
+        End SyncLock
+
+        Dim context As New 插件设置页上下文(registration.PluginId)
+        Dim page As Control = Nothing
+        Try
+            If registration.Extension.CreatePage Is Nothing Then Throw New InvalidOperationException("插件设置页工厂已失效")
+            page = registration.Extension.CreatePage.Invoke(context)
+            If page Is Nothing OrElse page.IsDisposed Then
+                Throw New InvalidOperationException($"插件 {registration.PluginId} 的设置页工厂没有返回有效控件")
+            End If
+            If page.Parent IsNot Nothing Then
+                Throw New InvalidOperationException("插件设置页工厂必须返回尚未加入其他容器的新控件")
+            End If
+            Dim pageForm = TryCast(page, Form)
+            If pageForm IsNot Nothing AndAlso pageForm.TopLevel Then
+                pageForm.TopLevel = False
+                pageForm.FormBorderStyle = FormBorderStyle.None
+            End If
+
+            context.设置页面控件(page)
+            Dim instance As New 已创建插件设置页 With {
+                .Registration = registration,
+                .Context = context,
+                .Control = page
+            }
+            ' 先挂接释放通知，再把实例放入注册表，避免插件注销与页面创建并发时漏掉 Cleanup。
+            AddHandler page.Disposed, Sub() 清理插件设置页实例(instance)
+            SyncLock 同步锁
+                If registration.Disposed OrElse page.IsDisposed Then Throw New ObjectDisposedException("插件设置页注册")
+                registration.Instances.Add(instance)
+            End SyncLock
+            Return page
+        Catch
+            page?.Dispose()
+            Throw
+        End Try
+    End Function
+
+    Private Sub 注销插件设置页(registration As 已注册插件设置页)
+        If registration Is Nothing Then Exit Sub
+
+        Dim instances As List(Of 已创建插件设置页)
+        SyncLock 同步锁
+            If registration.Disposed Then Exit Sub
+            registration.Disposed = True
+            Dim current As 已注册插件设置页 = Nothing
+            If 插件设置页表.TryGetValue(registration.PluginId, current) AndAlso current Is registration Then
+                插件设置页表.Remove(registration.PluginId)
+            End If
+            instances = registration.Instances.ToList()
+            registration.Instances.Clear()
+        End SyncLock
+
+        插件管理.注销Ext插件设置入口(registration.PluginId)
+        For Each instance In instances
+            Dim page = instance.Control
+            If page Is Nothing OrElse page.IsDisposed Then
+                清理插件设置页实例(instance)
+            Else
+                在控件线程执行(page, Sub() page.Dispose())
+            End If
+        Next
+    End Sub
+
+    Private Sub 清理插件设置页实例(instance As 已创建插件设置页)
+        If instance Is Nothing Then Exit Sub
+        SyncLock instance
+            If instance.CleanupCalled Then Exit Sub
+            instance.CleanupCalled = True
+        End SyncLock
+
+        SyncLock 同步锁
+            instance.Registration?.Instances.Remove(instance)
+        End SyncLock
+        Try
+            instance.Registration?.Extension.Cleanup?.Invoke(instance.Context)
+        Catch ex As Exception
+            Debug.WriteLine($"[FFmpegFreeUI Plugin/Warning] {instance.Registration?.PluginId}: 清理插件设置页失败：{ex}")
+        End Try
+    End Sub
 
     Friend Sub 注册界面锚点(anchorId As String,
                          anchorControl As Control,
@@ -1524,6 +1641,7 @@ Friend Module Ext插件扩展宿主_v2
         Private ReadOnly _ui As IExtPluginUiRegistry
         Private ReadOnly _pageEntries As IExtPluginPageEntryRegistry
         Private ReadOnly _encodingQueueToolbar As IExtPluginEncodingQueueToolbarRegistry
+        Private ReadOnly _pluginSettings As IExtPluginSettingsRegistry
         Private ReadOnly _pipeline As IExtPluginPipelineRegistry
         Private ReadOnly _behaviors As IExtPluginBehaviorRegistry
         Private ReadOnly _resources As IExtPluginResourceRegistry
@@ -1539,6 +1657,7 @@ Friend Module Ext插件扩展宿主_v2
             _ui = New 插件界面注册表(pluginId, AddressOf 跟踪注册)
             _pageEntries = New Ext插件页面入口注册表_v2(pluginId, AddressOf 跟踪注册)
             _encodingQueueToolbar = New Ext编码队列工具栏注册表_v2(pluginId, AddressOf 跟踪注册)
+            _pluginSettings = New 插件设置注册表(pluginId, AddressOf 跟踪注册)
             _pipeline = New 插件处理注册表(pluginId, AddressOf 跟踪注册)
             _behaviors = New 插件行为注册表(pluginId, AddressOf 跟踪注册)
             _resources = New 插件资源注册表(pluginId, AddressOf 跟踪注册)
@@ -1574,6 +1693,12 @@ Friend Module Ext插件扩展宿主_v2
         Public ReadOnly Property EncodingQueueToolbar As IExtPluginEncodingQueueToolbarRegistry Implements IExtFFmpegFreeUIHost.EncodingQueueToolbar
             Get
                 Return _encodingQueueToolbar
+            End Get
+        End Property
+
+        Public ReadOnly Property PluginSettings As IExtPluginSettingsRegistry Implements IExtFFmpegFreeUIHost.PluginSettings
+            Get
+                Return _pluginSettings
             End Get
         End Property
 
@@ -1715,6 +1840,24 @@ Friend Module Ext插件扩展宿主_v2
 
         Public Function Claim(resourceClaim As ExtPluginResourceClaim) As IDisposable Implements IExtPluginResourceRegistry.Claim
             Dim registration = 注册资源声明(_pluginId, resourceClaim)
+            _track.Invoke(registration)
+            Return registration
+        End Function
+    End Class
+
+    Private NotInheritable Class 插件设置注册表
+        Implements IExtPluginSettingsRegistry
+
+        Private ReadOnly _pluginId As String
+        Private ReadOnly _track As Action(Of IDisposable)
+
+        Public Sub New(pluginId As String, track As Action(Of IDisposable))
+            _pluginId = pluginId
+            _track = track
+        End Sub
+
+        Public Function RegisterPage(extension As ExtPluginSettingsPageExtension) As IDisposable Implements IExtPluginSettingsRegistry.RegisterPage
+            Dim registration = 注册插件设置页(_pluginId, extension)
             _track.Invoke(registration)
             Return registration
         End Function
@@ -1944,6 +2087,42 @@ Friend Module Ext插件扩展宿主_v2
     Private NotInheritable Class 已注册资源声明
         Public Property PluginId As String
         Public Property Claim As ExtPluginResourceClaim
+    End Class
+
+    Private NotInheritable Class 已注册插件设置页
+        Public Property PluginId As String = ""
+        Public Property Extension As ExtPluginSettingsPageExtension
+        Public Property Disposed As Boolean
+        Public ReadOnly Instances As New List(Of 已创建插件设置页)
+    End Class
+
+    Private NotInheritable Class 已创建插件设置页
+        Public Property Registration As 已注册插件设置页
+        Public Property Context As 插件设置页上下文
+        Public Property Control As Control
+        Public Property CleanupCalled As Boolean
+    End Class
+
+    Private NotInheritable Class 插件设置页上下文
+        Implements IExtPluginSettingsPageContext
+
+        Private _pageControl As Control
+
+        Public Sub New(pluginId As String)
+            Me.PluginId = pluginId
+        End Sub
+
+        Public ReadOnly Property PluginId As String Implements IExtPluginSettingsPageContext.PluginId
+
+        Public ReadOnly Property PageControl As Control Implements IExtPluginSettingsPageContext.PageControl
+            Get
+                Return _pageControl
+            End Get
+        End Property
+
+        Public Sub 设置页面控件(control As Control)
+            _pageControl = control
+        End Sub
     End Class
 
     Private NotInheritable Class 已注册命令参数提供器

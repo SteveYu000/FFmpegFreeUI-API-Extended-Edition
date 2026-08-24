@@ -24,6 +24,8 @@ public interface IExtFFmpegFreeUIHost
     IExtPluginPageEntryRegistry PageEntries { get; }
     /// <summary>v2.4：编码队列顶部工具栏中的插件控件。</summary>
     IExtPluginEncodingQueueToolbarRegistry EncodingQueueToolbar { get; }
+    /// <summary>v2.4：插件管理页面中的当前插件设置页。</summary>
+    IExtPluginSettingsRegistry PluginSettings { get; }
     IExtPluginPipelineRegistry Pipeline { get; }
     IExtPluginBehaviorRegistry Behaviors { get; }
     IExtPluginResourceRegistry Resources { get; }
@@ -281,6 +283,18 @@ public enum ExtPluginLogLevel
     Information,
     Warning,
     Error
+}
+
+/// <summary>
+/// 相对于目标的位置。纵向 TabList 中的 Before/After 分别表示上方/下方；
+/// 横向工具栏中的 Before/After 分别表示左侧/右侧。
+/// </summary>
+public enum ExtPluginRelativePosition
+{
+    /// <summary>纵向 TabPage 目标上方，或横向工具栏目标左侧。</summary>
+    Before,
+    /// <summary>纵向 TabPage 目标下方，或横向工具栏目标右侧。</summary>
+    After
 }
 
 /// <summary>在宿主定义的稳定 UI 锚点上注册控件或装饰逻辑。</summary>
