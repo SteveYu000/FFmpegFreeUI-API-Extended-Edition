@@ -1,6 +1,6 @@
-# C# Ext Plugin API v2.4 综合示例
+# C# Ext Plugin API v2.5 综合示例
 
-本示例用六个场景覆盖当前主要公共接口：
+本示例用七个场景覆盖当前主要公共接口：
 
 1. 自动质量策略：在参数面板中保存 CRF，在预设捕获和任务准备阶段写入结构化预设。
 2. 命令与进程审计：修改任务名、输出后缀、进阶参数、最终命令和实际启动程序，并观察退出码。
@@ -8,6 +8,7 @@
 4. v2.3 扩展：枚举全部参数控件、装饰音频编码器、向音频页顶部加控件，并把声明式 metadata 和 `cmd.exe` 前置步骤同时带入预览、模板与执行队列。
 5. v2.4 页面入口与工具栏扩展：在主导航和参数面板一级导航中插入页面，并在编码队列“定位”按钮右侧插入自定义按钮。
 6. 插件设置入口：点亮插件详情卡片中的设置齿轮，在插件管理页面内部显示示例设置页。
+7. v2.5 预设总览行：从完整预设中的插件私有状态生成总览，使当前参数面板和预设管理器选中项显示一致。
 
 所有会改变任务或执行耗时工作的选项默认关闭。代码按职责拆成：
 
@@ -17,6 +18,7 @@
 - `SamplePlugin.Commands.cs`：v2.3 参数面板目录、动态控件清理、页面插入和声明式命令计划。
 - `SamplePlugin.PageEntriesAndToolbar.cs`：v2.4 主导航页、参数导航页和编码队列工具栏控件。
 - `SamplePlugin.Settings.cs`：v2.4 插件管理器内的可选设置页。
+- `SamplePlugin.PresetOverview.cs`：v2.5 基于完整预设快照的插件私有参数总览行。
 
 ## 接口覆盖
 
@@ -25,10 +27,11 @@
 - `Resources.Claim`：声明对原始控件的观察意图，展示冲突协调入口。
 
 - `IExtFFmpegFreeUIPlugin`：`Id`、`DisplayName`、`Initialize`。
-- `IExtFFmpegFreeUIHost`：`ApiVersion`、`HostVersion`、`PageEntries`、`EncodingQueueToolbar`、`PluginSettings`、`Ui`、`Pipeline`、4 种 `Log` 级别。
+- `IExtFFmpegFreeUIHost`：`ApiVersion`、`HostVersion`、`PageEntries`、`EncodingQueueToolbar`、`PluginSettings`、`PresetOverview`、`Ui`、`Pipeline`、4 种 `Log` 级别。
 - `IExtFFmpegFreeUIHost.PageEntries`：枚举稳定页面目标，并用 `RegisterPage` 相对插入任意数量的页面入口。
 - `IExtFFmpegFreeUIHost.EncodingQueueToolbar`：枚举编码队列顶栏目标，并用 `RegisterControl` 插入自定义控件。
 - `IExtFFmpegFreeUIHost.PluginSettings`：在插件详情卡片中提供齿轮入口，并按需创建一个设置页。
+- `IExtFFmpegFreeUIHost.PresetOverview`：根据完整 `PresetJson` 和当前插件的 `PluginStateJson` 生成有序总览行。
 - `IExtFFmpegFreeUIHost.ParameterPanel`：参数页与全部原生控件目录。
 - `IExtFFmpegFreeUIHost.Commands`：声明式参数与外部命令步骤。
 - `AvailablePages` / `AvailableControls`：页面插槽、全部原生控件锚点和动态资源 ID。

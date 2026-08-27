@@ -656,6 +656,7 @@ Public Class 插件管理
                     Dim hasExtReference As Boolean
                     Dim requiresV23 As Boolean
                     Dim requiresV24 As Boolean
+                    Dim requiresV25 As Boolean
                     For Each handle In metadata.AssemblyReferences
                         Dim reference = metadata.GetAssemblyReference(handle)
                         If String.Equals(metadata.GetString(reference.Name), "FFmpegFreeUI.Ext.PluginSdk", StringComparison.OrdinalIgnoreCase) Then
@@ -678,17 +679,27 @@ Public Class 插件管理
                         "ExtFFmpegFreeUIPageTargets", "ExtFFmpegFreeUIToolbarTargets",
                         "IExtPluginSettingsRegistry", "ExtPluginSettingsPageExtension", "IExtPluginSettingsPageContext"
                     }
+                    Dim v25Types = New HashSet(Of String)(StringComparer.Ordinal) From {
+                        "IExtPluginPresetOverviewRegistry", "ExtPluginPresetOverviewRowProvider",
+                        "ExtPluginPresetOverviewContext", "ExtPluginPresetOverviewRow",
+                        "ExtPluginPresetOverviewRowLevel"
+                    }
                     For Each handle In metadata.TypeReferences
                         Dim reference = metadata.GetTypeReference(handle)
                         Dim typeName = metadata.GetString(reference.Name)
                         If v23Types.Contains(typeName) Then requiresV23 = True
                         If v24Types.Contains(typeName) Then requiresV24 = True
+                        If v25Types.Contains(typeName) Then requiresV25 = True
                     Next
-                    If Not requiresV24 OrElse Not requiresV23 Then
+                    If Not requiresV25 OrElse Not requiresV24 OrElse Not requiresV23 Then
                         For Each handle In metadata.MemberReferences
                             Dim member = metadata.GetMemberReference(handle)
                             Dim memberName = metadata.GetString(member.Name)
-                            If String.Equals(memberName, "PageEntries", StringComparison.Ordinal) OrElse
+                            If String.Equals(memberName, "PresetOverview", StringComparison.Ordinal) OrElse
+                               String.Equals(memberName, "get_PresetOverview", StringComparison.Ordinal) OrElse
+                               String.Equals(memberName, "RegisterRowProvider", StringComparison.Ordinal) Then
+                                requiresV25 = True
+                            ElseIf String.Equals(memberName, "PageEntries", StringComparison.Ordinal) OrElse
                                String.Equals(memberName, "EncodingQueueToolbar", StringComparison.Ordinal) OrElse
                                String.Equals(memberName, "PluginSettings", StringComparison.Ordinal) OrElse
                                String.Equals(memberName, "RegisterPage", StringComparison.Ordinal) OrElse
@@ -702,7 +713,11 @@ Public Class 插件管理
                     End If
 
                     If hasExtReference Then
-                        info.ExtAPI最低版本 = If(requiresV24, "v2.4（推断）", If(requiresV23, "v2.3（推断）", "v2.2（推断）"))
+                        info.ExtAPI最低版本 = If(requiresV25,
+                                                  "v2.5（推断）",
+                                                  If(requiresV24,
+                                                     "v2.4（推断）",
+                                                     If(requiresV23, "v2.3（推断）", "v2.2（推断）")))
                     End If
                     If hasOfficialEntry AndAlso hasExtReference Then
                         info.接口类型 = 插件接口类型_v6.官方与Ext

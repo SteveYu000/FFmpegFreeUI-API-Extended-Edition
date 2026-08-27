@@ -26,6 +26,8 @@ public interface IExtFFmpegFreeUIHost
     IExtPluginEncodingQueueToolbarRegistry EncodingQueueToolbar { get; }
     /// <summary>v2.4：插件管理页面中的当前插件设置页。</summary>
     IExtPluginSettingsRegistry PluginSettings { get; }
+    /// <summary>v2.5：从任意完整预设快照生成插件私有参数总览行。</summary>
+    IExtPluginPresetOverviewRegistry PresetOverview { get; }
     IExtPluginPipelineRegistry Pipeline { get; }
     IExtPluginBehaviorRegistry Behaviors { get; }
     IExtPluginResourceRegistry Resources { get; }
@@ -770,7 +772,7 @@ public enum ExtPluginTaskStatus
 /// <summary>稳定的 API 与发现机制常量。</summary>
 public static class ExtFFmpegFreeUIPluginApi
 {
-    public static Version Version { get; } = new(2, 4, 0);
+    public static Version Version { get; } = new(2, 5, 0);
 }
 
 /// <summary>宿主当前提供的 UI 锚点 ID。</summary>

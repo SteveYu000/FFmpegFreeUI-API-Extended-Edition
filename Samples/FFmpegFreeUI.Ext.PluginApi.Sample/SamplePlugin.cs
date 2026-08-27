@@ -8,7 +8,7 @@ using FFmpegFreeUI.Ext.PluginSdk;
 namespace FFmpegFreeUI.Ext.PluginApi.Sample;
 
 /// <summary>
-/// C# 综合示例：以“自动质量策略、命令审计、输出校验”为应用场景，展示 Ext Plugin API v2.4
+/// C# 综合示例：以“自动质量策略、命令审计、输出校验”为应用场景，展示 Ext Plugin API v2.5
 /// 的布局注册、参数面板目录、声明式命令计划、兼容 UI 锚点和处理阶段。所有会改变任务的选项默认关闭。
 /// </summary>
 public sealed partial class SamplePlugin : IExtFFmpegFreeUIPlugin
@@ -46,6 +46,7 @@ public sealed partial class SamplePlugin : IExtFFmpegFreeUIPlugin
         RegisterPageEntries(host);
         RegisterEncodingQueueToolbarControls(host);
         RegisterPluginSettings(host);
+        RegisterPresetOverview(host);
 
         // AvailableAnchors / AvailableStages 可用于兼容较旧宿主；不要反射查找宿主私有控件或方法。
         var missingAnchors = ExtFFmpegFreeUIUiAnchors.All.Except(

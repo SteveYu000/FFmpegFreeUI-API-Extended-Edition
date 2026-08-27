@@ -13,7 +13,7 @@ Imports LakeUI
 ''' </summary>
 Friend Module Ext插件扩展宿主_v2
 
-    Private ReadOnly 支持API版本 As New Version(2, 4, 0)
+    Private ReadOnly 支持API版本 As New Version(2, 5, 0)
     Private ReadOnly 同步锁 As New Object
     Private ReadOnly 界面扩展列表 As New List(Of 已注册界面扩展)
     Private ReadOnly 安全下拉项列表 As New List(Of 已注册安全下拉项)
@@ -22,6 +22,7 @@ Friend Module Ext插件扩展宿主_v2
     Private ReadOnly 资源声明列表 As New List(Of 已注册资源声明)
     Private ReadOnly 命令参数提供器列表 As New List(Of 已注册命令参数提供器)
     Private ReadOnly 命令步骤提供器列表 As New List(Of 已注册命令步骤提供器)
+    Private ReadOnly 预设总览行提供器列表 As New List(Of 已注册预设总览行提供器)
     Private ReadOnly 界面锚点列表 As New List(Of 已注册界面锚点)
     Private ReadOnly 插件设置页表 As New Dictionary(Of String, 已注册插件设置页)(StringComparer.OrdinalIgnoreCase)
     Private ReadOnly 参数页面目录 As New Dictionary(Of String, ExtPluginParameterPageDescriptor)(StringComparer.OrdinalIgnoreCase)
@@ -510,12 +511,51 @@ Friend Module Ext插件扩展宿主_v2
         Return result
     End Function
 
+    Friend Function 解析插件预设总览行(source As Ext插件预设总览上下文_v2) As List(Of Ext插件预设总览行_v2)
+        If source Is Nothing Then Throw New ArgumentNullException(NameOf(source))
+        Dim result As New List(Of Ext插件预设总览行_v2)
+        For Each registration In 获取预设总览行提供器()
+            Dim context As New ExtPluginPresetOverviewContext(
+                registration.PluginId,
+                If(source.PresetJson, ""),
+                读取插件状态(source.PresetJson, registration.PluginId))
+            Try
+                registration.Provider.Callback.Invoke(context)
+            Catch ex As Exception
+                Debug.WriteLine(
+                    $"[FFmpegFreeUI Ext Plugin] 插件 {registration.PluginId} 的预设总览提供器 " &
+                    $"{registration.Provider.Id} 生成失败：{ex}")
+                result.Add(New Ext插件预设总览行_v2 With {
+                    .PluginId = registration.PluginId,
+                    .ProviderId = registration.Provider.Id,
+                    .Text = 规范化预设总览行文本($"插件 {registration.PluginId} 的预设总览生成失败：{ex.Message}"),
+                    .Order = Integer.MaxValue,
+                    .Level = Ext插件预设总览行级别_v2.错误
+                })
+                Continue For
+            End Try
+
+            For Each row In context.Rows.
+                Where(Function(item) item IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(item.Text)).
+                OrderBy(Function(item) item.Order)
+                result.Add(New Ext插件预设总览行_v2 With {
+                    .PluginId = registration.PluginId,
+                    .ProviderId = registration.Provider.Id,
+                    .Text = 规范化预设总览行文本(row.Text),
+                    .Order = row.Order,
+                    .Level = 转换预设总览行级别(row.Level)
+                })
+            Next
+        Next
+        Return result
+    End Function
+
     Private Function 创建插件命令上下文(source As Ext插件命令解析上下文_v2,
                                   pluginId As String) As ExtPluginCommandContext
         Dim result As New ExtPluginCommandContext With {
             .PluginId = pluginId,
             .PresetJson = If(source.PresetJson, ""),
-            .PluginStateJson = 读取插件命令状态(source.PresetJson, pluginId),
+            .PluginStateJson = 读取插件状态(source.PresetJson, pluginId),
             .InputPath = If(source.InputPath, ""),
             .OutputPath = If(source.OutputPath, ""),
             .TaskId = If(source.TaskId, ""),
@@ -528,7 +568,7 @@ Friend Module Ext插件扩展宿主_v2
         Return result
     End Function
 
-    Private Function 读取插件命令状态(presetJson As String, pluginId As String) As String
+    Private Function 读取插件状态(presetJson As String, pluginId As String) As String
         If String.IsNullOrWhiteSpace(presetJson) OrElse String.IsNullOrWhiteSpace(pluginId) Then Return "{}"
         Try
             Using document = JsonDocument.Parse(presetJson)
@@ -547,6 +587,25 @@ Friend Module Ext插件扩展宿主_v2
             Return "{}"
         End Try
         Return "{}"
+    End Function
+
+    Private Function 转换预设总览行级别(level As ExtPluginPresetOverviewRowLevel) As Ext插件预设总览行级别_v2
+        Select Case level
+            Case ExtPluginPresetOverviewRowLevel.Warning
+                Return Ext插件预设总览行级别_v2.警告
+            Case ExtPluginPresetOverviewRowLevel.Error
+                Return Ext插件预设总览行级别_v2.错误
+            Case Else
+                Return Ext插件预设总览行级别_v2.普通
+        End Select
+    End Function
+
+    Private Function 规范化预设总览行文本(value As String) As String
+        Return If(value, "").
+            Replace(vbCrLf, " ").
+            Replace(vbCr, " ").
+            Replace(vbLf, " ").
+            Trim()
     End Function
 
     Private Function 转换命令参数位置(position As ExtPluginCommandArgumentPosition) As Ext插件命令参数位置_v2
@@ -918,6 +977,34 @@ Friend Module Ext插件扩展宿主_v2
         End Try
     End Function
 
+    Private Function 注册预设总览行提供器(pluginId As String,
+                                    provider As ExtPluginPresetOverviewRowProvider) As IDisposable
+        If provider Is Nothing Then Throw New ArgumentNullException(NameOf(provider))
+        If String.IsNullOrWhiteSpace(provider.Id) Then Throw New ArgumentException("预设总览行提供器 ID 不能为空")
+        If provider.Callback Is Nothing Then Throw New ArgumentException("预设总览行提供器回调不能为空")
+        provider.Id = provider.Id.Trim()
+
+        Dim registration As New 已注册预设总览行提供器 With {
+            .PluginId = pluginId,
+            .Provider = provider
+        }
+        SyncLock 同步锁
+            If 预设总览行提供器列表.Any(
+                Function(item) String.Equals(item.PluginId, pluginId, StringComparison.OrdinalIgnoreCase) AndAlso
+                               String.Equals(item.Provider.Id, provider.Id, StringComparison.OrdinalIgnoreCase)) Then
+                Throw New InvalidOperationException($"插件 {pluginId} 已注册预设总览行提供器 {provider.Id}")
+            End If
+            预设总览行提供器列表.Add(registration)
+        End SyncLock
+
+        Return New 注销句柄(
+            Sub()
+                SyncLock 同步锁
+                    预设总览行提供器列表.Remove(registration)
+                End SyncLock
+            End Sub)
+    End Function
+
     Private Function 获取命令参数提供器() As List(Of 已注册命令参数提供器)
         SyncLock 同步锁
             Return 命令参数提供器列表.
@@ -932,6 +1019,17 @@ Friend Module Ext插件扩展宿主_v2
     Private Function 获取命令步骤提供器() As List(Of 已注册命令步骤提供器)
         SyncLock 同步锁
             Return 命令步骤提供器列表.
+                OrderBy(Function(item) 插件管理.获取插件处理顺序(item.PluginId)).
+                ThenBy(Function(item) item.Provider.Order).
+                ThenBy(Function(item) item.PluginId, StringComparer.OrdinalIgnoreCase).
+                ThenBy(Function(item) item.Provider.Id, StringComparer.OrdinalIgnoreCase).
+                ToList()
+        End SyncLock
+    End Function
+
+    Private Function 获取预设总览行提供器() As List(Of 已注册预设总览行提供器)
+        SyncLock 同步锁
+            Return 预设总览行提供器列表.
                 OrderBy(Function(item) 插件管理.获取插件处理顺序(item.PluginId)).
                 ThenBy(Function(item) item.Provider.Order).
                 ThenBy(Function(item) item.PluginId, StringComparer.OrdinalIgnoreCase).
@@ -1642,6 +1740,7 @@ Friend Module Ext插件扩展宿主_v2
         Private ReadOnly _pageEntries As IExtPluginPageEntryRegistry
         Private ReadOnly _encodingQueueToolbar As IExtPluginEncodingQueueToolbarRegistry
         Private ReadOnly _pluginSettings As IExtPluginSettingsRegistry
+        Private ReadOnly _presetOverview As IExtPluginPresetOverviewRegistry
         Private ReadOnly _pipeline As IExtPluginPipelineRegistry
         Private ReadOnly _behaviors As IExtPluginBehaviorRegistry
         Private ReadOnly _resources As IExtPluginResourceRegistry
@@ -1658,6 +1757,7 @@ Friend Module Ext插件扩展宿主_v2
             _pageEntries = New Ext插件页面入口注册表_v2(pluginId, AddressOf 跟踪注册)
             _encodingQueueToolbar = New Ext编码队列工具栏注册表_v2(pluginId, AddressOf 跟踪注册)
             _pluginSettings = New 插件设置注册表(pluginId, AddressOf 跟踪注册)
+            _presetOverview = New 插件预设总览注册表(pluginId, AddressOf 跟踪注册)
             _pipeline = New 插件处理注册表(pluginId, AddressOf 跟踪注册)
             _behaviors = New 插件行为注册表(pluginId, AddressOf 跟踪注册)
             _resources = New 插件资源注册表(pluginId, AddressOf 跟踪注册)
@@ -1699,6 +1799,12 @@ Friend Module Ext插件扩展宿主_v2
         Public ReadOnly Property PluginSettings As IExtPluginSettingsRegistry Implements IExtFFmpegFreeUIHost.PluginSettings
             Get
                 Return _pluginSettings
+            End Get
+        End Property
+
+        Public ReadOnly Property PresetOverview As IExtPluginPresetOverviewRegistry Implements IExtFFmpegFreeUIHost.PresetOverview
+            Get
+                Return _presetOverview
             End Get
         End Property
 
@@ -1858,6 +1964,24 @@ Friend Module Ext插件扩展宿主_v2
 
         Public Function RegisterPage(extension As ExtPluginSettingsPageExtension) As IDisposable Implements IExtPluginSettingsRegistry.RegisterPage
             Dim registration = 注册插件设置页(_pluginId, extension)
+            _track.Invoke(registration)
+            Return registration
+        End Function
+    End Class
+
+    Private NotInheritable Class 插件预设总览注册表
+        Implements IExtPluginPresetOverviewRegistry
+
+        Private ReadOnly _pluginId As String
+        Private ReadOnly _track As Action(Of IDisposable)
+
+        Public Sub New(pluginId As String, track As Action(Of IDisposable))
+            _pluginId = pluginId
+            _track = track
+        End Sub
+
+        Public Function RegisterRowProvider(provider As ExtPluginPresetOverviewRowProvider) As IDisposable Implements IExtPluginPresetOverviewRegistry.RegisterRowProvider
+            Dim registration = 注册预设总览行提供器(_pluginId, provider)
             _track.Invoke(registration)
             Return registration
         End Function
@@ -2133,6 +2257,11 @@ Friend Module Ext插件扩展宿主_v2
     Private NotInheritable Class 已注册命令步骤提供器
         Public Property PluginId As String
         Public Property Provider As ExtPluginCommandStepProvider
+    End Class
+
+    Private NotInheritable Class 已注册预设总览行提供器
+        Public Property PluginId As String
+        Public Property Provider As ExtPluginPresetOverviewRowProvider
     End Class
 
     Private NotInheritable Class 已注册界面锚点

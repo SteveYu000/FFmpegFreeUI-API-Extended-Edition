@@ -2,7 +2,7 @@
 
 仓库标识：`FFmpegFreeUI-API-Extended-Edition`
 
-当前版本：`v6.1.39-ext.3+v2.4`（官方基线 `v6.1.39`、扩展修订 `ext.3`、Ext API `v2.4`）
+当前版本：`v6.1.40-ext.1+v2.5`（官方基线 `v6.1.40`、扩展修订 `ext.1`、Ext API `v2.5`）
 
 版本规则：`v{官方版本号}-ext.{扩展修订号}+v{Ext API 主版本.次版本}`。
 
@@ -17,6 +17,7 @@ Ext Plugin API v2 补充官方插件 API 尚未提供的能力，主要包括：
 - 在左侧主导航或参数面板一级导航的任意原生选项卡上方/下方插入任意数量的插件页面；
 - 在编码队列顶部任意原生按钮的左侧/右侧插入自定义 WinForms 控件；
 - 在插件管理器中提供可选设置页，不占用主窗口最左侧导航；
+- 基于宿主当前正在查看的完整预设生成插件私有参数总览行，使参数面板、预设管理和其他总览保持一致；
 - 声明式追加 FFmpeg 参数，使参数预览、命令模板和实际执行使用同一结果；
 - 把插件自定义外部命令注册为可预览、可取消、受退出码和日志统一管理的队列步骤；
 - 在预设、队列、任务准备、命令构建、外部进程和任务终态阶段注册有序处理器；
@@ -44,11 +45,11 @@ Ext Plugin API v2 是可选组件。只有程序根目录同时存在 `FFmpegFre
 
 完整的接入方法、UI 锚点、处理阶段和可修改字段，请阅读 [Ext Plugin API v2 中文开发指南](doc/Ext-Plugin-API-v2.zh-CN.md)。
 
-仓库同时提供 [C# v2.4 综合示例](Samples/FFmpegFreeUI.Ext.PluginApi.Sample) 和 [VB.NET v2.2 兼容基线示例](Samples/FFmpegFreeUI.Ext.PluginApi.VbVmafSample)。C# 示例覆盖导航页面、编码队列工具栏控件、插件管理内设置页、动态参数控件、声明式参数和自定义命令步骤；两者分别以 SHA-256 与 VMAF 展示成功后处理。
+仓库同时提供 [C# v2.5 综合示例](Samples/FFmpegFreeUI.Ext.PluginApi.Sample) 和 [VB.NET v2.2 兼容基线示例](Samples/FFmpegFreeUI.Ext.PluginApi.VbVmafSample)。C# 示例覆盖预设总览行、导航页面、编码队列工具栏控件、插件管理内设置页、动态参数控件、声明式参数和自定义命令步骤；两者分别以 SHA-256 与 VMAF 展示成功后处理。
 
 SDK 已发布到 [NuGet.org](https://www.nuget.org/packages/FFmpegFreeUI.Ext.PluginSdk)，独立插件推荐直接使用 `PackageReference`；源码引用和 DLL + XML 文档引用继续用于 SDK 联调与离线开发。`ExtDeployFFmpegFreeUIPlugin` MSBuild 目标可用一条命令完成插件还原、编译与依赖部署，具体配置见开发指南第 2、3、17 节。
 
-从源码构建主程序只需正常克隆仓库并执行 `dotnet restore`。主程序通过 NuGet 使用 `LakeUI 3.23.0`，无需再初始化 LakeUI 源码子模块。
+从源码构建主程序只需正常克隆仓库并执行 `dotnet restore`。主程序通过 NuGet 使用 `LakeUI 3.31.0`，无需再初始化 LakeUI 源码子模块。
 
 ---
 

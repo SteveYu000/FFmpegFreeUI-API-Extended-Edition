@@ -112,6 +112,7 @@ Partial Public Class 预设管理_v6
         If Not String.IsNullOrWhiteSpace(a.自定义参数_完全自己写) Then
             添加总览文本行(sb, "正在使用完全自己写参数模式，其他参数均不会生效")
             添加总览文本行(sb, "完全自己写参数：" & a.自定义参数_完全自己写)
+            添加插件预设总览行(sb, a)
             设置参数总览文本(MTB, sb.ToString())
             Exit Sub
         End If
@@ -395,6 +396,7 @@ Partial Public Class 预设管理_v6
             Next
         End If
 
+        添加插件预设总览行(sb, a)
         设置参数总览文本(MTB, If(sb.Length > 0, sb.ToString(), "未设置参数"))
     End Sub
 
@@ -413,6 +415,21 @@ Partial Public Class 预设管理_v6
         sb.AppendLine(文本)
     End Sub
 
+    Private Shared Sub 添加插件预设总览行(sb As StringBuilder, a As 预设数据_v6)
+        If sb Is Nothing OrElse a Is Nothing Then Exit Sub
+        For Each row In Ext插件扩展桥接_v2.解析插件预设总览行(a)
+            If row Is Nothing OrElse String.IsNullOrWhiteSpace(row.Text) Then Continue For
+            Dim text = row.Text.Trim()
+            Select Case row.Level
+                Case Ext插件预设总览行级别_v2.警告
+                    If Not text.StartsWith("警告：", StringComparison.Ordinal) Then text = "警告：" & text
+                Case Ext插件预设总览行级别_v2.错误
+                    If Not text.StartsWith("错误：", StringComparison.Ordinal) Then text = "错误：" & text
+            End Select
+            添加总览文本行(sb, text)
+        Next
+    End Sub
+
     Private Shared Sub 设置参数总览文本(MTB As ModernTextBox, 文本 As String)
         If MTB Is Nothing Then Exit Sub
         MTB.Clear()
@@ -426,6 +443,7 @@ Partial Public Class 预设管理_v6
     Private Shared Function 获取参数总览行颜色(文本 As String) As Color
         Dim line = If(文本, "")
         If line.StartsWith("警告：", StringComparison.Ordinal) Then Return 界面配色_v6.错误文本色
+        If line.StartsWith("错误：", StringComparison.Ordinal) Then Return 界面配色_v6.错误文本色
         If line.Contains("没有指定输出容器", StringComparison.Ordinal) OrElse line.Contains("没有指定输出后缀", StringComparison.Ordinal) Then Return 界面配色_v6.错误文本色
         If line.Contains("没有指定 AviSynth 模板", StringComparison.Ordinal) OrElse line.Contains("没有指定 VapourSynth 模板", StringComparison.Ordinal) Then Return 界面配色_v6.错误文本色
         If line.Contains("必须指定解码硬件的参数", StringComparison.Ordinal) Then Return 界面配色_v6.错误文本色

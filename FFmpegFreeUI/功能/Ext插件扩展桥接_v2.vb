@@ -91,6 +91,26 @@ Public NotInheritable Class Ext插件命令步骤_v2
     Public Property ParseFFmpegProgress As Boolean
 End Class
 
+''' <summary>核心与可选宿主之间传递的预设总览解析上下文。</summary>
+Public NotInheritable Class Ext插件预设总览上下文_v2
+    Public Property PresetJson As String = ""
+End Class
+
+Public Enum Ext插件预设总览行级别_v2
+    普通
+    警告
+    错误
+End Enum
+
+''' <summary>插件宿主返回给核心的一行预设总览文本。</summary>
+Public NotInheritable Class Ext插件预设总览行_v2
+    Public Property PluginId As String = ""
+    Public Property ProviderId As String = ""
+    Public Property Text As String = ""
+    Public Property Order As Integer
+    Public Property Level As Ext插件预设总览行级别_v2
+End Class
+
 ''' <summary>核心内部使用的稳定 UI 锚点 ID。</summary>
 Friend Module Ext插件界面锚点_v2
     Friend Const 视频质量控制方式 As String = "ext.parameters.video.quality.mode"
@@ -354,6 +374,15 @@ Friend Module Ext插件扩展桥接_v2
         If Not 可用 Then Return New List(Of Ext插件命令步骤_v2)
         Return If(TryCast(调用可选宿主(NameOf(解析插件命令步骤), context), List(Of Ext插件命令步骤_v2)),
                   New List(Of Ext插件命令步骤_v2))
+    End Function
+
+    Friend Function 解析插件预设总览行(preset As 预设数据_v6) As List(Of Ext插件预设总览行_v2)
+        If preset Is Nothing OrElse Not 可用 Then Return New List(Of Ext插件预设总览行_v2)
+        Dim context As New Ext插件预设总览上下文_v2 With {
+            .PresetJson = 序列化预设(preset)
+        }
+        Return If(TryCast(调用可选宿主(NameOf(解析插件预设总览行), context), List(Of Ext插件预设总览行_v2)),
+                  New List(Of Ext插件预设总览行_v2))
     End Function
 
     Friend Function 创建预设管线上下文(stageId As String,

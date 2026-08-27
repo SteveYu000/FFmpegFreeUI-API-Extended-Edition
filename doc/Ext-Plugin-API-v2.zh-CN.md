@@ -1,6 +1,6 @@
-# FFmpegFreeUI Ext Plugin API v2.4 插件开发指南
+# FFmpegFreeUI Ext Plugin API v2.5 插件开发指南
 
-本文面向希望扩展 FFmpegFreeUI 界面、原生参数和任务处理链的插件开发者，对应 Ext Plugin API `2.4.0`。
+本文面向希望扩展 FFmpegFreeUI 界面、原生参数和任务处理链的插件开发者，对应 Ext Plugin API `2.5.0`。
 
 > **这篇指南不需要从头看到尾。** 先看下面的接口选择表，确定插件要做什么；然后只阅读“基础必读 + 对应能力 + 构建部署”三部分。插件只应引用 `FFmpegFreeUI.Ext.PluginSdk`，不要引用宿主内部程序集或通过反射访问私有控件。
 
@@ -22,6 +22,7 @@
 - [6. UI：修改原生参数与增加控件](#ui-extension)
     - [页面入口与编码队列工具栏](#page-entry-and-toolbar)
     - [插件管理内设置页](#plugin-settings-page)
+    - [预设总览行提供器](#preset-overview)
 - [7. 命令与任务：处理链和声明式命令](#pipeline-and-commands)
 - [8. 深度定制：原生行为点与 UI 替换](#behavior-extension)
 - [9. 处理链生命周期与全部阶段](#pipeline-lifecycle)
@@ -48,15 +49,16 @@
 | 接口 | 主要成员 | 用途 | 详细说明 |
 |---|---|---|---|
 | `IExtFFmpegFreeUIPlugin` | `Id`、`DisplayName`、`Initialize(host)` | 插件递给 FFmpegFreeUI 的入口。宿主发现插件后调用 `Initialize`，插件在这里注册所需能力。 | [第 4 节](#plugin-entry) |
-| `IExtFFmpegFreeUIHost` | `ApiVersion`、`HostVersion`、`PageEntries`、`EncodingQueueToolbar`、`PluginSettings`、`Ui`、`ParameterPanel`、`Commands`、`Pipeline`、`Behaviors`、`Resources`、`Log` | FFmpegFreeUI 递给插件的功能入口。先检查 `ApiVersion`，再使用需要的注册表。 | [第 5 节](#host-interface) |
+| `IExtFFmpegFreeUIHost` | `ApiVersion`、`HostVersion`、`PageEntries`、`EncodingQueueToolbar`、`PluginSettings`、`PresetOverview`、`Ui`、`ParameterPanel`、`Commands`、`Pipeline`、`Behaviors`、`Resources`、`Log` | FFmpegFreeUI 递给插件的功能入口。先检查 `ApiVersion`，再使用需要的注册表。 | [第 5 节](#host-interface) |
 
-### 0.2 九类能力与接口对应表
+### 0.2 十类能力与接口对应表
 
 | 能力 | 从 `host` 进入 | 主要接口、成员和类型 | 用途 | 详细说明 |
 |---|---|---|---|---|
 | 插件页面入口 | `host.PageEntries` | `AvailableTargets`、`RegisterPage`；页面目标、扩展和上下文 | 在左侧主导航或参数面板一级导航的任意原生选项卡上方/下方插入页面。 | [页面入口](#page-entries) |
 | 编码队列工具栏 | `host.EncodingQueueToolbar` | `AvailableTargets`、`RegisterControl`；工具栏目标、控件扩展和上下文 | 在编码队列任意原生按钮左侧/右侧插入自定义控件。 | [编码队列工具栏](#encoding-queue-toolbar) |
 | 插件设置页 | `host.PluginSettings` | `RegisterPage`；设置页扩展和上下文 | 在插件管理器中提供可选设置入口，不占用主导航。每个 Ext 插件最多注册一个。 | [插件管理内设置页](#plugin-settings-page) |
+| 预设总览行 | `host.PresetOverview` | `RegisterRowProvider`；总览提供器、上下文、总览行和级别 | 根据宿主当前正在查看的完整预设显示插件私有参数；参数面板、预设管理和其他宿主总览使用同一结果。 | [预设总览行提供器](#preset-overview) |
 | 参数面板目录 | `host.ParameterPanel` | `IExtPluginParameterPanelCatalog.AvailablePages`、`AvailableControls`；页面/控件描述符；`ExtPluginControlAccess.TryGetValue`、`TrySetValue`、`TryGetProperty`、`TrySetProperty` | 找到原有参数页和控件，知道控件的稳定锚点、资源 ID 和默认值属性；取得真实控件后读取或修改公开属性。 | [参数面板目录与全部控件](#parameter-panel-catalog) |
 | 安全 UI 扩展 | `host.Ui` | `IExtPluginUiRegistry.AvailableAnchors`、`AvailableChoiceAnchors`、`Register`、`RegisterChoice`；`ExtPluginUiExtension`、`ExtPluginUiChoiceExtension`、两个 UI 上下文 | 在原页面增加控件、装饰或替换原控件，或者给宿主管理的下拉框增加稳定选项。 | [第 6 节](#ui-extension) |
 | 声明式命令 | `host.Commands` | `IExtPluginCommandRegistry.RegisterParameterProvider`、`RegisterStepProvider`；`ExtPluginCommandContext.Arguments`、`Steps`；参数和步骤类型 | 让插件参数同时进入预览、命令模板和实际 FFmpeg 命令；或者增加由队列统一执行的外部程序步骤。 | [声明式参数](#declarative-arguments) / [外部命令步骤](#declarative-steps) |
@@ -75,6 +77,7 @@
 | 在参数面板一级选项卡任意位置插入一个或多个页面 | `host.PageEntries.RegisterPage` | [页面入口](#page-entries) |
 | 在编码队列顶部任意按钮左侧/右侧插入控件 | `host.EncodingQueueToolbar.RegisterControl` | [编码队列工具栏](#encoding-queue-toolbar) |
 | 插件只需要一个设置页，不希望占用最左侧导航 | `host.PluginSettings.RegisterPage` | [插件管理内设置页](#plugin-settings-page) |
+| 在参数面板和预设管理的参数总览中显示插件私有参数 | `host.PresetOverview.RegisterRowProvider` | [预设总览行提供器](#preset-overview) |
 | 在原有参数页顶部或底部增加输入框、按钮或整块面板 | `host.ParameterPanel` + `host.Ui.Register` | [任意参数页增加控件](#insert-controls-on-page) |
 | 查找、读取或修改现有的视频/音频参数控件 | `host.ParameterPanel` + `host.Ui.Register` + `ExtPluginControlAccess` | [参数面板目录与全部控件](#parameter-panel-catalog)；写操作再看[资源租约](#resource-coordination) |
 | 给原生下拉框增加新选项 | `host.Ui.RegisterChoice` | [安全下拉选项](#safe-choice-extension) |
@@ -161,8 +164,8 @@ Plugin\
 - 插件自己的托管依赖可以放在 `Plugin`；不要复制另一份 SDK、PluginHost、LakeUI 或宿主自带依赖。
 - 根目录缺少 `FFmpegFreeUI.Ext.PluginSdk.dll` 时，Ext Plugin API v2 会安全禁用。依赖 SDK 的插件会在程序集加载之前被静默跳过，FFmpegFreeUI 本体仍可运行。
 - 根目录缺少 `FFmpegFreeUI.Ext.PluginHost.dll`、版本不兼容或初始化失败时，v2 同样安全禁用。
-- 当前桥接层接受 `2.2.0` 或更高的 `2.x` 组件，并要求 SDK 与 PluginHost 的主、次版本一致；当前发行包应使用 `2.4.x` SDK 搭配 `2.4.x` Host。
-- 新主程序若误配成完整的旧版 SDK/Host 组合，只会保留该旧版合同本身提供的能力；v2.3 参数目录/声明式命令和 v2.4 布局能力会按实际版本安全降级。这只用于容错，发布时不要混装版本。
+- 当前桥接层接受 `2.2.0` 或更高的 `2.x` 组件，并要求 SDK 与 PluginHost 的主、次版本一致；当前发行包应使用 `2.5.x` SDK 搭配 `2.5.x` Host。
+- 新主程序若误配成完整的旧版 SDK/Host 组合，只会保留该旧版合同本身提供的能力；v2.3 参数目录/声明式命令、v2.4 布局能力和 v2.5 预设总览能力会按实际版本安全降级。这只用于容错，发布时不要混装版本。
 - 只提供 `Entry` / `SetHost_*` 的插件仍走官方兼容逻辑；需要补充能力时，可以在同一程序集内再实现 `IExtFFmpegFreeUIPlugin`，无需放弃官方接口。
 
 ### 为什么同时需要 PluginSdk 和 PluginHost
@@ -175,6 +178,7 @@ Plugin\
 - 页面入口合同：[`FFmpegFreeUI.Ext.PluginSdk/ExtPluginPageEntryContracts.cs`](../FFmpegFreeUI.Ext.PluginSdk/ExtPluginPageEntryContracts.cs)
 - 编码队列工具栏合同：[`FFmpegFreeUI.Ext.PluginSdk/ExtPluginEncodingQueueToolbarContracts.cs`](../FFmpegFreeUI.Ext.PluginSdk/ExtPluginEncodingQueueToolbarContracts.cs)
 - 插件设置页合同：[`FFmpegFreeUI.Ext.PluginSdk/ExtPluginSettingsContracts.cs`](../FFmpegFreeUI.Ext.PluginSdk/ExtPluginSettingsContracts.cs)
+- 预设总览合同：[`FFmpegFreeUI.Ext.PluginSdk/ExtPluginPresetOverviewContracts.cs`](../FFmpegFreeUI.Ext.PluginSdk/ExtPluginPresetOverviewContracts.cs)
 - 可选桥接：[`FFmpegFreeUI/功能/Ext插件扩展桥接_v2.vb`](../FFmpegFreeUI/功能/Ext插件扩展桥接_v2.vb)
 - 宿主实现：[`FFmpegFreeUI/功能/Ext插件扩展宿主_v2.vb`](../FFmpegFreeUI/功能/Ext插件扩展宿主_v2.vb)
 - PluginHost 项目：[`FFmpegFreeUI.Ext.PluginHost/FFmpegFreeUI.Ext.PluginHost.vbproj`](../FFmpegFreeUI.Ext.PluginHost/FFmpegFreeUI.Ext.PluginHost.vbproj)
@@ -210,7 +214,7 @@ dotnet restore .\FFmpegFreeUI-API-Extended-Edition.sln
 dotnet build .\FFmpegFreeUI-API-Extended-Edition.sln -c Debug --no-restore
 ```
 
-主程序会在还原时自动从 NuGet 获取 `LakeUI 3.23.0`。只开发独立 Ext 插件时无需直接引用或调用 LakeUI。
+主程序会在还原时自动从 NuGet 获取 `LakeUI 3.31.0`。只开发独立 Ext 插件时无需直接引用或调用 LakeUI。
 
 ### 2.2 SDK 引用与编辑器提示
 
@@ -236,10 +240,10 @@ FFmpegFreeUI.Ext.PluginSdk.Deploy.targets
 
 仓库提供两套可直接编译的示例：
 
-- [C# v2.4 综合示例](../Samples/FFmpegFreeUI.Ext.PluginApi.Sample)：导航页面、队列工具栏控件、动态参数控件、声明式参数/步骤和 SHA-256 后处理。
+- [C# v2.5 综合示例](../Samples/FFmpegFreeUI.Ext.PluginApi.Sample)：预设总览行、导航页面、队列工具栏控件、动态参数控件、声明式参数/步骤和 SHA-256 后处理。
 - [VB.NET v2.2 兼容基线示例](../Samples/FFmpegFreeUI.Ext.PluginApi.VbVmafSample)：传统锚点、命令/进程处理和 VMAF 后处理。
 
-C# 示例覆盖 v2.4 布局能力、v2.3 参数/命令能力，以及 6 个传统 UI 锚点、1 个安全下拉框锚点、1 个行为点和 14 个处理阶段；VB.NET 示例用于证明只使用 v2.2 合同的插件仍可在 v2.4 宿主运行。遇到文档与行为不一致时，以当前 SDK 公共合同和可编译示例为准。
+C# 示例覆盖 v2.5 预设总览能力、v2.4 布局能力、v2.3 参数/命令能力，以及 6 个传统 UI 锚点、1 个安全下拉框锚点、1 个行为点和 14 个处理阶段；VB.NET 示例用于证明只使用 v2.2 合同的插件仍可在 v2.5 宿主运行。遇到文档与行为不一致时，以当前 SDK 公共合同和可编译示例为准。
 
 <a id="create-project"></a>
 
@@ -267,7 +271,7 @@ cd MyCompany.MyPlugin
 
   <ItemGroup>
     <PackageReference Include="FFmpegFreeUI.Ext.PluginSdk"
-                      Version="2.4.0"
+                      Version="2.5.0"
                       PrivateAssets="all"
                       ExcludeAssets="runtime" />
   </ItemGroup>
@@ -297,7 +301,7 @@ cd MyCompany.MyPlugin
 
   <ItemGroup>
     <PackageReference Include="FFmpegFreeUI.Ext.PluginSdk"
-                      Version="2.4.0"
+                      Version="2.5.0"
                       PrivateAssets="all"
                       ExcludeAssets="runtime" />
   </ItemGroup>
@@ -350,7 +354,7 @@ cd MyCompany.MyPlugin
 `FFmpegFreeUI.Ext.PluginSdk` 已发布到 NuGet.org。新建或现有插件项目可以直接安装固定版本：
 
 ```powershell
-dotnet add package FFmpegFreeUI.Ext.PluginSdk --version 2.4.0
+dotnet add package FFmpegFreeUI.Ext.PluginSdk --version 2.5.0
 ```
 
 安装后确认项目中的引用包含以下两个资产控制属性：
@@ -358,7 +362,7 @@ dotnet add package FFmpegFreeUI.Ext.PluginSdk --version 2.4.0
 ```xml
 <ItemGroup>
   <PackageReference Include="FFmpegFreeUI.Ext.PluginSdk"
-                    Version="2.4.0"
+                    Version="2.5.0"
                     PrivateAssets="all"
                     ExcludeAssets="runtime" />
 </ItemGroup>
@@ -377,10 +381,10 @@ dotnet restore
 ```powershell
 dotnet pack .\FFmpegFreeUI.Ext.PluginSdk\FFmpegFreeUI.Ext.PluginSdk.csproj `
   -c Release -o .\artifacts\packages `
-  -p:PackageVersion=2.4.1-local.1
+  -p:PackageVersion=2.5.1-local.1
 ```
 
-把插件项目中的版本临时改为 `2.4.1-local.1`，再同时保留本地目录和 NuGet.org 两个还原源：
+把插件项目中的版本临时改为 `2.5.1-local.1`，再同时保留本地目录和 NuGet.org 两个还原源：
 
 ```powershell
 dotnet restore .\MyCompany.MyPlugin.csproj `
@@ -505,6 +509,7 @@ End Class
 | `PageEntries` | v2.4 主导航和参数面板一级导航中的插件页面入口注册表。 |
 | `EncodingQueueToolbar` | v2.4 编码队列顶部工具栏的插件控件注册表。 |
 | `PluginSettings` | v2.4 插件管理页面中的可选插件设置页注册表。 |
+| `PresetOverview` | v2.5 基于完整预设快照生成插件私有参数总览行的注册表。 |
 | `Ui` | UI 扩展注册表。 |
 | `Pipeline` | 处理链注册表。 |
 | `Behaviors` | 原生稳定行为点注册表。 |
@@ -513,7 +518,7 @@ End Class
 | `Commands` | v2.3 声明式 FFmpeg 参数和外部命令步骤注册表。 |
 | `Log(level, message, exception)` | 写插件诊断信息；当前实现输出到调试器，不等同于任务日志。 |
 
-v2.3 和 v2.4 都直接把新能力加入基础宿主接口，插件不需要转换成其他版本接口。使用 v2.4 页面入口或编码队列工具栏成员前仍应检查宿主能力版本：
+v2.3～v2.5 都直接把新能力加入基础宿主接口，插件不需要转换成其他版本接口。使用相应成员前应检查宿主能力版本：
 
 ```csharp
 if (host.ApiVersion < new Version(2, 4, 0))
@@ -527,9 +532,16 @@ var toolbarTargets = host.EncodingQueueToolbar.AvailableTargets;
 // 只有插件确实需要设置页面时才注册；每个 Ext 插件最多一个。
 host.PluginSettings.RegisterPage(
     new ExtPluginSettingsPageExtension(CreateSettingsPage));
+
+if (host.ApiVersion < new Version(2, 5, 0))
+{
+    throw new NotSupportedException("需要 Ext Plugin API 2.5");
+}
+
+var overview = host.PresetOverview;
 ```
 
-已编译的 v2.2、v2.3 插件只消费旧成员，仍可直接运行；v2.4 插件通过 `ApiVersion` 声明最低能力要求。SDK 程序集版本继续保持 `2.0.0.0`，让旧插件的程序集引用可以绑定到新 SDK；NuGet/FileVersion `2.4.0` 表示实际提供的能力版本。第三方不应自行实现宿主接口，测试替身重新编译时需要补充新增成员。
+已编译的 v2.2、v2.3、v2.4 插件只消费旧成员，仍可直接运行；使用新成员的插件通过 `ApiVersion` 声明最低能力要求。SDK 程序集版本继续保持 `2.0.0.0`，让旧插件的程序集引用可以绑定到新 SDK；NuGet/FileVersion `2.5.0` 表示实际提供的能力版本。第三方不应自行实现宿主接口，测试替身重新编译时需要补充新增成员。
 
 `ExtPluginLogLevel` 包含：
 
@@ -920,7 +932,7 @@ if (host.PageEntries.AvailableTargets.Any(x =>
 
 ```xml
 <PackageReference Include="LakeUI"
-                  Version="3.23.0"
+                  Version="3.31.0"
                   PrivateAssets="all"
                   ExcludeAssets="runtime" />
 ```
@@ -1000,6 +1012,64 @@ public void Initialize(IExtFFmpegFreeUIHost host)
 - 纯官方 API 插件不能直接注册此入口；同一 DLL 同时提供官方 `Entry` 与 Ext 入口时，可以由 Ext 入口注册设置页。
 
 注册返回值由宿主自动跟踪，插件也可以保存并提前释放。释放注册会使齿轮立即变灰，并关闭已经创建的设置页。
+
+<a id="preset-overview"></a>
+
+### 6.11 v2.5 预设总览行提供器
+
+只装饰参数面板中的 `MTB_预设参数总览` 控件并不能正确覆盖所有场景：装饰回调属于某个当前 UI 实例，只能直接取得该实例的 `StateJson`；用户在预设管理器中选中磁盘上的另一个预设时，正在生成总览的并不是当前参数面板状态。
+
+需要在参数面板、预设管理器和宿主其他预设总览中显示插件私有参数时，注册 `host.PresetOverview.RegisterRowProvider(...)`。宿主每次都把**本次正在生成总览的完整预设快照**交给插件：
+
+```csharp
+if (host.ApiVersion < new Version(2, 5, 0))
+{
+    throw new NotSupportedException("需要 Ext Plugin API 2.5");
+}
+
+_registrations.Add(host.PresetOverview.RegisterRowProvider(
+    new ExtPluginPresetOverviewRowProvider(
+        "private-options",
+        context =>
+        {
+            var state = JsonSerializer.Deserialize<MyPresetState>(
+                            context.PluginStateJson)
+                        ?? new MyPresetState();
+
+            if (state.Enabled)
+            {
+                context.Rows.Add(new ExtPluginPresetOverviewRow(
+                    $"插件质量策略：CRF {state.Crf}")
+                {
+                    Order = 10
+                });
+            }
+
+            if (state.DeleteSourceAfterComplete)
+            {
+                context.Rows.Add(new ExtPluginPresetOverviewRow(
+                    "编码完成后删除源文件")
+                {
+                    Order = 20,
+                    Level = ExtPluginPresetOverviewRowLevel.Warning
+                });
+            }
+        })
+    {
+        Order = 100
+    }));
+```
+
+上下文和输出约定：
+
+- `PresetJson` 是本次总览对应的完整 v6 预设 JSON，可能来自当前参数面板，也可能来自预设管理器中选中的预设；它是只读快照。插件需要同时查看原生字段时解析它，但必须保留对未知字段的兼容。
+- `PluginStateJson` 是宿主按当前插件 ID 从 `PresetJson` 的 `插件扩展数据[PluginId]` 中提取并规范化的私有 JSON；没有状态或状态损坏时为 `{}`。通常优先解析这个字段。
+- 插件向 `Rows` 添加 `ExtPluginPresetOverviewRow`。一个对象只表示一行，换行会被压成空格，空文本会被忽略；`Order` 只控制同一提供器返回的多行顺序；`Level` 可选 `Normal`、`Warning`、`Error`。
+- 不同插件先按插件管理器的全局顺序执行，再按提供器 `Order → PluginId → ProviderId` 排列。调整插件顺序会从下一次总览刷新开始生效。
+- 回调是同步且可能被频繁调用的纯展示函数。不要访问网络、启动进程、写文件、修改预设或依赖当前页面控件；需要改变命令时仍使用 `RegisterParameterProvider` 或处理链。
+- 某个提供器抛出异常时，宿主会跳过它的正常输出、记录调试信息，并追加一条错误级别总览行；其他插件的总览仍会继续生成。
+
+旧插件仍可继续装饰总览控件，但正式的私有参数展示应迁移到该提供器。这样插件只实现一次解析逻辑，就不会再出现“当前参数面板能显示，预设管理器中的已保存预设却不显示”的差异。
 
 <a id="pipeline-and-commands"></a>
 <a id="pipeline-registration"></a>
@@ -1792,6 +1862,10 @@ dotnet build .\Samples\FFmpegFreeUI.Ext.PluginApi.Sample\FFmpegFreeUI.Ext.Plugin
 
 不要只在按钮点击后私下保存一段字符串，也不要只在 `process.before-start` 临时改参数。把状态写入 `StateJson`，调用 `RequestParameterRefresh()`，再由 `RegisterParameterProvider` 根据 `PluginStateJson` 返回参数。三条链路会得到同一结果。“完全自己写”模板应加入对应的 `<ext:...>` 位置标记。
 
+### 插件私有参数为什么只在当前参数面板总览显示，预设管理器里不显示
+
+不要只装饰 `MTB_预设参数总览` 或从当前页面的 `StateJson` 生成文本。使用 v2.5 `host.PresetOverview.RegisterRowProvider`，根据回调中的 `PluginStateJson` 返回总览行。这个状态来自本次正在查看的完整 `PresetJson`，所以当前参数面板、预设管理器选中项和其他宿主总览会显示同一份插件参数。
+
 ### 插件要执行自定义命令，应该在哪个回调启动
 
 需要作为编码流程一部分的命令不要在预览、`command.*` 或 UI 回调中启动，应由 `RegisterStepProvider` 返回 `ExtPluginCommandStep`。只有不能表示为固定前/后步骤的复杂成功后处理才继续使用 `ext.task.after-complete` 自行管理进程；后者需要插件自己处理输出、取消、超时和清理。
@@ -1849,7 +1923,7 @@ dotnet build .\Samples\FFmpegFreeUI.Ext.PluginApi.Sample\FFmpegFreeUI.Ext.Plugin
 | 分类 | 类型 | 核心用途 | 详细说明 |
 |---|---|---|---|
 | 入口与宿主 | `IExtFFmpegFreeUIPlugin` | 插件入口：`Id`、`DisplayName`、`Initialize`。 | [第 4 节](#plugin-entry) |
-| 入口与宿主 | `IExtFFmpegFreeUIHost` | 版本、日志以及九类能力注册表的总入口。 | [第 5 节](#host-interface) |
+| 入口与宿主 | `IExtFFmpegFreeUIHost` | 版本、日志以及十类能力注册表的总入口。 | [第 5 节](#host-interface) |
 | 入口与宿主 | `ExtPluginLogLevel` | `Trace`、`Information`、`Warning`、`Error`。 | [第 5 节](#host-interface) |
 | 入口与宿主 | `ExtFFmpegFreeUIPluginApi` | 当前 SDK 声明的 API `Version`。 | [第 5 节](#host-interface) |
 | 参数与 UI | `IExtPluginParameterPanelCatalog` | 枚举当前全部参数页和原生控件描述符。 | [参数面板目录](#parameter-panel-catalog) |
@@ -1872,6 +1946,10 @@ dotnet build .\Samples\FFmpegFreeUI.Ext.PluginApi.Sample\FFmpegFreeUI.Ext.Plugin
 | 页面入口与工具栏 | `ExtPluginRelativePosition` | 页面中表示上/下，横向工具栏中表示左/右。 | [第 6.9 节](#page-entry-and-toolbar) |
 | 插件设置页 | `IExtPluginSettingsRegistry` | 在插件管理器中注册当前插件唯一的可选设置页。 | [插件管理内设置页](#plugin-settings-page) |
 | 插件设置页 | `ExtPluginSettingsPageExtension` / `IExtPluginSettingsPageContext` | 定义设置页工厂、清理逻辑，并提供当前插件和页面实例。 | [插件管理内设置页](#plugin-settings-page) |
+| 预设总览 | `IExtPluginPresetOverviewRegistry` | 注册基于完整预设快照的插件总览行提供器。 | [预设总览行提供器](#preset-overview) |
+| 预设总览 | `ExtPluginPresetOverviewRowProvider` / `ExtPluginPresetOverviewRowCallback` | 定义提供器 ID、顺序和同步生成回调。 | [预设总览行提供器](#preset-overview) |
+| 预设总览 | `ExtPluginPresetOverviewContext` | 提供完整 `PresetJson`、隔离后的 `PluginStateJson` 和输出 `Rows`。 | [预设总览行提供器](#preset-overview) |
+| 预设总览 | `ExtPluginPresetOverviewRow` / `ExtPluginPresetOverviewRowLevel` | 定义文本、行内顺序及普通/警告/错误显示级别。 | [预设总览行提供器](#preset-overview) |
 | 声明式命令 | `IExtPluginCommandRegistry` | 注册 FFmpeg 参数提供器和外部命令步骤提供器。 | [第 7 节](#pipeline-and-commands) |
 | 声明式命令 | `ExtPluginCommandParameterCallback` / `ExtPluginCommandStepCallback` | 参数或步骤提供器使用的同步、可重复调用回调。 | [参数](#declarative-arguments) / [步骤](#declarative-steps) |
 | 声明式命令 | `ExtPluginCommandParameterProvider` / `ExtPluginCommandStepProvider` | 定义提供器 ID、顺序以及可重复调用的计划生成回调。 | [参数](#declarative-arguments) / [步骤](#declarative-steps) |
