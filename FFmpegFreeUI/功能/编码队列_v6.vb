@@ -800,7 +800,9 @@ Public Class 编码队列_v6
                                           Optional useHostFFmpegArgumentWrapper As Boolean = True) As String
         Dim processName = If(Not String.IsNullOrWhiteSpace(specifiedProcess),
                              specifiedProcess,
-                             If(stage = 预设数据_v6.命令行阶段.FFprobe获取时长, "ffprobe", If(设置_v6.实例对象.替代进程文件名 <> "", 设置_v6.实例对象.替代进程文件名, "ffmpeg")))
+                             If(stage = 预设数据_v6.命令行阶段.FFprobe获取时长,
+                                设置_v6.获取FFprobe进程文件名(),
+                                设置_v6.获取FFmpeg进程文件名()))
         Dim actualArgs = If(Not useHostFFmpegArgumentWrapper OrElse
                             stage = 预设数据_v6.命令行阶段.FFprobe获取时长 OrElse
                             设置_v6.实例对象.覆盖参数传递 = "",
@@ -1741,10 +1743,12 @@ Public Class 编码任务_v6
         当前进程 = process
         process.StartInfo.FileName = If(Not String.IsNullOrWhiteSpace(stepItem.进程文件名),
                                         stepItem.进程文件名,
-                                        If(stepItem.阶段 = 预设数据_v6.命令行阶段.FFprobe获取时长, "ffprobe", If(设置_v6.实例对象.替代进程文件名 <> "", 设置_v6.实例对象.替代进程文件名, "ffmpeg")))
+                                        If(stepItem.阶段 = 预设数据_v6.命令行阶段.FFprobe获取时长,
+                                           设置_v6.获取FFprobe进程文件名(),
+                                           设置_v6.获取FFmpeg进程文件名()))
         process.StartInfo.WorkingDirectory = If(Not String.IsNullOrWhiteSpace(stepItem.工作目录),
                                                 stepItem.工作目录,
-                                                If(设置_v6.实例对象.工作目录 <> "", 设置_v6.实例对象.工作目录, ""))
+                                                设置_v6.获取有效工作目录())
         process.StartInfo.Arguments = If(Not stepItem.使用宿主FFmpeg参数包装 OrElse
                                          stepItem.阶段 = 预设数据_v6.命令行阶段.FFprobe获取时长 OrElse
                                          设置_v6.实例对象.覆盖参数传递 = "",
@@ -1845,7 +1849,23 @@ Public Class 编码任务_v6
         Dim outPoint = 编码进度_v6.转换时间(outPointText)
         If 预设数据.剪辑区间_方法 = 预设数据_v6.剪辑方法.掐头去尾 Then
             If originalDuration <= TimeSpan.Zero Then Return originalDuration
-            Return TimeSpan.FromSeconds(Math.Max(0, originalDuration.TotalSeconds - inPoint.TotalSeconds - outPoint.TotalSeconds))
+            If outPointText <> "" Then
+                Return TimeSpan.FromSeconds(Math.Max(0, Math.Min(originalDuration.TotalSeconds, outPoint.TotalSeconds) - Math.Min(originalDuration.TotalSeconds, inPoint.TotalSeconds)))
+            ElseIf inPointText <> "" Then
+                Return TimeSpan.FromSeconds(Math.Max(0, originalDuration.TotalSeconds - Math.Min(originalDuration.TotalSeconds, inPoint.TotalSeconds)))
+            End If
+            Return originalDuration
+        End If
+
+        If 预设数据.剪辑区间_方法 = 预设数据_v6.剪辑方法.剔除中间 Then
+            If originalDuration <= TimeSpan.Zero Then Return originalDuration
+            If inPointText <> "" AndAlso outPointText <> "" Then
+                Return TimeSpan.FromSeconds(Math.Max(0, originalDuration.TotalSeconds - Math.Max(0, outPoint.TotalSeconds - inPoint.TotalSeconds)))
+            ElseIf inPointText <> "" Then
+                Return TimeSpan.FromSeconds(Math.Min(originalDuration.TotalSeconds, Math.Max(0, inPoint.TotalSeconds)))
+            ElseIf outPointText <> "" Then
+                Return TimeSpan.FromSeconds(Math.Max(0, originalDuration.TotalSeconds - Math.Max(0, outPoint.TotalSeconds)))
+            End If
         End If
 
         If outPointText <> "" Then

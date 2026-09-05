@@ -23,7 +23,7 @@ Partial Class Form_v6_参数面板_章节
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         HCL_章节说明 = New LakeUI.HtmlColorLabel()
-        Panel1 = New Panel()
+        Panel1 = New LakeUI.ModernPanel()
         MCB_章节文件 = New LakeUI.ModernComboBox()
         JustEmptyControl1 = New LakeUI.JustEmptyControl()
         MCB_章节来源 = New LakeUI.ModernComboBox()
@@ -40,23 +40,27 @@ Partial Class Form_v6_参数面板_章节
         HCL_章节说明.AutoSize = True
         HCL_章节说明.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_章节说明.Dock = DockStyle.Top
+        HCL_章节说明.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         HCL_章节说明.Location = New Point(20, 20)
         HCL_章节说明.Margin = New Padding(2)
         HCL_章节说明.Name = "HCL_章节说明"
         HCL_章节说明.Padding = New Padding(0, 0, 0, 5)
-        HCL_章节说明.Size = New Size(743, 30)
+        HCL_章节说明.Size = New Size(743, 28)
         HCL_章节说明.TabIndex = 11
-        HCL_章节说明.Text = "<span style=""font-size:13"">章节</span>   <span style=""font-size:10pt; color:Gray"">向输出文件中写入自定义章节，请自行编辑并准备好符合标准的章节文本文档</span>"
+        HCL_章节说明.Text = "<span style=""font-size:13; color:Silver"">章节</span>   <span style=""font-size:10pt; color:Gray"">向输出文件中写入自定义章节，请自行编辑并准备好符合标准的章节文本文档</span>"
         '
         ' Panel1
         '
+        Panel1.BackColor = Color.Transparent
+        Panel1.BackColor1 = Color.Transparent
+        Panel1.BorderSize = 0
         Panel1.Controls.Add(MCB_章节文件)
         Panel1.Controls.Add(JustEmptyControl1)
         Panel1.Controls.Add(MCB_章节来源)
         Panel1.Controls.Add(JustEmptyControl2)
         Panel1.Controls.Add(MB_教程)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 50)
+        Panel1.Location = New Point(20, 48)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 10)
         Panel1.Size = New Size(743, 52)
@@ -165,17 +169,17 @@ Partial Class Form_v6_参数面板_章节
         MDV_章节教程.ForeColor = Color.Silver
         MDV_章节教程.HorizontalRuleColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
         MDV_章节教程.HorizontalRuleThickness = 2
-        MDV_章节教程.Location = New Point(20, 102)
+        MDV_章节教程.Location = New Point(20, 100)
         MDV_章节教程.Name = "MDV_章节教程"
         MDV_章节教程.Padding = New Padding(20)
-        MDV_章节教程.Size = New Size(743, 507)
+        MDV_章节教程.Size = New Size(743, 509)
         MDV_章节教程.TabIndex = 13
-        MDV_章节教程.Text = ""
         MDV_章节教程.Visible = False
         '
         ' ModernPanel1
         '
-        ModernPanel1.BackColor1 = Color.FromArgb(CByte(24), CByte(24), CByte(24))
+        ModernPanel1.BackColor = Color.Transparent
+        ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
         ModernPanel1.Controls.Add(MDV_章节教程)
         ModernPanel1.Controls.Add(Panel1)
@@ -205,7 +209,7 @@ Partial Class Form_v6_参数面板_章节
     End Sub
 
     Friend WithEvents HCL_章节说明 As LakeUI.HtmlColorLabel
-    Friend WithEvents Panel1 As Panel
+    Friend WithEvents Panel1 As LakeUI.ModernPanel
     Friend WithEvents JustEmptyControl1 As LakeUI.JustEmptyControl
     Friend WithEvents MCB_章节来源 As LakeUI.ModernComboBox
     Friend WithEvents MCB_章节文件 As LakeUI.ModernComboBox

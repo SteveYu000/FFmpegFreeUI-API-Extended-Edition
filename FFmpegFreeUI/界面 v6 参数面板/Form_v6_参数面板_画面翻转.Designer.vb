@@ -18,10 +18,10 @@ Partial Class Form_v6_参数面板_画面翻转
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         ModernPanel1 = New LakeUI.ModernPanel()
-        Panel2 = New Panel()
+        Panel2 = New LakeUI.ModernPanel()
         MCB_镜像翻转 = New LakeUI.ModernComboBox()
         HCL_镜像翻转 = New LakeUI.HtmlColorLabel()
-        Panel1 = New Panel()
+        Panel1 = New LakeUI.ModernPanel()
         MCB_角度翻转 = New LakeUI.ModernComboBox()
         HCL_角度翻转 = New LakeUI.HtmlColorLabel()
         MCK_画面翻转总开关 = New LakeUI.ModernCheckBox()
@@ -32,7 +32,8 @@ Partial Class Form_v6_参数面板_画面翻转
         '
         ' ModernPanel1
         '
-        ModernPanel1.BackColor1 = Color.FromArgb(CByte(24), CByte(24), CByte(24))
+        ModernPanel1.BackColor = Color.Transparent
+        ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
         ModernPanel1.Controls.Add(Panel2)
         ModernPanel1.Controls.Add(HCL_镜像翻转)
@@ -48,9 +49,12 @@ Partial Class Form_v6_参数面板_画面翻转
         '
         ' Panel2
         '
+        Panel2.BackColor = Color.Transparent
+        Panel2.BackColor1 = Color.Transparent
+        Panel2.BorderSize = 0
         Panel2.Controls.Add(MCB_镜像翻转)
         Panel2.Dock = DockStyle.Top
-        Panel2.Location = New Point(20, 176)
+        Panel2.Location = New Point(20, 172)
         Panel2.Name = "Panel2"
         Panel2.Padding = New Padding(0, 10, 0, 0)
         Panel2.Size = New Size(344, 42)
@@ -92,19 +96,22 @@ Partial Class Form_v6_参数面板_画面翻转
         HCL_镜像翻转.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_镜像翻转.Dock = DockStyle.Top
         HCL_镜像翻转.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_镜像翻转.Location = New Point(20, 131)
+        HCL_镜像翻转.Location = New Point(20, 129)
         HCL_镜像翻转.Margin = New Padding(2)
         HCL_镜像翻转.Name = "HCL_镜像翻转"
         HCL_镜像翻转.Padding = New Padding(0, 20, 0, 0)
-        HCL_镜像翻转.Size = New Size(344, 45)
+        HCL_镜像翻转.Size = New Size(344, 43)
         HCL_镜像翻转.TabIndex = 37
         HCL_镜像翻转.Text = "<span style=""font-size:13; color:Silver"">镜像翻转</span>"
         '
         ' Panel1
         '
+        Panel1.BackColor = Color.Transparent
+        Panel1.BackColor1 = Color.Transparent
+        Panel1.BorderSize = 0
         Panel1.Controls.Add(MCB_角度翻转)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 89)
+        Panel1.Location = New Point(20, 87)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 0)
         Panel1.Size = New Size(344, 42)
@@ -154,7 +161,7 @@ Partial Class Form_v6_参数面板_画面翻转
         HCL_角度翻转.Margin = New Padding(2)
         HCL_角度翻转.Name = "HCL_角度翻转"
         HCL_角度翻转.Padding = New Padding(0, 20, 0, 0)
-        HCL_角度翻转.Size = New Size(344, 45)
+        HCL_角度翻转.Size = New Size(344, 43)
         HCL_角度翻转.TabIndex = 35
         HCL_角度翻转.Text = "<span style=""font-size:13; color:Silver"">角度翻转</span>"
         '
@@ -190,6 +197,7 @@ Partial Class Form_v6_参数面板_画面翻转
         MinimumSize = New Size(400, 280)
         Name = "Form_v6_参数面板_画面翻转"
         ShowInTaskbar = False
+        StartPosition = FormStartPosition.Manual
         Text = "画面翻转"
         ModernPanel1.ResumeLayout(False)
         ModernPanel1.PerformLayout()
@@ -201,9 +209,9 @@ Partial Class Form_v6_参数面板_画面翻转
     Friend WithEvents ModernPanel1 As LakeUI.ModernPanel
     Friend WithEvents MCK_画面翻转总开关 As LakeUI.ModernCheckBox
     Friend WithEvents HCL_角度翻转 As LakeUI.HtmlColorLabel
-    Friend WithEvents Panel1 As Panel
+    Friend WithEvents Panel1 As LakeUI.ModernPanel
     Friend WithEvents MCB_角度翻转 As LakeUI.ModernComboBox
-    Friend WithEvents Panel2 As Panel
+    Friend WithEvents Panel2 As LakeUI.ModernPanel
     Friend WithEvents MCB_镜像翻转 As LakeUI.ModernComboBox
     Friend WithEvents HCL_镜像翻转 As LakeUI.HtmlColorLabel
 End Class

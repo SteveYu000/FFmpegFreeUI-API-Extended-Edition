@@ -19,6 +19,8 @@ Public Class FormMain_v6
         UI同步上下文 = Threading.SynchronizationContext.Current
         设置_v6.启动时读取SP解锁器()
         设置_v6.启动时加载设置()
+        界面主题_v6.初始化()
+        界面主题_v6.应用窗口圆角设置()
         网络功能.启动时后台获取SPAgent端点()
 
         设置_v6.加载SP自定义图标()
@@ -68,6 +70,10 @@ Public Class FormMain_v6
                         Form_v6_集成工具.ModernTabListControl1.ContentBackColor = Color.Transparent
                         Form_v6_设置.ModernTabListControl1.TabStripBackColor = Color.Transparent
                         Form_v6_设置.ModernTabListControl1.ContentBackColor = Color.Transparent
+                        Form_v6_参数面板.私有界面_自定义参数.ModernTabControl1.TabStripBackColor = Color.Transparent
+                        Form_v6_参数面板.私有界面_自定义参数.ModernTabControl1.ContentBackColor = Color.Transparent
+                        Form_v6_参数面板.私有界面_附加内容.ModernTabControl1.TabStripBackColor = Color.Transparent
+                        Form_v6_参数面板.私有界面_附加内容.ModernTabControl1.ContentBackColor = Color.Transparent
 
                         Form_v6_起始页面.ModernPanel1.Padding = New Padding(10 * DeviceDpi / 96, 10 * DeviceDpi / 96, Form_v6_起始页面.ModernPanel1.Padding.Right, Form_v6_起始页面.ModernPanel1.Padding.Bottom)
                         Form_v6_准备文件.ModernPanel1.Padding = New Padding(10 * DeviceDpi / 96, 10 * DeviceDpi / 96, Form_v6_准备文件.ModernPanel1.Padding.Right, Form_v6_准备文件.ModernPanel1.Padding.Bottom)
@@ -110,14 +116,7 @@ Public Class FormMain_v6
     End Sub
 
     Sub 绑定选项卡(选项卡的根面板容器 As ModernPanel)
-        If SP_UnLock Then
-            Select Case 设置_v6.实例对象.SP_毛玻璃模式
-                Case > 0
-                    选项卡的根面板容器.BackColor = Color.Transparent
-                    选项卡的根面板容器.BackColor1 = Color.Transparent
-                    选项卡的根面板容器.BackgroundSource = Me
-            End Select
-        End If
+        绑定选项卡核心(选项卡的根面板容器)
     End Sub
 
     Public Sub 请求重启应用()
@@ -146,29 +145,11 @@ Public Class FormMain_v6
     End Sub
 
     Public Sub 添加插件选项卡(选项卡标题 As String, 面板 As Control)
-        Dim 标题 = If(选项卡标题, "").Trim()
-        If 标题 = "" OrElse 面板 Is Nothing Then Exit Sub
-
-        面板.Dock = DockStyle.Fill
-
-        Dim 选项卡 As ModernTabListControl.ModernTabPage = Nothing
-        If 插件选项卡页.TryGetValue(标题, 选项卡) Then
-            选项卡.BoundControl = 面板
-        Else
-            选项卡 = New ModernTabListControl.ModernTabPage With {
-                .Text = 标题,
-                .BoundControl = 面板
-            }
-            ModernTabListControl1.Items.Insert(获取插件选项卡插入位置(), 选项卡)
-            插件选项卡页(标题) = 选项卡
-        End If
-
-        配置插件页面背景(面板)
+        添加插件选项卡核心(选项卡标题, 面板)
     End Sub
 
     Public Sub 配置插件页面背景(页面 As Control)
-        Dim 根面板 = 查找可绑定背景映射的插件ModernPanel(页面)
-        If 根面板 IsNot Nothing Then 绑定选项卡(根面板)
+        配置插件页面背景核心(页面)
     End Sub
 
     Private Sub 确保注册插件主导航目标()
@@ -264,84 +245,13 @@ Public Class FormMain_v6
         Else
             Form_v6_性能监控.停止()
         End If
+
+        If selectedControl Is Form_v6_插件管理 Then Form_v6_插件管理.提交切页首帧()
     End Sub
 
     <CodeAnalysis.SuppressMessage("Performance", "CA1861:不要将常量数组作为参数", Justification:="<挂起>")>
     Private Async Sub FormMain_v6_Closing(sender As Object, e As CancelEventArgs) Handles Me.FormClosing
-        e.Cancel = False
-        If Not 退出确认已完成 Then
-            Dim 进行中任务数量 = 编码队列_v6.获取进行中任务数量()
-            Dim 未处理任务数量 = 编码队列_v6.获取未处理任务数量()
-            退出时清除所有任务 = True
-            If 进行中任务数量 > 0 OrElse 未处理任务数量 > 0 Then
-                Dim promptParts As New List(Of String)
-                If 进行中任务数量 > 0 Then promptParts.Add($"当前仍有 {进行中任务数量} 个任务正在处理、暂停或等待自动开始。")
-                If 未处理任务数量 > 0 Then promptParts.Add($"当前可保留的未执行任务有 {未处理任务数量} 个。")
-                promptParts.Add("请选择退出方式。")
-
-                Dim result = ExOverlayMsgBox(
-                    Me,
-                    String.Join(vbCrLf, promptParts),
-                    {"保留未执行的任务并退出", "清除所有任务然后退出", "取消退出操作"},
-                    "确认退出",
-                    MsgBoxStyle.Question,
-                    2)
-
-                Select Case result
-                    Case 0
-                        Try
-                            编码队列_v6.保存未处理任务缓存()
-                            退出时清除所有任务 = False
-                        Catch ex As Exception
-                            ExOverlayMsgBox(Me, "保存未执行任务失败：" & ex.Message, MsgBoxStyle.Critical, "无法退出")
-                            重启请求待执行 = False
-                            e.Cancel = True
-                            Exit Sub
-                        End Try
-                    Case 1
-                        编码队列_v6.删除未处理任务缓存()
-                        退出时清除所有任务 = True
-                    Case Else
-                        重启请求待执行 = False
-                        e.Cancel = True
-                        Exit Sub
-                End Select
-            End If
-            退出确认已完成 = True
-        End If
-
-        If Not 退出里程碑检查已完成 Then
-            e.Cancel = True
-            If 退出里程碑检查进行中 Then Exit Sub
-            退出里程碑检查进行中 = True
-            Try
-                Await 用户使用统计_v6.退出时后台检查Async(Me)
-            Catch
-            Finally
-                退出里程碑检查进行中 = False
-                退出里程碑检查已完成 = True
-            End Try
-            BeginInvoke(Sub() Close())
-            Exit Sub
-        End If
-
-        If 重启请求待执行 AndAlso Not 重启助手已启动 Then
-            Try
-                启动重启助手()
-                重启助手已启动 = True
-                重启请求待执行 = False
-            Catch ex As Exception
-                重启请求待执行 = False
-                e.Cancel = True
-                ExOverlayMsgBox(Me, "无法启动重启助手：" & ex.Message, MsgBoxStyle.Critical, "重启失败")
-                Exit Sub
-            End Try
-        End If
-
-        If 退出时清除所有任务 AndAlso 编码队列_v6.获取进行中任务数量() > 0 Then 编码队列_v6.停止所有进行中任务()
-        端口监听_v6.停止客户端()
-        设置_v6.退出时保存设置()
-        If Form_v6_调试播放器.ffplayHandle <> IntPtr.Zero Then Form_v6_调试播放器.停止()
+        Await 执行关闭流程Async(e)
     End Sub
 
     Private Shared Sub 启动重启助手()
@@ -382,32 +292,7 @@ Public Class FormMain_v6
 
     <CodeAnalysis.SuppressMessage("Performance", "CA1861:不要将常量数组作为参数", Justification:="<挂起>")>
     Private Sub 检查并询问加载未处理任务缓存()
-        If Not 编码队列_v6.存在未处理任务缓存() Then Exit Sub
-
-        Dim count = 编码队列_v6.读取未处理任务缓存任务数量()
-        If count <= 0 Then
-            编码队列_v6.删除未处理任务缓存()
-            Exit Sub
-        End If
-
-        Dim result = ExOverlayMsgBox(
-            Me,
-            $"检测到上次退出时保留了 {count} 个未执行任务。是否加载到编码队列？",
-            {"加载", "不加载"},
-            "恢复未执行任务",
-            MsgBoxStyle.Question,
-            0)
-
-        If result = 0 Then
-            Try
-                Dim restored = 编码队列_v6.加载未处理任务缓存()
-                If restored > 0 Then ExFloatingTip(Me, $"已加载 {restored} 个未执行任务", 1800)
-            Catch ex As Exception
-                ExOverlayMsgBox(Me, "加载未执行任务失败：" & ex.Message, MsgBoxStyle.Critical, "恢复失败")
-            End Try
-        Else
-            编码队列_v6.删除未处理任务缓存()
-        End If
+        检查并询问加载未处理任务缓存核心()
     End Sub
 
     Private Sub PrecisionTimer1_Tick(sender As Object, e As EventArgs) Handles PrecisionTimer1.Tick

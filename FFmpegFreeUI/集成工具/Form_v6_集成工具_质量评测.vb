@@ -212,7 +212,7 @@ Public Class Form_v6_集成工具_质量评测
     Private Shared Async Function 运行FFmpeg模型查询Async(ffmpeg As String, arguments As String, timeoutValue As TimeSpan) As Task(Of 进程运行结果)
         Using process As New Process(), timeout As New CancellationTokenSource(timeoutValue)
             process.StartInfo.FileName = ffmpeg
-            process.StartInfo.WorkingDirectory = If(设置_v6.实例对象.工作目录 <> "", 设置_v6.实例对象.工作目录, "")
+            process.StartInfo.WorkingDirectory = 设置_v6.获取有效工作目录()
             process.StartInfo.Arguments = arguments
             process.StartInfo.UseShellExecute = False
             process.StartInfo.RedirectStandardOutput = True
@@ -997,7 +997,7 @@ Public Class Form_v6_集成工具_质量评测
     Private Async Function 运行FFprobeAsync(arguments As String, token As CancellationToken) As Task(Of 进程运行结果)
         Using process As New Process()
             process.StartInfo.FileName = 获取FFprobe文件名()
-            process.StartInfo.WorkingDirectory = If(设置_v6.实例对象.工作目录 <> "", 设置_v6.实例对象.工作目录, "")
+            process.StartInfo.WorkingDirectory = 设置_v6.获取有效工作目录()
             process.StartInfo.Arguments = arguments
             process.StartInfo.UseShellExecute = False
             process.StartInfo.RedirectStandardOutput = True
@@ -1024,21 +1024,7 @@ Public Class Form_v6_集成工具_质量评测
     End Function
 
     Private Shared Function 获取FFprobe文件名() As String
-        Dim custom = If(设置_v6.实例对象.替代进程文件名, "").Trim()
-        If custom <> "" Then
-            Dim fileName = Path.GetFileName(custom)
-            If fileName.Contains("ffmpeg", StringComparison.OrdinalIgnoreCase) Then
-                Dim probeName = Regex.Replace(fileName, "ffmpeg", "ffprobe", RegexOptions.IgnoreCase)
-                Dim directory = Path.GetDirectoryName(custom)
-                If Not String.IsNullOrWhiteSpace(directory) Then
-                    Dim candidate = Path.Combine(directory, probeName)
-                    If File.Exists(candidate) Then Return candidate
-                    Return "ffprobe"
-                End If
-                If 查找可执行文件(probeName) <> "" Then Return probeName
-            End If
-        End If
-        Return "ffprobe"
+        Return 设置_v6.获取FFprobe进程文件名()
     End Function
 
     Private Shared Function 查找可执行文件(fileName As String) As String
@@ -1250,7 +1236,7 @@ Public Class Form_v6_集成工具_质量评测
     End Function
 
     Private Shared Function 获取FFmpeg文件名() As String
-        Return If(设置_v6.实例对象.替代进程文件名 <> "", 设置_v6.实例对象.替代进程文件名, "ffmpeg")
+        Return 设置_v6.获取FFmpeg进程文件名()
     End Function
 
     Private Async Function 运行FFmpegAsync(arguments As String, token As CancellationToken, onLine As Action(Of String)) As Task(Of 进程运行结果)
@@ -1260,7 +1246,7 @@ Public Class Form_v6_集成工具_质量评测
         Dim output As New StringBuilder()
         Dim process As New Process()
         process.StartInfo.FileName = 获取FFmpeg文件名()
-        process.StartInfo.WorkingDirectory = If(设置_v6.实例对象.工作目录 <> "", 设置_v6.实例对象.工作目录, "")
+        process.StartInfo.WorkingDirectory = 设置_v6.获取有效工作目录()
         process.StartInfo.Arguments = arguments
         process.StartInfo.UseShellExecute = False
         process.StartInfo.RedirectStandardOutput = True
@@ -1547,7 +1533,7 @@ Public Class Form_v6_集成工具_质量评测
 
     Private Sub 设置运行状态(running As Boolean)
         MB_开始评测.Text = If(running, "取消评测", "开始评测")
-        MB_开始评测.ForeColor = If(running, Color.IndianRed, Color.YellowGreen)
+        MB_开始评测.ForeColor = If(running, Color.IndianRed, 界面主题_v6.获取当前主题前景色(Color.YellowGreen))
         MB_选择原视频.Enabled = Not running
         MB_移除选中文件.Enabled = Not running
         MB_移除全部文件.Enabled = Not running
@@ -1648,7 +1634,7 @@ Public Class Form_v6_集成工具_质量评测
         Next
 
         If scoredItems.Count = 1 Then
-            scoredItems(0).Item.SubItems(index).ForeColor = Color.YellowGreen
+            scoredItems(0).Item.SubItems(index).ForeColor = 界面主题_v6.获取当前主题前景色(Color.YellowGreen)
         ElseIf scoredItems.Count > 1 Then
             Dim minValue = scoredItems.Min(Function(x) x.Value)
             Dim maxValue = scoredItems.Max(Function(x) x.Value)
@@ -1656,7 +1642,7 @@ Public Class Form_v6_集成工具_质量评测
             For Each entry In scoredItems
                 Dim color As Color
                 If entry.Value.Equals(maxValue) Then
-                    color = Color.YellowGreen
+                    color = 界面主题_v6.获取当前主题前景色(Color.YellowGreen)
                 ElseIf entry.Value.Equals(minValue) Then
                     color = Color.IndianRed
                 Else
@@ -1670,12 +1656,13 @@ Public Class Form_v6_集成工具_质量评测
     End Sub
 
     Private Shared Function 获取评分渐变颜色(value As Double, minValue As Double, maxValue As Double) As Color
-        If Double.IsInfinity(value) Then Return Color.YellowGreen
+        If Double.IsInfinity(value) Then Return 界面主题_v6.获取当前主题前景色(Color.YellowGreen)
         If Double.IsInfinity(minValue) OrElse Double.IsInfinity(maxValue) OrElse maxValue <= minValue Then Return Color.Silver
         Dim ratio = Math.Max(0.0, Math.Min(1.0, (value - minValue) / (maxValue - minValue)))
-        Dim r = CInt(205 + (154 - 205) * ratio)
-        Dim g = CInt(92 + (205 - 92) * ratio)
-        Dim b = CInt(92 + (50 - 92) * ratio)
+        Dim best = 界面主题_v6.获取当前主题前景色(Color.YellowGreen)
+        Dim r = CInt(205 + (best.R - 205) * ratio)
+        Dim g = CInt(92 + (best.G - 92) * ratio)
+        Dim b = CInt(92 + (best.B - 92) * ratio)
         Return Color.FromArgb(r, g, b)
     End Function
 

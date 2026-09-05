@@ -29,26 +29,26 @@ Partial Class Form_v6_插件管理
         Dim ListColumn4 As LakeUI.UltraDetailListView.ListColumn = New LakeUI.UltraDetailListView.ListColumn()
         Dim ListColumn5 As LakeUI.UltraDetailListView.ListColumn = New LakeUI.UltraDetailListView.ListColumn()
         ModernPanel1 = New LakeUI.ModernPanel()
-        插件设置布局 = New Panel()
+        插件设置布局 = New LakeUI.ModernPanel()
         P_插件设置内容 = New LakeUI.ModernPanel()
-        P_插件设置标题栏 = New Panel()
+        P_插件设置标题栏 = New LakeUI.ModernPanel()
         HCL_插件设置标题 = New LakeUI.HtmlColorLabel()
         MB_返回插件详情 = New LakeUI.ModernButton()
-        管理内容布局 = New TableLayoutPanel()
-        P_插件列表区域 = New Panel()
+        管理内容布局 = New LakeUI.ModernPanel()
+        P_插件列表区域 = New LakeUI.ModernPanel()
         UDLV_插件列表 = New LakeUI.UltraDetailListView()
         P_空状态 = New LakeUI.ModernPanel()
-        TLP_空状态 = New TableLayoutPanel()
-        L_空状态标题 = New Label()
-        L_空状态说明 = New Label()
-        L_插件目录路径 = New Label()
+        TLP_空状态 = New LakeUI.ModernPanel()
+        L_空状态标题 = New LakeUI.HtmlColorLabel()
+        L_空状态说明 = New LakeUI.HtmlColorLabel()
+        L_插件目录路径 = New LakeUI.HtmlColorLabel()
         MB_空状态打开目录 = New LakeUI.ModernButton()
         MP_插件详情 = New LakeUI.ModernPanel()
-        详情视图 = New 插件详情视图_v6()
+        详情视图 = New 插件详情GPU视图_v6()
         HCL_说明 = New LakeUI.HtmlColorLabel()
-        管理工具栏 = New Panel()
+        管理工具栏 = New LakeUI.ModernPanel()
         HCL_概览 = New LakeUI.HtmlColorLabel()
-        FLP_管理操作 = New FlowLayoutPanel()
+        FLP_管理操作 = New LakeUI.ModernPanel()
         MB_打开目录 = New LakeUI.ModernButton()
         MB_刷新 = New LakeUI.ModernButton()
         MB_切换启用 = New LakeUI.ModernButton()
@@ -89,11 +89,14 @@ Partial Class Form_v6_插件管理
         ' 插件设置布局
         '
         插件设置布局.BackColor = Color.Transparent
+        插件设置布局.BackColor1 = Color.Transparent
+        插件设置布局.BorderSize = 0
         插件设置布局.Controls.Add(P_插件设置内容)
         插件设置布局.Controls.Add(P_插件设置标题栏)
         插件设置布局.Dock = DockStyle.Fill
         插件设置布局.Location = New Point(20, 101)
         插件设置布局.Name = "插件设置布局"
+        插件设置布局.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.None
         插件设置布局.Size = New Size(940, 538)
         插件设置布局.TabIndex = 4
         插件设置布局.Visible = False
@@ -115,12 +118,15 @@ Partial Class Form_v6_插件管理
         ' P_插件设置标题栏
         '
         P_插件设置标题栏.BackColor = Color.Transparent
+        P_插件设置标题栏.BackColor1 = Color.Transparent
+        P_插件设置标题栏.BorderSize = 0
         P_插件设置标题栏.Controls.Add(HCL_插件设置标题)
         P_插件设置标题栏.Controls.Add(MB_返回插件详情)
         P_插件设置标题栏.Dock = DockStyle.Top
         P_插件设置标题栏.Location = New Point(0, 0)
         P_插件设置标题栏.Name = "P_插件设置标题栏"
         P_插件设置标题栏.Padding = New Padding(0, 10, 0, 10)
+        P_插件设置标题栏.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.None
         P_插件设置标题栏.Size = New Size(940, 54)
         P_插件设置标题栏.TabIndex = 0
         '
@@ -161,28 +167,29 @@ Partial Class Form_v6_插件管理
         ' 管理内容布局
         '
         管理内容布局.BackColor = Color.Transparent
-        管理内容布局.ColumnCount = 2
-        管理内容布局.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 70.0F))
-        管理内容布局.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 30.0F))
-        管理内容布局.Controls.Add(P_插件列表区域, 0, 0)
-        管理内容布局.Controls.Add(MP_插件详情, 1, 0)
+        管理内容布局.BackColor1 = Color.Transparent
+        管理内容布局.BorderSize = 0
+        管理内容布局.Controls.Add(P_插件列表区域)
+        管理内容布局.Controls.Add(MP_插件详情)
         管理内容布局.Dock = DockStyle.Fill
         管理内容布局.Location = New Point(20, 101)
         管理内容布局.Name = "管理内容布局"
-        管理内容布局.RowCount = 1
-        管理内容布局.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
+        管理内容布局.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.None
         管理内容布局.Size = New Size(940, 538)
         管理内容布局.TabIndex = 3
         '
         ' P_插件列表区域
         '
         P_插件列表区域.BackColor = Color.Transparent
+        P_插件列表区域.BackColor1 = Color.Transparent
+        P_插件列表区域.BorderSize = 0
         P_插件列表区域.Controls.Add(UDLV_插件列表)
         P_插件列表区域.Controls.Add(P_空状态)
-        P_插件列表区域.Dock = DockStyle.Fill
+        P_插件列表区域.Dock = DockStyle.None
         P_插件列表区域.Location = New Point(0, 0)
         P_插件列表区域.Margin = New Padding(0, 0, 5, 0)
         P_插件列表区域.Name = "P_插件列表区域"
+        P_插件列表区域.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.None
         P_插件列表区域.Size = New Size(653, 538)
         P_插件列表区域.TabIndex = 0
         '
@@ -252,30 +259,24 @@ Partial Class Form_v6_插件管理
         ' TLP_空状态
         '
         TLP_空状态.BackColor = Color.Transparent
-        TLP_空状态.ColumnCount = 1
-        TLP_空状态.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100.0F))
-        TLP_空状态.Controls.Add(L_空状态标题, 0, 1)
-        TLP_空状态.Controls.Add(L_空状态说明, 0, 2)
-        TLP_空状态.Controls.Add(L_插件目录路径, 0, 3)
-        TLP_空状态.Controls.Add(MB_空状态打开目录, 0, 4)
+        TLP_空状态.BackColor1 = Color.Transparent
+        TLP_空状态.BorderSize = 0
+        TLP_空状态.Controls.Add(L_空状态标题)
+        TLP_空状态.Controls.Add(L_空状态说明)
+        TLP_空状态.Controls.Add(L_插件目录路径)
+        TLP_空状态.Controls.Add(MB_空状态打开目录)
         TLP_空状态.Dock = DockStyle.Fill
         TLP_空状态.Location = New Point(0, 0)
         TLP_空状态.Name = "TLP_空状态"
-        TLP_空状态.RowCount = 6
-        TLP_空状态.RowStyles.Add(New RowStyle(SizeType.Percent, 45.0F))
-        TLP_空状态.RowStyles.Add(New RowStyle(SizeType.Absolute, 44.0F))
-        TLP_空状态.RowStyles.Add(New RowStyle(SizeType.Absolute, 38.0F))
-        TLP_空状态.RowStyles.Add(New RowStyle(SizeType.Absolute, 54.0F))
-        TLP_空状态.RowStyles.Add(New RowStyle(SizeType.Absolute, 44.0F))
-        TLP_空状态.RowStyles.Add(New RowStyle(SizeType.Percent, 55.0F))
+        TLP_空状态.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.None
         TLP_空状态.Size = New Size(653, 538)
         TLP_空状态.TabIndex = 0
         '
         ' L_空状态标题
         '
-        L_空状态标题.AutoEllipsis = True
+        L_空状态标题.AutoSizeMode = AutoSizeMode.GrowAndShrink
         L_空状态标题.BackColor = Color.Transparent
-        L_空状态标题.Dock = DockStyle.Fill
+        L_空状态标题.Dock = DockStyle.None
         L_空状态标题.Font = New Font("Microsoft YaHei UI", 13.0F)
         L_空状态标题.ForeColor = Color.Silver
         L_空状态标题.Location = New Point(3, 144)
@@ -283,13 +284,13 @@ Partial Class Form_v6_插件管理
         L_空状态标题.Size = New Size(647, 44)
         L_空状态标题.TabIndex = 0
         L_空状态标题.Text = "没有找到插件"
-        L_空状态标题.TextAlign = ContentAlignment.MiddleCenter
+        L_空状态标题.TextAlign = LakeUI.HtmlColorLabel.TextAlignEnum.Center
         '
         ' L_空状态说明
         '
-        L_空状态说明.AutoEllipsis = True
+        L_空状态说明.AutoSizeMode = AutoSizeMode.GrowAndShrink
         L_空状态说明.BackColor = Color.Transparent
-        L_空状态说明.Dock = DockStyle.Fill
+        L_空状态说明.Dock = DockStyle.None
         L_空状态说明.Font = New Font("Microsoft YaHei UI", 10.0F)
         L_空状态说明.ForeColor = Color.FromArgb(CByte(150), CByte(255), CByte(255), CByte(255))
         L_空状态说明.Location = New Point(3, 188)
@@ -297,13 +298,13 @@ Partial Class Form_v6_插件管理
         L_空状态说明.Size = New Size(647, 38)
         L_空状态说明.TabIndex = 1
         L_空状态说明.Text = "将 *.3fui.dll 拖放到本页，或放入插件目录后刷新。"
-        L_空状态说明.TextAlign = ContentAlignment.MiddleCenter
+        L_空状态说明.TextAlign = LakeUI.HtmlColorLabel.TextAlignEnum.Center
         '
         ' L_插件目录路径
         '
-        L_插件目录路径.AutoEllipsis = True
+        L_插件目录路径.AutoSizeMode = AutoSizeMode.GrowAndShrink
         L_插件目录路径.BackColor = Color.Transparent
-        L_插件目录路径.Dock = DockStyle.Fill
+        L_插件目录路径.Dock = DockStyle.None
         L_插件目录路径.Font = New Font("Microsoft YaHei UI", 9.0F)
         L_插件目录路径.ForeColor = Color.FromArgb(CByte(110), CByte(255), CByte(255), CByte(255))
         L_插件目录路径.Location = New Point(3, 226)
@@ -312,7 +313,7 @@ Partial Class Form_v6_插件管理
         L_插件目录路径.Size = New Size(647, 54)
         L_插件目录路径.TabIndex = 2
         L_插件目录路径.Text = "<程序目录>\Plugin"
-        L_插件目录路径.TextAlign = ContentAlignment.MiddleCenter
+        L_插件目录路径.TextAlign = LakeUI.HtmlColorLabel.TextAlignEnum.Center
         '
         ' MB_空状态打开目录
         '
@@ -342,19 +343,19 @@ Partial Class Form_v6_插件管理
         MP_插件详情.BorderRadius = 10
         MP_插件详情.BorderSize = 0
         MP_插件详情.Controls.Add(详情视图)
-        MP_插件详情.Dock = DockStyle.Fill
+        MP_插件详情.Dock = DockStyle.None
         MP_插件详情.Location = New Point(663, 0)
         MP_插件详情.Margin = New Padding(5, 0, 0, 0)
         MP_插件详情.Name = "MP_插件详情"
         MP_插件详情.Padding = New Padding(20)
-        MP_插件详情.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.Vertical
+        MP_插件详情.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.None
         MP_插件详情.Size = New Size(277, 538)
         MP_插件详情.TabIndex = 1
         '
         ' 详情视图
         '
         详情视图.BackColor = Color.Transparent
-        详情视图.Dock = DockStyle.Top
+        详情视图.Dock = DockStyle.Fill
         详情视图.Location = New Point(20, 20)
         详情视图.Margin = New Padding(0)
         详情视图.Name = "详情视图"
@@ -379,19 +380,22 @@ Partial Class Form_v6_插件管理
         ' 管理工具栏
         '
         管理工具栏.BackColor = Color.Transparent
+        管理工具栏.BackColor1 = Color.Transparent
+        管理工具栏.BorderSize = 0
         管理工具栏.Controls.Add(HCL_概览)
         管理工具栏.Controls.Add(FLP_管理操作)
         管理工具栏.Dock = DockStyle.Top
         管理工具栏.Location = New Point(20, 47)
         管理工具栏.Name = "管理工具栏"
         管理工具栏.Padding = New Padding(0, 10, 0, 10)
+        管理工具栏.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.None
         管理工具栏.Size = New Size(940, 54)
         管理工具栏.TabIndex = 2
         '
         ' HCL_概览
         '
         HCL_概览.AutoSizeMode = AutoSizeMode.GrowAndShrink
-        HCL_概览.Dock = DockStyle.Fill
+        HCL_概览.Dock = DockStyle.None
         HCL_概览.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         HCL_概览.Location = New Point(590, 10)
         HCL_概览.Name = "HCL_概览"
@@ -403,23 +407,22 @@ Partial Class Form_v6_插件管理
         '
         ' FLP_管理操作
         '
-        FLP_管理操作.AutoSize = True
-        FLP_管理操作.AutoSizeMode = AutoSizeMode.GrowAndShrink
         FLP_管理操作.BackColor = Color.Transparent
+        FLP_管理操作.BackColor1 = Color.Transparent
+        FLP_管理操作.BorderSize = 0
         FLP_管理操作.Controls.Add(MB_打开目录)
         FLP_管理操作.Controls.Add(MB_刷新)
         FLP_管理操作.Controls.Add(MB_切换启用)
         FLP_管理操作.Controls.Add(MB_上移)
         FLP_管理操作.Controls.Add(MB_下移)
         FLP_管理操作.Controls.Add(MB_重启应用)
-        FLP_管理操作.Dock = DockStyle.Left
-        FLP_管理操作.FlowDirection = FlowDirection.LeftToRight
+        FLP_管理操作.Dock = DockStyle.None
         FLP_管理操作.Location = New Point(0, 10)
         FLP_管理操作.Margin = New Padding(0)
         FLP_管理操作.Name = "FLP_管理操作"
+        FLP_管理操作.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.None
         FLP_管理操作.Size = New Size(590, 34)
         FLP_管理操作.TabIndex = 0
-        FLP_管理操作.WrapContents = False
         '
         ' MB_打开目录
         '
@@ -583,26 +586,26 @@ Partial Class Form_v6_插件管理
     End Sub
 
     Public WithEvents ModernPanel1 As LakeUI.ModernPanel
-    Friend WithEvents 插件设置布局 As Panel
+    Friend WithEvents 插件设置布局 As LakeUI.ModernPanel
     Friend WithEvents P_插件设置内容 As LakeUI.ModernPanel
-    Friend WithEvents P_插件设置标题栏 As Panel
+    Friend WithEvents P_插件设置标题栏 As LakeUI.ModernPanel
     Friend WithEvents HCL_插件设置标题 As LakeUI.HtmlColorLabel
     Friend WithEvents MB_返回插件详情 As LakeUI.ModernButton
-    Friend WithEvents 管理内容布局 As TableLayoutPanel
-    Friend WithEvents P_插件列表区域 As Panel
+    Friend WithEvents 管理内容布局 As LakeUI.ModernPanel
+    Friend WithEvents P_插件列表区域 As LakeUI.ModernPanel
     Friend WithEvents UDLV_插件列表 As LakeUI.UltraDetailListView
     Friend WithEvents P_空状态 As LakeUI.ModernPanel
-    Friend WithEvents TLP_空状态 As TableLayoutPanel
-    Friend WithEvents L_空状态标题 As Label
-    Friend WithEvents L_空状态说明 As Label
-    Friend WithEvents L_插件目录路径 As Label
+    Friend WithEvents TLP_空状态 As LakeUI.ModernPanel
+    Friend WithEvents L_空状态标题 As LakeUI.HtmlColorLabel
+    Friend WithEvents L_空状态说明 As LakeUI.HtmlColorLabel
+    Friend WithEvents L_插件目录路径 As LakeUI.HtmlColorLabel
     Friend WithEvents MB_空状态打开目录 As LakeUI.ModernButton
     Friend WithEvents MP_插件详情 As LakeUI.ModernPanel
-    Friend WithEvents 详情视图 As 插件详情视图_v6
+    Friend WithEvents 详情视图 As 插件详情GPU视图_v6
     Friend WithEvents HCL_说明 As LakeUI.HtmlColorLabel
-    Friend WithEvents 管理工具栏 As Panel
+    Friend WithEvents 管理工具栏 As LakeUI.ModernPanel
     Friend WithEvents HCL_概览 As LakeUI.HtmlColorLabel
-    Friend WithEvents FLP_管理操作 As FlowLayoutPanel
+    Friend WithEvents FLP_管理操作 As LakeUI.ModernPanel
     Friend WithEvents MB_打开目录 As LakeUI.ModernButton
     Friend WithEvents MB_刷新 As LakeUI.ModernButton
     Friend WithEvents MB_切换启用 As LakeUI.ModernButton

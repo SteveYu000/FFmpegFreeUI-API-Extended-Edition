@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     发布 FFmpegFreeUI API Extended Edition 的框架依赖单文件版本。
 

@@ -142,13 +142,13 @@ Public Class Form_v6_参数面板
             ("video-frame", 7),
             ("video-quality", 8),
             ("color", 9),
-            ("frame-server", 10),
-            ("audio", 12),
-            ("trim", 14),
-            ("filter-order", 15),
-            ("custom", 16),
-            ("stream-control", 17),
-            ("additional", 19)
+            ("frame-server", 19),
+            ("audio", 11),
+            ("trim", 13),
+            ("filter-order", 14),
+            ("custom", 15),
+            ("stream-control", 16),
+            ("additional", 18)
         }
         For Each mapping In mappings
             原生参数选项卡.Add(mapping.Id, ModernTabListControl1.Items(mapping.Index))
@@ -248,7 +248,8 @@ Public Class Form_v6_参数面板
             ("chapters", "章节", 私有界面_章节),
             ("attachments", "附件", 私有界面_附件),
             ("video-frame-extract", "抽帧参数", 私有界面_画面帧.私有窗口_抽帧参数),
-            ("video-frame-interpolate", "插帧参数", 私有界面_画面帧.私有窗口_插帧参数),
+            ("video-frame-interpolate", "简易插帧参数", 私有界面_画面帧.私有窗口_简易插帧参数),
+            ("video-frame-interpolate-nv-fruc", "NV FRUC 插帧参数", 私有界面_画面帧.私有窗口_NV_FRUC_插帧参数),
             ("video-frame-burn-subtitles", "烧录字幕", 私有界面_画面帧.私有窗口_烧录字幕),
             ("video-frame-denoise", "降噪", 私有界面_画面帧.私有窗口_降噪),
             ("video-frame-sharpen", "锐化", 私有界面_画面帧.私有窗口_锐化),

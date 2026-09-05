@@ -111,6 +111,7 @@ Partial Class FormMain_v6
         ' 
         ModernTextBox1.BackColor = Color.FromArgb(CByte(48), CByte(48), CByte(48))
         ModernTextBox1.BackColor1 = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        ModernTextBox1.BackgroundSource = ModernTabListControl1
         ModernTextBox1.BorderColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
         ModernTextBox1.BorderColorFocus = Color.FromArgb(CByte(120), CByte(220), CByte(220), CByte(220))
         ModernTextBox1.BorderRadius = 5
@@ -130,7 +131,6 @@ Partial Class FormMain_v6
         ' 
         ThisIsYourWindow1.BackdropNoiseScale = 0.5F
         ThisIsYourWindow1.BackdropTintColor = Color.FromArgb(CByte(160), CByte(0), CByte(0), CByte(0))
-        ThisIsYourWindow1.BackdropTintInactiveColor = Color.FromArgb(CByte(160), CByte(0), CByte(0), CByte(0))
         ThisIsYourWindow1.BorderColor = Color.Gray
         ThisIsYourWindow1.BorderInactiveColor = Color.Gray
         ThisIsYourWindow1.ButtonCornerRadius = 5

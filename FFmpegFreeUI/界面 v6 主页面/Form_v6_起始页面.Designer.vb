@@ -24,10 +24,10 @@ Partial Class Form_v6_起始页面
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form_v6_起始页面))
         ModernPanel2 = New LakeUI.ModernPanel()
-        Panel1 = New Panel()
+        HtmlColorLabel1 = New LakeUI.HtmlColorLabel()
+        Panel1 = New LakeUI.ModernPanel()
         MCB_清理内存 = New LakeUI.ModernComboBox()
         HtmlColorLabel2 = New LakeUI.HtmlColorLabel()
-        HtmlColorLabel1 = New LakeUI.HtmlColorLabel()
         ModernPanel3 = New LakeUI.ModernPanel()
         ModernPanel1 = New LakeUI.ModernPanel()
         ModernPanel5 = New LakeUI.ModernPanel()
@@ -63,11 +63,12 @@ Partial Class Form_v6_起始页面
         ' 
         ' ModernPanel2
         ' 
+        ModernPanel2.BackColor = Color.Transparent
         ModernPanel2.BackColor1 = Color.Transparent
         ModernPanel2.BorderRadius = 10
         ModernPanel2.BorderSize = 0
-        ModernPanel2.Controls.Add(Panel1)
         ModernPanel2.Controls.Add(HtmlColorLabel1)
+        ModernPanel2.Controls.Add(Panel1)
         ModernPanel2.Controls.Add(ModernPanel3)
         ModernPanel2.Dock = DockStyle.Top
         ModernPanel2.Location = New Point(15, 15)
@@ -77,8 +78,25 @@ Partial Class Form_v6_起始页面
         ModernPanel2.Size = New Size(934, 100)
         ModernPanel2.TabIndex = 0
         ' 
+        ' HtmlColorLabel1
+        '
+        HtmlColorLabel1.AutoSizeMode = AutoSizeMode.GrowAndShrink
+        HtmlColorLabel1.Dock = DockStyle.Fill
+        HtmlColorLabel1.LineSpacing = 5
+        HtmlColorLabel1.Location = New Point(80, 20)
+        HtmlColorLabel1.Margin = New Padding(2)
+        HtmlColorLabel1.Name = "HtmlColorLabel1"
+        HtmlColorLabel1.Padding = New Padding(15, 0, 0, 0)
+        HtmlColorLabel1.Size = New Size(634, 60)
+        HtmlColorLabel1.TabIndex = 1
+        HtmlColorLabel1.Text = "主标题<br>副标题"
+        HtmlColorLabel1.TextAlign = LakeUI.HtmlColorLabel.TextAlignEnum.MiddleLeft
+        '
         ' Panel1
         ' 
+        Panel1.BackColor = Color.Transparent
+        Panel1.BackColor1 = Color.Transparent
+        Panel1.BorderSize = 0
         Panel1.Controls.Add(MCB_清理内存)
         Panel1.Controls.Add(HtmlColorLabel2)
         Panel1.Dock = DockStyle.Right
@@ -89,6 +107,7 @@ Partial Class Form_v6_起始页面
         ' 
         ' MCB_清理内存
         ' 
+        MCB_清理内存.BackColor = Color.Transparent
         MCB_清理内存.BackColor1 = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
         MCB_清理内存.BorderRadius = 10
         MCB_清理内存.BorderSize = 0
@@ -134,22 +153,9 @@ Partial Class Form_v6_起始页面
         HtmlColorLabel2.Text = "@湖边的稻草 (1059 Studio)"
         HtmlColorLabel2.TextAlign = LakeUI.HtmlColorLabel.TextAlignEnum.TopRight
         ' 
-        ' HtmlColorLabel1
-        ' 
-        HtmlColorLabel1.AutoSizeMode = AutoSizeMode.GrowAndShrink
-        HtmlColorLabel1.Dock = DockStyle.Fill
-        HtmlColorLabel1.LineSpacing = 5
-        HtmlColorLabel1.Location = New Point(80, 20)
-        HtmlColorLabel1.Margin = New Padding(2)
-        HtmlColorLabel1.Name = "HtmlColorLabel1"
-        HtmlColorLabel1.Padding = New Padding(15, 0, 0, 0)
-        HtmlColorLabel1.Size = New Size(834, 60)
-        HtmlColorLabel1.TabIndex = 1
-        HtmlColorLabel1.Text = "主标题<br>副标题"
-        HtmlColorLabel1.TextAlign = LakeUI.HtmlColorLabel.TextAlignEnum.MiddleLeft
-        ' 
         ' ModernPanel3
         ' 
+        ModernPanel3.BackColor = Color.Transparent
         ModernPanel3.BackColor1 = Color.Transparent
         ModernPanel3.BorderColor = Color.FromArgb(CByte(56), CByte(56), CByte(56))
         ModernPanel3.BorderRadius = 5
@@ -183,6 +189,7 @@ Partial Class Form_v6_起始页面
         ' 
         ' ModernPanel5
         ' 
+        ModernPanel5.BackColor = Color.Transparent
         ModernPanel5.BackColor1 = Color.Transparent
         ModernPanel5.BorderColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
         ModernPanel5.BorderRadius = 10
@@ -292,10 +299,9 @@ Partial Class Form_v6_起始页面
         HtmlColorLabel7.TabIndex = 25
         HtmlColorLabel7.Text = "3F Project"
         HtmlColorLabel7.TextAlign = LakeUI.HtmlColorLabel.TextAlignEnum.Center
-        ' 
+        '
         ' 即将推出2
-        ' 
-        即将推出2.AnimationDuration = 0
+        '
         即将推出2.BackColor1 = Color.Transparent
         即将推出2.BorderRadius = 10
         即将推出2.BorderSize = 0
@@ -311,9 +317,9 @@ Partial Class Form_v6_起始页面
         即将推出2.TabIndex = 24
         即将推出2.Text = "自建社区应用组件"
         即将推出2.TextAlign = LakeUI.ModernButton.TextAlignEnum.Left
-        ' 
+        '
         ' HtmlColorLabel5
-        ' 
+        '
         HtmlColorLabel5.AutoSize = True
         HtmlColorLabel5.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HtmlColorLabel5.Dock = DockStyle.Top
@@ -338,6 +344,7 @@ Partial Class Form_v6_起始页面
         ' 
         ' MP_新闻列表
         ' 
+        MP_新闻列表.BackColor = Color.Transparent
         MP_新闻列表.BackColor1 = Color.Transparent
         MP_新闻列表.BorderColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
         MP_新闻列表.BorderRadius = 10
@@ -377,6 +384,7 @@ Partial Class Form_v6_起始页面
         ' 
         ' ModernPanel4
         ' 
+        ModernPanel4.BackColor = Color.Transparent
         ModernPanel4.BackColor1 = Color.Transparent
         ModernPanel4.BorderRadius = 10
         ModernPanel4.BorderSize = 0
@@ -399,7 +407,6 @@ Partial Class Form_v6_起始页面
         ' 
         ' MB_FFmpegFull
         ' 
-        MB_FFmpegFull.AnimationDuration = 0
         MB_FFmpegFull.BackColor1 = Color.Transparent
         MB_FFmpegFull.BorderRadius = 10
         MB_FFmpegFull.BorderSize = 0
@@ -419,7 +426,6 @@ Partial Class Form_v6_起始页面
         ' 
         ' MB_LakeUI
         ' 
-        MB_LakeUI.AnimationDuration = 0
         MB_LakeUI.BackColor1 = Color.Transparent
         MB_LakeUI.BorderRadius = 10
         MB_LakeUI.BorderSize = 0
@@ -433,12 +439,11 @@ Partial Class Form_v6_起始页面
         MB_LakeUI.SubText = "将 DirectX GPU 加速 带入 WinForms"
         MB_LakeUI.SubTextForeColor = Color.DarkGray
         MB_LakeUI.TabIndex = 14
-        MB_LakeUI.Text = "界面主框架：LakeUI v3"
+        MB_LakeUI.Text = "界面主框架：LakeUI v5"
         MB_LakeUI.TextAlign = LakeUI.ModernButton.TextAlignEnum.Left
         ' 
         ' MB_终末诗
         ' 
-        MB_终末诗.AnimationDuration = 0
         MB_终末诗.BackColor1 = Color.Transparent
         MB_终末诗.BorderRadius = 10
         MB_终末诗.BorderSize = 0
@@ -457,7 +462,6 @@ Partial Class Form_v6_起始页面
         ' 
         ' MB_爱发电
         ' 
-        MB_爱发电.AnimationDuration = 0
         MB_爱发电.BackColor1 = Color.Transparent
         MB_爱发电.BorderRadius = 10
         MB_爱发电.BorderSize = 0
@@ -477,7 +481,6 @@ Partial Class Form_v6_起始页面
         ' 
         ' MB_哔哩哔哩
         ' 
-        MB_哔哩哔哩.AnimationDuration = 0
         MB_哔哩哔哩.BackColor1 = Color.Transparent
         MB_哔哩哔哩.BorderRadius = 10
         MB_哔哩哔哩.BorderSize = 0
@@ -497,7 +500,6 @@ Partial Class Form_v6_起始页面
         ' 
         ' MB_官网
         ' 
-        MB_官网.AnimationDuration = 0
         MB_官网.BackColor1 = Color.Transparent
         MB_官网.BorderRadius = 10
         MB_官网.BorderSize = 0
@@ -517,7 +519,6 @@ Partial Class Form_v6_起始页面
         ' 
         ' MB_GitHub
         ' 
-        MB_GitHub.AnimationDuration = 0
         MB_GitHub.BackColor1 = Color.Transparent
         MB_GitHub.BorderRadius = 10
         MB_GitHub.BorderSize = 0
@@ -536,7 +537,6 @@ Partial Class Form_v6_起始页面
         ' 
         ' MB_AI提示
         ' 
-        MB_AI提示.AnimationDuration = 0
         MB_AI提示.BackColor1 = Color.Transparent
         MB_AI提示.BorderRadius = 10
         MB_AI提示.BorderSize = 0
@@ -607,7 +607,7 @@ Partial Class Form_v6_起始页面
     Friend WithEvents ModernPanel3 As LakeUI.ModernPanel
     Friend WithEvents HtmlColorLabel1 As LakeUI.HtmlColorLabel
     Friend WithEvents ModernPanel1 As LakeUI.ModernPanel
-    Friend WithEvents Panel1 As Panel
+    Friend WithEvents Panel1 As LakeUI.ModernPanel
     Friend WithEvents HtmlColorLabel2 As LakeUI.HtmlColorLabel
     Friend WithEvents MCB_清理内存 As LakeUI.ModernComboBox
     Friend WithEvents JustEmptyControl1 As LakeUI.JustEmptyControl

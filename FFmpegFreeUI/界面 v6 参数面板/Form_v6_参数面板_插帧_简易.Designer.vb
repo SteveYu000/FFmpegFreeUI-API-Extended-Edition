@@ -1,5 +1,5 @@
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class Form_v6_参数面板_插帧参数
+Partial Class Form_v6_参数面板_插帧_简易
     Inherits System.Windows.Forms.Form
 
     'Form 重写 Dispose，以清理组件列表。
@@ -23,34 +23,34 @@ Partial Class Form_v6_参数面板_插帧参数
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         ModernPanel1 = New LakeUI.ModernPanel()
-        Panel6 = New Panel()
+        Panel6 = New LakeUI.ModernPanel()
         MTB_场景变化检测强度 = New LakeUI.ModernTextBox()
         JustEmptyControl2 = New LakeUI.JustEmptyControl()
         MTB_搜索范围 = New LakeUI.ModernTextBox()
         JustEmptyControl4 = New LakeUI.JustEmptyControl()
         MTB_块大小 = New LakeUI.ModernTextBox()
-        Panel7 = New Panel()
+        Panel7 = New LakeUI.ModernPanel()
         HCL_场景变化检测强度 = New LakeUI.HtmlColorLabel()
         HCL_搜索范围 = New LakeUI.HtmlColorLabel()
         HCL_块大小 = New LakeUI.HtmlColorLabel()
         HCL_识别设置 = New LakeUI.HtmlColorLabel()
-        Panel3 = New Panel()
+        Panel3 = New LakeUI.ModernPanel()
         MCK_可变块大小的运动补偿 = New LakeUI.ModernCheckBox()
         MCB_运动补偿模式 = New LakeUI.ModernComboBox()
-        Panel5 = New Panel()
+        Panel5 = New LakeUI.ModernPanel()
         HCL_运动补偿模式 = New LakeUI.HtmlColorLabel()
-        Panel1 = New Panel()
+        Panel1 = New LakeUI.ModernPanel()
         MCB_运动估计算法 = New LakeUI.ModernComboBox()
         JustEmptyControl1 = New LakeUI.JustEmptyControl()
         MCB_运动估计模式 = New LakeUI.ModernComboBox()
         JustEmptyControl3 = New LakeUI.JustEmptyControl()
         MCB_插帧模式 = New LakeUI.ModernComboBox()
-        Panel4 = New Panel()
+        Panel4 = New LakeUI.ModernPanel()
         HCL_运动估计算法 = New LakeUI.HtmlColorLabel()
         HCL_运动估计模式 = New LakeUI.HtmlColorLabel()
         HCL_插帧模式 = New LakeUI.HtmlColorLabel()
         HCL_算法设置 = New LakeUI.HtmlColorLabel()
-        Panel2 = New Panel()
+        Panel2 = New LakeUI.ModernPanel()
         MTB_目标帧率 = New LakeUI.ModernTextBox()
         HCL_目标帧率 = New LakeUI.HtmlColorLabel()
         MCK_插帧总开关 = New LakeUI.ModernCheckBox()
@@ -66,7 +66,8 @@ Partial Class Form_v6_参数面板_插帧参数
         '
         ' ModernPanel1
         '
-        ModernPanel1.BackColor1 = Color.FromArgb(CByte(24), CByte(24), CByte(24))
+        ModernPanel1.BackColor = Color.Transparent
+        ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
         ModernPanel1.Controls.Add(Panel6)
         ModernPanel1.Controls.Add(Panel7)
@@ -89,13 +90,16 @@ Partial Class Form_v6_参数面板_插帧参数
         '
         ' Panel6
         '
+        Panel6.BackColor = Color.Transparent
+        Panel6.BackColor1 = Color.Transparent
+        Panel6.BorderSize = 0
         Panel6.Controls.Add(MTB_场景变化检测强度)
         Panel6.Controls.Add(JustEmptyControl2)
         Panel6.Controls.Add(MTB_搜索范围)
         Panel6.Controls.Add(JustEmptyControl4)
         Panel6.Controls.Add(MTB_块大小)
         Panel6.Dock = DockStyle.Top
-        Panel6.Location = New Point(20, 395)
+        Panel6.Location = New Point(20, 389)
         Panel6.Name = "Panel6"
         Panel6.Padding = New Padding(0, 10, 0, 0)
         Panel6.Size = New Size(594, 42)
@@ -173,11 +177,14 @@ Partial Class Form_v6_参数面板_插帧参数
         '
         ' Panel7
         '
+        Panel7.BackColor = Color.Transparent
+        Panel7.BackColor1 = Color.Transparent
+        Panel7.BorderSize = 0
         Panel7.Controls.Add(HCL_场景变化检测强度)
         Panel7.Controls.Add(HCL_搜索范围)
         Panel7.Controls.Add(HCL_块大小)
         Panel7.Dock = DockStyle.Top
-        Panel7.Location = New Point(20, 365)
+        Panel7.Location = New Point(20, 359)
         Panel7.Name = "Panel7"
         Panel7.Size = New Size(594, 30)
         Panel7.TabIndex = 32
@@ -227,20 +234,23 @@ Partial Class Form_v6_参数面板_插帧参数
         HCL_识别设置.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_识别设置.Dock = DockStyle.Top
         HCL_识别设置.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_识别设置.Location = New Point(20, 320)
+        HCL_识别设置.Location = New Point(20, 316)
         HCL_识别设置.Margin = New Padding(2)
         HCL_识别设置.Name = "HCL_识别设置"
         HCL_识别设置.Padding = New Padding(0, 20, 0, 0)
-        HCL_识别设置.Size = New Size(594, 45)
+        HCL_识别设置.Size = New Size(594, 43)
         HCL_识别设置.TabIndex = 29
         HCL_识别设置.Text = "<span style=""font-size:13; color:Silver"">识别设置</span>   值越大计算需求越多越稳定"
         '
         ' Panel3
         '
+        Panel3.BackColor = Color.Transparent
+        Panel3.BackColor1 = Color.Transparent
+        Panel3.BorderSize = 0
         Panel3.Controls.Add(MCK_可变块大小的运动补偿)
         Panel3.Controls.Add(MCB_运动补偿模式)
         Panel3.Dock = DockStyle.Top
-        Panel3.Location = New Point(20, 278)
+        Panel3.Location = New Point(20, 274)
         Panel3.Name = "Panel3"
         Panel3.Padding = New Padding(0, 10, 0, 0)
         Panel3.Size = New Size(594, 42)
@@ -296,9 +306,12 @@ Partial Class Form_v6_参数面板_插帧参数
         '
         ' Panel5
         '
+        Panel5.BackColor = Color.Transparent
+        Panel5.BackColor1 = Color.Transparent
+        Panel5.BorderSize = 0
         Panel5.Controls.Add(HCL_运动补偿模式)
         Panel5.Dock = DockStyle.Top
-        Panel5.Location = New Point(20, 248)
+        Panel5.Location = New Point(20, 244)
         Panel5.Name = "Panel5"
         Panel5.Size = New Size(594, 30)
         Panel5.TabIndex = 30
@@ -318,13 +331,16 @@ Partial Class Form_v6_参数面板_插帧参数
         '
         ' Panel1
         '
+        Panel1.BackColor = Color.Transparent
+        Panel1.BackColor1 = Color.Transparent
+        Panel1.BorderSize = 0
         Panel1.Controls.Add(MCB_运动估计算法)
         Panel1.Controls.Add(JustEmptyControl1)
         Panel1.Controls.Add(MCB_运动估计模式)
         Panel1.Controls.Add(JustEmptyControl3)
         Panel1.Controls.Add(MCB_插帧模式)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 206)
+        Panel1.Location = New Point(20, 202)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 0)
         Panel1.Size = New Size(594, 42)
@@ -448,11 +464,14 @@ Partial Class Form_v6_参数面板_插帧参数
         '
         ' Panel4
         '
+        Panel4.BackColor = Color.Transparent
+        Panel4.BackColor1 = Color.Transparent
+        Panel4.BorderSize = 0
         Panel4.Controls.Add(HCL_运动估计算法)
         Panel4.Controls.Add(HCL_运动估计模式)
         Panel4.Controls.Add(HCL_插帧模式)
         Panel4.Dock = DockStyle.Top
-        Panel4.Location = New Point(20, 176)
+        Panel4.Location = New Point(20, 172)
         Panel4.Name = "Panel4"
         Panel4.Size = New Size(594, 30)
         Panel4.TabIndex = 27
@@ -502,19 +521,22 @@ Partial Class Form_v6_参数面板_插帧参数
         HCL_算法设置.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_算法设置.Dock = DockStyle.Top
         HCL_算法设置.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_算法设置.Location = New Point(20, 131)
+        HCL_算法设置.Location = New Point(20, 129)
         HCL_算法设置.Margin = New Padding(2)
         HCL_算法设置.Name = "HCL_算法设置"
         HCL_算法设置.Padding = New Padding(0, 20, 0, 0)
-        HCL_算法设置.Size = New Size(594, 45)
+        HCL_算法设置.Size = New Size(594, 43)
         HCL_算法设置.TabIndex = 26
         HCL_算法设置.Text = "<span style=""font-size:13; color:Silver"">算法设置</span>   推荐的最佳质量：运动补偿插值 + 加权 obmc"
         '
         ' Panel2
         '
+        Panel2.BackColor = Color.Transparent
+        Panel2.BackColor1 = Color.Transparent
+        Panel2.BorderSize = 0
         Panel2.Controls.Add(MTB_目标帧率)
         Panel2.Dock = DockStyle.Top
-        Panel2.Location = New Point(20, 89)
+        Panel2.Location = New Point(20, 87)
         Panel2.Name = "Panel2"
         Panel2.Padding = New Padding(0, 10, 0, 0)
         Panel2.Size = New Size(594, 42)
@@ -548,7 +570,7 @@ Partial Class Form_v6_参数面板_插帧参数
         HCL_目标帧率.Margin = New Padding(2)
         HCL_目标帧率.Name = "HCL_目标帧率"
         HCL_目标帧率.Padding = New Padding(0, 20, 0, 0)
-        HCL_目标帧率.Size = New Size(594, 45)
+        HCL_目标帧率.Size = New Size(594, 43)
         HCL_目标帧率.TabIndex = 24
         HCL_目标帧率.Text = "<span style=""font-size:13; color:Silver"">目标帧率</span>   然后就不要在其他地方设置帧率了"
         '
@@ -570,7 +592,7 @@ Partial Class Form_v6_参数面板_插帧参数
         MCK_插帧总开关.TabIndex = 23
         MCK_插帧总开关.Text = "插帧总开关 / 勾选才会使用 / 建议考虑 AI 软件，如 SVP、TopazAI"
         '
-        ' Form_v6_参数面板_插帧参数
+        ' Form_v6_参数面板_插帧_简易
         '
         AutoScaleDimensions = New SizeF(96F, 96F)
         AutoScaleMode = AutoScaleMode.Dpi
@@ -582,10 +604,10 @@ Partial Class Form_v6_参数面板_插帧参数
         MaximizeBox = False
         MinimizeBox = False
         MinimumSize = New Size(650, 550)
-        Name = "Form_v6_参数面板_插帧参数"
+        Name = "Form_v6_参数面板_插帧_简易"
         ShowInTaskbar = False
         StartPosition = FormStartPosition.Manual
-        Text = "视频插帧"
+        Text = "简易插帧"
         ModernPanel1.ResumeLayout(False)
         ModernPanel1.PerformLayout()
         Panel6.ResumeLayout(False)
@@ -601,12 +623,12 @@ Partial Class Form_v6_参数面板_插帧参数
 
     Friend WithEvents ModernPanel1 As LakeUI.ModernPanel
     Friend WithEvents MCK_插帧总开关 As LakeUI.ModernCheckBox
-    Friend WithEvents Panel2 As Panel
+    Friend WithEvents Panel2 As LakeUI.ModernPanel
     Friend WithEvents MTB_目标帧率 As LakeUI.ModernTextBox
     Friend WithEvents HCL_目标帧率 As LakeUI.HtmlColorLabel
-    Friend WithEvents Panel1 As Panel
+    Friend WithEvents Panel1 As LakeUI.ModernPanel
     Friend WithEvents JustEmptyControl3 As LakeUI.JustEmptyControl
-    Friend WithEvents Panel4 As Panel
+    Friend WithEvents Panel4 As LakeUI.ModernPanel
     Friend WithEvents HCL_运动估计算法 As LakeUI.HtmlColorLabel
     Friend WithEvents HCL_运动估计模式 As LakeUI.HtmlColorLabel
     Friend WithEvents HCL_插帧模式 As LakeUI.HtmlColorLabel
@@ -616,16 +638,16 @@ Partial Class Form_v6_参数面板_插帧参数
     Friend WithEvents JustEmptyControl1 As LakeUI.JustEmptyControl
     Friend WithEvents MCB_运动估计模式 As LakeUI.ModernComboBox
     Friend WithEvents HCL_识别设置 As LakeUI.HtmlColorLabel
-    Friend WithEvents Panel3 As Panel
+    Friend WithEvents Panel3 As LakeUI.ModernPanel
     Friend WithEvents MCB_运动补偿模式 As LakeUI.ModernComboBox
-    Friend WithEvents Panel5 As Panel
+    Friend WithEvents Panel5 As LakeUI.ModernPanel
     Friend WithEvents HCL_运动补偿模式 As LakeUI.HtmlColorLabel
     Friend WithEvents MCK_可变块大小的运动补偿 As LakeUI.ModernCheckBox
-    Friend WithEvents Panel7 As Panel
+    Friend WithEvents Panel7 As LakeUI.ModernPanel
     Friend WithEvents HCL_场景变化检测强度 As LakeUI.HtmlColorLabel
     Friend WithEvents HCL_搜索范围 As LakeUI.HtmlColorLabel
     Friend WithEvents HCL_块大小 As LakeUI.HtmlColorLabel
-    Friend WithEvents Panel6 As Panel
+    Friend WithEvents Panel6 As LakeUI.ModernPanel
     Friend WithEvents MTB_场景变化检测强度 As LakeUI.ModernTextBox
     Friend WithEvents JustEmptyControl2 As LakeUI.JustEmptyControl
     Friend WithEvents MTB_搜索范围 As LakeUI.ModernTextBox

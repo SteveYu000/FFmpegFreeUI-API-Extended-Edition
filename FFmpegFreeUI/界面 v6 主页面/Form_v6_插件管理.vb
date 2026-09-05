@@ -17,6 +17,7 @@ Public Class Form_v6_插件管理
 
     Public Sub New()
         InitializeComponent()
+        配置LakeUI5渲染结构()
         If 是设计器宿主() Then
             初始化设计器预览()
             Return
@@ -27,6 +28,126 @@ Public Class Form_v6_插件管理
         AddHandler 插件管理.插件列表已变化, AddressOf 插件列表变化
         已订阅插件列表变化 = True
     End Sub
+
+    ''' <summary>
+    ''' LakeUI 5 的控件各自拥有 HWND 与交换链。这里把插件管理页的容器全部接入同一条
+    ''' GPU 背景依赖链，并使用单一的绝对布局所有者，避免 WinForms 透明布局容器与
+    ''' ModernPanel 的 presenter 同时争用子控件几何。
+    ''' </summary>
+    Private Sub 配置LakeUI5渲染结构()
+        插件设置布局.BackgroundSource = ModernPanel1
+        P_插件设置标题栏.BackgroundSource = 插件设置布局
+        P_插件设置内容.BackgroundSource = 插件设置布局
+        MB_返回插件详情.BackgroundSource = P_插件设置标题栏
+        HCL_插件设置标题.BackgroundSource = P_插件设置标题栏
+
+        管理工具栏.BackgroundSource = ModernPanel1
+        FLP_管理操作.BackgroundSource = 管理工具栏
+        HCL_概览.BackgroundSource = 管理工具栏
+        For Each button In {MB_打开目录, MB_刷新, MB_切换启用, MB_上移, MB_下移, MB_重启应用}
+            button.BackgroundSource = FLP_管理操作
+        Next
+
+        管理内容布局.BackgroundSource = ModernPanel1
+        P_插件列表区域.BackgroundSource = 管理内容布局
+        UDLV_插件列表.BackgroundSource = P_插件列表区域
+        P_空状态.BackgroundSource = P_插件列表区域
+        TLP_空状态.BackgroundSource = P_空状态
+        L_空状态标题.BackgroundSource = TLP_空状态
+        L_空状态说明.BackgroundSource = TLP_空状态
+        L_插件目录路径.BackgroundSource = TLP_空状态
+        MB_空状态打开目录.BackgroundSource = TLP_空状态
+
+        MP_插件详情.BackgroundSource = 管理内容布局
+        详情视图.BackgroundSource = MP_插件详情
+        HCL_说明.BackgroundSource = ModernPanel1
+        HCL_页面标题.BackgroundSource = ModernPanel1
+
+        AddHandler 管理内容布局.SizeChanged, AddressOf 页面布局尺寸变化
+        AddHandler 管理工具栏.SizeChanged, AddressOf 页面布局尺寸变化
+        AddHandler TLP_空状态.SizeChanged, AddressOf 页面布局尺寸变化
+        AddHandler Me.DpiChangedAfterParent, AddressOf 页面Dpi变化
+        更新页面布局()
+    End Sub
+
+    Private Sub 页面布局尺寸变化(sender As Object, e As EventArgs)
+        更新页面布局()
+    End Sub
+
+    Private Sub 页面Dpi变化(sender As Object, e As DpiChangedEventArgs)
+        更新页面布局()
+    End Sub
+
+    Private Sub 更新页面布局()
+        更新管理双栏布局()
+        更新管理工具栏布局()
+        更新空状态布局()
+    End Sub
+
+    Private Sub 更新管理双栏布局()
+        Dim width = 管理内容布局.ClientSize.Width
+        Dim height = 管理内容布局.ClientSize.Height
+        If width <= 0 OrElse height <= 0 Then Return
+
+        Dim gap = 缩放界面值(10)
+        Dim minimumListWidth = 缩放界面值(470)
+        Dim minimumDetailWidth = 缩放界面值(280)
+        Dim preferredDetailWidth = Math.Max(minimumDetailWidth, CInt(Math.Round(width * 0.31R)))
+        Dim detailWidth = Math.Min(preferredDetailWidth, Math.Max(minimumDetailWidth, width - gap - minimumListWidth))
+        detailWidth = Math.Min(detailWidth, Math.Max(1, width - gap - 1))
+        Dim listWidth = Math.Max(1, width - gap - detailWidth)
+
+        P_插件列表区域.SetBounds(0, 0, listWidth, height)
+        MP_插件详情.SetBounds(listWidth + gap, 0, detailWidth, height)
+    End Sub
+
+    Private Sub 更新管理工具栏布局()
+        Dim clientWidth = 管理工具栏.ClientSize.Width
+        Dim clientHeight = 管理工具栏.ClientSize.Height
+        If clientWidth <= 0 OrElse clientHeight <= 0 Then Return
+
+        Dim gap = 缩放界面值(10)
+        Dim x = 0
+        Dim buttons = {MB_打开目录, MB_刷新, MB_切换启用, MB_上移, MB_下移, MB_重启应用}
+        For Each button In buttons
+            button.Location = New Point(x, 0)
+            x += button.Width + gap
+        Next
+        If buttons.Length > 0 Then x -= gap
+
+        FLP_管理操作.SetBounds(0, 管理工具栏.Padding.Top, Math.Max(1, x), Math.Max(1, clientHeight - 管理工具栏.Padding.Vertical))
+        Dim overviewLeft = Math.Min(clientWidth, x + gap)
+        HCL_概览.SetBounds(overviewLeft,
+                          管理工具栏.Padding.Top,
+                          Math.Max(1, clientWidth - overviewLeft),
+                          Math.Max(1, clientHeight - 管理工具栏.Padding.Vertical))
+    End Sub
+
+    Private Sub 更新空状态布局()
+        Dim width = TLP_空状态.ClientSize.Width
+        Dim height = TLP_空状态.ClientSize.Height
+        If width <= 0 OrElse height <= 0 Then Return
+
+        Dim titleHeight = 缩放界面值(44)
+        Dim descriptionHeight = 缩放界面值(38)
+        Dim pathHeight = 缩放界面值(54)
+        Dim buttonHeight = MB_空状态打开目录.Height
+        Dim gap = 缩放界面值(5)
+        Dim totalHeight = titleHeight + descriptionHeight + pathHeight + buttonHeight + gap
+        Dim y = Math.Max(0, (height - totalHeight) \ 2)
+
+        L_空状态标题.SetBounds(0, y, width, titleHeight)
+        y += titleHeight
+        L_空状态说明.SetBounds(0, y, width, descriptionHeight)
+        y += descriptionHeight
+        L_插件目录路径.SetBounds(0, y, width, pathHeight)
+        y += pathHeight + gap
+        MB_空状态打开目录.Location = New Point(Math.Max(0, (width - MB_空状态打开目录.Width) \ 2), y)
+    End Sub
+
+    Private Function 缩放界面值(value As Integer) As Integer
+        Return Math.Max(1, CInt(Math.Round(value * CDbl(DeviceDpi) / 96.0R)))
+    End Function
 
     Private Shared Function 是设计器宿主() As Boolean
         If LicenseManager.UsageMode = LicenseUsageMode.Designtime Then Return True
@@ -56,6 +177,15 @@ Public Class Form_v6_插件管理
         调整列宽()
     End Sub
 
+    Friend Sub 提交切页首帧()
+        If Not Visible OrElse IsDisposed OrElse 是设计器宿主() Then Return
+        更新页面布局()
+        ' 页面切换是明确的同步视觉边界。LakeUI 5 要求父 surface 先于子 surface 提交；
+        ' 由主导航完成 BoundControl 切换后，再一次性按外到内提交，避免已显示但尚未
+        ' 提交的独立 HWND 短暂呈现黑色。
+        OuterToInnerRefreshScheduler.RequestFull(ModernPanel1, invalidateChildren:=True, immediate:=True)
+    End Sub
+
     Private Sub 插件列表变化(sender As Object, e As EventArgs)
         If 忽略管理器通知 OrElse IsDisposed Then Exit Sub
         If InvokeRequired Then
@@ -67,6 +197,7 @@ Public Class Form_v6_插件管理
 
     Private Sub 刷新列表(重新扫描 As Boolean)
         Dim selectedKey = 获取选中插件键()
+        Dim detailPlugin As 插件信息_v6 = Nothing
         If 重新扫描 Then
             忽略管理器通知 = True
             Try
@@ -100,7 +231,9 @@ Public Class Form_v6_插件管理
                 P_空状态.BringToFront()
             Else
                 Dim targetIndex = plugins.FindIndex(Function(item) String.Equals(item.插件键, selectedKey, StringComparison.OrdinalIgnoreCase))
-                UDLV_插件列表.SelectedIndex = If(targetIndex >= 0, targetIndex, 0)
+                targetIndex = If(targetIndex >= 0, targetIndex, 0)
+                UDLV_插件列表.SelectedIndex = targetIndex
+                detailPlugin = plugins(targetIndex)
                 UDLV_插件列表.BringToFront()
             End If
         Finally
@@ -112,7 +245,7 @@ Public Class Form_v6_插件管理
            Not plugins.Any(Function(item) item.Ext设置页插件标识.Contains(当前设置页插件标识, StringComparer.OrdinalIgnoreCase)) Then
             显示插件管理视图()
         ElseIf 插件设置布局 Is Nothing OrElse Not 插件设置布局.Visible Then
-            显示选中插件详情()
+            显示选中插件详情(detailPlugin)
         End If
         调整列宽()
     End Sub
@@ -172,8 +305,8 @@ Public Class Form_v6_插件管理
         Return Nothing
     End Function
 
-    Private Sub 显示选中插件详情()
-        Dim plugin = 获取选中插件()
+    Private Sub 显示选中插件详情(Optional preferredPlugin As 插件信息_v6 = Nothing)
+        Dim plugin = If(preferredPlugin, 获取选中插件())
         If plugin Is Nothing Then
             MB_切换启用.Text = "启用插件"
             MB_切换启用.ForeColor = Color.YellowGreen
