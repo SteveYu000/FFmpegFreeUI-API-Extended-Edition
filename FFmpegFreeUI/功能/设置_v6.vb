@@ -411,6 +411,8 @@ Public Class 设置_v6
             Dim image = LoadImageFromFile(自定义图标路径, preserveAnimation:=True)
             设置自有面板图片(Form_v6_起始页面.ModernPanel3, image, _当前自有图标)
             设置主窗体图标(CreateIconFromImage(image))
+        Else
+            设置主窗体图标(CreateIconFromImage(My.Resources.Resource1.AppIcon))
         End If
     End Sub
     Public Shared Sub 加载SP自定义起始页顶栏背景图()

@@ -7,7 +7,7 @@ Public NotInheritable Class Agent推理级别能力表_v6
     '   前缀("gpt-5.5", "xhigh")
     '   精确("some-model-id", "xhigh")
     Private Shared ReadOnly 规则 As 推理级别规则() = {
-        前缀("gpt-5", "xhigh")
+        前缀("gpt", "xhigh")
     }
 
     Public Shared Function 获取额外推理级别(modelId As String) As List(Of String)
