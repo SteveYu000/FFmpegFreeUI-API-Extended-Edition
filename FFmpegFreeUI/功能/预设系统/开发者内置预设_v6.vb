@@ -31,22 +31,8 @@ Public Class 开发者内置预设_v6
         RTX50_AV1.视频参数_色彩管理_像素格式 = "p010le"
         result.Add(New 预设项("RTX50 AV1", RTX50_AV1))
 
-        Dim RTX50_AV1_UHQ As New 预设数据_v6
-        RTX50_AV1_UHQ.预设备注 = "老黄 AV1 UHQ 模式推荐答案，极细微质量损失换来体积大幅降低，参考 VMAF = 94~95，最推荐 RTX50 全系使用。此预设仅包含视频参数！"
-        RTX50_AV1_UHQ.解码参数_解码器 = "cuda"
-        RTX50_AV1_UHQ.视频参数_编码器_类型 = 预设数据_v6.视频编码器类型.视频
-        RTX50_AV1_UHQ.视频参数_编码器_分类名称 = "AV1"
-        RTX50_AV1_UHQ.视频参数_编码器_具体编码 = "av1_nvenc"
-        RTX50_AV1_UHQ.视频参数_编码器_编码预设 = "p7"
-        RTX50_AV1_UHQ.视频参数_编码器_场景优化 = "uhq"
-        RTX50_AV1_UHQ.视频参数_比特率_控制方式 = 预设数据_v6.视频全局质量控制方式.VBR
-        RTX50_AV1_UHQ.视频参数_质量控制_参数名 = "cq"
-        RTX50_AV1_UHQ.视频参数_质量控制_值 = "38"
-        RTX50_AV1_UHQ.视频参数_色彩管理_像素格式 = "p010le"
-        result.Add(New 预设项("RTX50 AV1 UHQ", RTX50_AV1_UHQ))
-
         Dim RTX50_AV1_UHQ_EX As New 预设数据_v6
-        RTX50_AV1_UHQ_EX.预设备注 = "老黄 AV1 UHQ + 复杂度全开，提升极细微可能对稳定度有帮助但同时也可能不利于评测，参考 VMAF = 94~95，最推荐 RTX50 全系使用。此预设仅包含视频参数！"
+        RTX50_AV1_UHQ_EX.预设备注 = "老黄 AV1 UHQ + 复杂度全开，个人存储用显卡压片最优解，50系戈门御用参数，参考 VMAF = 94~95，最推荐 RTX50 全系使用。此预设仅包含视频参数！"
         RTX50_AV1_UHQ_EX.解码参数_解码器 = "cuda"
         RTX50_AV1_UHQ_EX.视频参数_编码器_类型 = 预设数据_v6.视频编码器类型.视频
         RTX50_AV1_UHQ_EX.视频参数_编码器_分类名称 = "AV1"
@@ -56,12 +42,12 @@ Public Class 开发者内置预设_v6
         RTX50_AV1_UHQ_EX.视频参数_比特率_控制方式 = 预设数据_v6.视频全局质量控制方式.VBR
         RTX50_AV1_UHQ_EX.视频参数_质量控制_参数名 = "cq"
         RTX50_AV1_UHQ_EX.视频参数_质量控制_值 = "38"
-        RTX50_AV1_UHQ_EX.视频参数_质量控制_进阶参数集 = "-multipass fullres -rc-lookahead 240 -spatial-aq 1 -temporal-aq 1 -aq-strength 15 -tf_level -1"
+        RTX50_AV1_UHQ_EX.视频参数_质量控制_进阶参数集 = "-multipass fullres -lookahead_level 15 -rc-lookahead 51 -spatial-aq 1 -temporal-aq 1 -aq-strength 15 -tf_level -1"
         RTX50_AV1_UHQ_EX.视频参数_色彩管理_像素格式 = "p010le"
-        result.Add(New 预设项("RTX50 AV1 UHQ 超压", RTX50_AV1_UHQ_EX))
+        result.Add(New 预设项("RTX50 AV1 UHQ 超压 V2", RTX50_AV1_UHQ_EX))
 
         Dim NVSDK131_AV1_Hierarchical_BFrames As New 预设数据_v6
-        NVSDK131_AV1_Hierarchical_BFrames.预设备注 = "从 FFmpeg 9.0 开始支持，需要更新到带 SDK 13.1 的驱动，也就是 610 及之后的版本，当然每代显卡收益不一样，老卡可能无法使用，最推荐 RTX50 全系使用。这个 AV1 hierarchical B-frame 的压缩度实际上打不赢 UHQ，还与 UHQ、前瞻帧、内部多遍分析 不兼容，如果你追求画质就不要用这个模式去压制。但它有一个更好的用途，比如只在手机这种小屏幕便携设备上观看，层次化B帧树开cq36 相较于 UHQ开cq38 能够将体积进一步降低约 30%，对于这类场景来说是非常高的收益。同时由于B帧增多，解码开销更大，强烈推荐带有AV1解码支持的芯片的设备。此预设仅包含视频参数！"
+        NVSDK131_AV1_Hierarchical_BFrames.预设备注 = "从 FFmpeg 9.0 开始支持，需要更新到带 SDK 13.1 的驱动，也就是 610 及之后的版本，当然每代显卡收益不一样，老卡可能无法使用。这个 AV1 hierarchical B-frame 的压缩度实际上打不赢 UHQ，还与 UHQ、前瞻帧、内部多遍分析 不兼容，如果你追求画质就不要用这个模式去压制，UHQ 依旧是版本答案。但它有一个更好的用途，比如只在手机这种小屏幕便携设备上观看，层次化B帧树开cq36 相较于 UHQ开cq38 能够将体积进一步降低约 30%，对于这类场景来说是非常高的收益。同时由于B帧增多，解码开销更大，强烈推荐带有AV1解码支持的芯片的设备。此预设仅包含视频参数！"
         NVSDK131_AV1_Hierarchical_BFrames.解码参数_解码器 = "cuda"
         NVSDK131_AV1_Hierarchical_BFrames.视频参数_编码器_类型 = 预设数据_v6.视频编码器类型.视频
         NVSDK131_AV1_Hierarchical_BFrames.视频参数_编码器_分类名称 = "AV1"
