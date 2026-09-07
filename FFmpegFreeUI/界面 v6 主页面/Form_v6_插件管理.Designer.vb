@@ -44,7 +44,7 @@ Partial Class Form_v6_插件管理
         L_插件目录路径 = New LakeUI.HtmlColorLabel()
         MB_空状态打开目录 = New LakeUI.ModernButton()
         MP_插件详情 = New LakeUI.ModernPanel()
-        详情视图 = New 插件详情GPU视图_v6()
+        详情视图 = New 插件详情视图_v6()
         HCL_说明 = New LakeUI.HtmlColorLabel()
         管理工具栏 = New LakeUI.ModernPanel()
         HCL_概览 = New LakeUI.HtmlColorLabel()
@@ -601,7 +601,7 @@ Partial Class Form_v6_插件管理
     Friend WithEvents L_插件目录路径 As LakeUI.HtmlColorLabel
     Friend WithEvents MB_空状态打开目录 As LakeUI.ModernButton
     Friend WithEvents MP_插件详情 As LakeUI.ModernPanel
-    Friend WithEvents 详情视图 As 插件详情GPU视图_v6
+    Friend WithEvents 详情视图 As 插件详情视图_v6
     Friend WithEvents HCL_说明 As LakeUI.HtmlColorLabel
     Friend WithEvents 管理工具栏 As LakeUI.ModernPanel
     Friend WithEvents HCL_概览 As LakeUI.HtmlColorLabel

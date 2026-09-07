@@ -2,7 +2,7 @@
 
 本文面向希望扩展 FFmpegFreeUI 界面、原生参数和任务处理链的插件开发者，对应 Ext Plugin API `2.5.0`。
 
-> **这篇指南不需要从头看到尾。** 先看下面的接口选择表，确定插件要做什么；然后只阅读“基础必读 + 对应能力 + 构建部署”三部分。插件只应引用 `FFmpegFreeUI.Ext.PluginSdk`，不要引用宿主内部程序集或通过反射访问私有控件。
+> **这篇指南不需要从头看到尾。** 先看下面的接口选择表，确定插件要做什么；然后只阅读“基础必读 + 对应能力 + 构建部署”三部分。通常只需引用 `FFmpegFreeUI.Ext.PluginSdk`；只有插件明确使用 LakeUI 控件时才增加 LakeUI 编译引用。不要引用宿主内部程序集或通过反射访问私有控件。
 
 ## 快速目录
 
@@ -214,11 +214,11 @@ dotnet restore .\FFmpegFreeUI-API-Extended-Edition.sln
 dotnet build .\FFmpegFreeUI-API-Extended-Edition.sln -c Debug --no-restore
 ```
 
-主程序会在还原时自动从 NuGet 获取 `LakeUI 3.31.0`。只开发独立 Ext 插件时无需直接引用或调用 LakeUI。
+当前主程序使用 **LakeUI 5.5**，完整源码构建通过主项目中的文件引用加载同级 LakeUI 源码仓库的编译产物，而不是从 NuGet 自动还原 LakeUI。先构建 LakeUI，或确保 `FFmpegFreeUI.vbproj` 中的 `HintPath` 指向实际的 LakeUI 5.5 程序集。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需 LakeUI 引用。
 
 ### 2.2 SDK 引用与编辑器提示
 
-Ext 插件只引用 `FFmpegFreeUI.Ext.PluginSdk`。不要引用 `FFmpegFreeUI.exe`、`FFmpegFreeUI.dll`、`FFmpegFreeUI.Ext.PluginHost.dll` 或 LakeUI；这些属于宿主运行时实现，不是插件合同。
+Ext 插件默认只引用 `FFmpegFreeUI.Ext.PluginSdk`。不要引用 `FFmpegFreeUI.exe`、`FFmpegFreeUI.dll` 或 `FFmpegFreeUI.Ext.PluginHost.dll`，这些属于宿主运行时实现，不是插件合同。只有在页面底板或其他控件明确使用 LakeUI 类型时，才按 [6.9.1](#page-entries) 的规则增加**仅编译期** LakeUI 引用；LakeUI 仍不属于 Ext SDK 合同。
 
 推荐按开发方式选择引用：
 
@@ -316,7 +316,7 @@ cd MyCompany.MyPlugin
 - `ExcludeAssets="runtime"` 防止构建时把 SDK 私有副本复制进插件输出；SDK 由 FFmpegFreeUI 根目录统一提供。
 - NuGet 包通过 `buildTransitive` 自动导入 `ExtDeployFFmpegFreeUIPlugin`；普通 `Build` 默认不会复制到安装目录。
 - SDK 源码联调和离线开发仍可使用 `ProjectReference` 或带 `HintPath` 的 DLL 引用，见下文。
-- 虽然FFmpegFreeUI使用了LakeUI，但这不是 Ext Plugin API 的硬依赖。普通 WinForms 控件最不容易受宿主 UI 库版本影响。如果插件自行引用第三方 UI 库，开发者需处理版本兼容、分发和许可证义务。
+- LakeUI 不是 Ext Plugin API 的硬依赖。普通、**不透明**的 WinForms 控件通常最容易保持兼容；不要把 `BackColor=Transparent` 的原生 `Label`、`Panel`、`UserControl` 或 `TableLayoutPanel` 直接叠在 LakeUI 5 GPU 控件/背景映射表面上。透明背景场景见 [6.9.1](#page-entries) 的合成约束。如果插件引用其他 UI 库，开发者仍需处理版本兼容、分发和许可证义务。
 
 ### 3.3 SDK 源码与独立文件引用
 
@@ -928,14 +928,33 @@ if (host.PageEntries.AvailableTargets.Any(x =>
 - `PageControl` 在执行 `CreatePage` 时还是 `null`，工厂返回后才可在 `Cleanup` 中读取；
 - 只有参数面板页面需要调用 `RequestParameterRefresh()`；主导航页面调用时不会执行操作。
 
-若插件页面要自动获得 FFmpegFreeUI 的个性化背景和“超容器背景映射”，页面底板必须是 **LakeUI 的 `ModernPanel`**，控件名称必须精确为 `ModernPanel1`，并设为 `DockStyle.Fill`。普通 WinForms 页面不需要依赖 LakeUI，也能正常显示，只是不会自动获得这项背景映射。需要该效果时可仅在编译期引用与宿主匹配的 LakeUI，不要随插件部署私有副本：
+若插件页面要自动获得 FFmpegFreeUI 的个性化背景和“超容器背景映射”，页面底板必须是 **LakeUI 的 `ModernPanel`**，控件名称必须精确为 `ModernPanel1`，并设为 `DockStyle.Fill`。普通 WinForms 页面不需要依赖 LakeUI，也能正常显示，只是不会自动获得这项背景映射。
+
+本仓库已验证的旧插件使用 NuGet `LakeUI 3.23.0` 编译既有公共控件，而实际宿主运行的是 LakeUI 5.5。引用必须限制为编译用途，插件发布目录中只能放插件自己的程序集，不能携带旧版 `LakeUI.dll`：
 
 ```xml
 <PackageReference Include="LakeUI"
-                  Version="3.31.0"
+                  Version="[3.23.0]"
                   PrivateAssets="all"
                   ExcludeAssets="runtime" />
 ```
+
+这项引用只允许使用经实际 FFmpegFreeUI 版本验证仍兼容的公开类型；它不会把 LakeUI 变成 Ext SDK 的稳定 ABI。使用了 LakeUI 控件的插件必须在目标 FFmpegFreeUI 发行版中做视觉回归，不能只以插件项目编译成功为依据。
+
+LakeUI 5 的每个 GPU 控件拥有独立 HWND 和 swap-chain。`Visible`、`Size`、`Parent`、`Dock`、页面切换以及 `BackgroundSource` 失效会分别影响这些 presenter。原生 WinForms 的“透明”控件并不是真正透明，它会要求父控件通过 GDI/`WM_PAINT` 重绘背景；当它与 GPU swap-chain 混合时，可能把空白或旧的 GDI 帧重新合成到 GPU 画面上，表现为黑块、重复文字、滚动拖影，且控件的 `Bounds`、`Visible` 和 presenter 实例看起来都可能完全正常。
+
+因此页面应遵守以下规则：
+
+- 不需要透出背景时，使用普通 WinForms 控件，但给容器和标签设置明确的不透明背景色；
+- 自定义整页需要透出背景时，以名为 `ModernPanel1` 的 `ModernPanel` 作为根底板；动态插入宿主页面的一组控件也应以一个 `ModernPanel` 作为该组的 GPU 根，而不是透明 `UserControl`；
+- 组根的 `BackgroundSource` 指向宿主提供的外层背景源，组内 LakeUI 控件的 `BackgroundSource` 再指向这个组根。需要透明文字时使用 `HtmlColorLabel` 等 LakeUI GPU 控件；
+- LakeUI 控件应直接放在 GPU 根下，或放进同样采用 LakeUI 合成路径的容器。不要在它们与 GPU 根之间夹入透明的原生 `Panel`、`TableLayoutPanel` 等布局容器；可在根容器的 `OnLayout` 中按 DPI 计算边界，且仅在边界变化时设置 `Bounds`；
+- 不要用长延时、循环 `Invalidate`、频繁 `Timer` 或反复切换 `Visible` 掩盖旧帧，这些做法会增加 GPU/CPU 开销且不能消除两套合成路径；
+- 页面切换后应同时测试个性化背景开/关、滚动、缩放、最小化/恢复和目标 DPI，并通过真实桌面捕获检查最终 swap-chain 输出。
+
+首次显示尚未创建 presenter 的复杂页面时，0～50 ms 内可能仍是上一帧或空表面，不能仅凭这一帧判定异常。本项目对官方 6.2.13 与合并版做了同条件捕获：参数面板约 250 ms 已完成首帧。只有在官方基线已经稳定后仍长期存在黑块、旧帧、文字截断，或重复切换后持续恶化，才应按合成问题排查。
+
+`ModernComboBox` 的关闭动画默认约 300 ms。弹层打开时改变选中项会立即更新控件文字，但 `SelectedIndexChanged` 会延迟到关闭动画结束后发送；插件不要另加 Timer 猜测选择结果，应在该事件到达后更新自己的页面状态。
 
 <a id="encoding-queue-toolbar"></a>
 
@@ -969,7 +988,7 @@ if (host.EncodingQueueToolbar.AvailableTargets.Any(x =>
 }
 ```
 
-工具栏工厂可以返回按钮、下拉框、标签或包含多个子控件的小型容器。宿主会将其高度统一为 `IExtPluginToolbarContext.RecommendedHeight`，清除外边距，并在插入/移除后重新计算原生按钮组居中位置；插件负责设置合适的宽度。`DeviceDpi` 可用于 DPI 尺寸计算，`ToolbarControl` 和 `TargetControl` 只应用于读取布局信息，不要修改或重新挂载原生控件。`ExtensionControl` 与页面上下文相同，在工厂执行期间为 `null`，返回后可在 `Cleanup` 中使用。
+工具栏工厂可以返回按钮、下拉框、标签或包含多个子控件的小型容器。宿主会将其高度统一为 `IExtPluginToolbarContext.RecommendedHeight`，清除外边距，并在插入/移除后重新计算原生按钮组居中位置；插件负责设置合适的宽度。普通 WinForms 工具栏控件应使用明确的不透明背景；若必须透出 LakeUI 背景，则遵守上一节的 GPU 控件和 `BackgroundSource` 规则。`DeviceDpi` 可用于 DPI 尺寸计算，`ToolbarControl` 和 `TargetControl` 只应用于读取布局信息，不要修改或重新挂载原生控件。`ExtensionControl` 与页面上下文相同，在工厂执行期间为 `null`，返回后可在 `Cleanup` 中使用。
 
 同一目标、同一侧的工具栏控件按 `Order → PluginId → Id` 排列。控件数量虽不受 API 限制，但顶栏宽度有限，应保持紧凑；耗时工作不要阻塞点击事件所在的 UI 线程。注册返回的 `IDisposable` 被释放或插件作用域结束时，宿主会移除页面/控件并调用 `Cleanup`。当前插件管理器不热卸载程序集，正常安装、替换、启用或停用插件仍应重启应用。
 
@@ -1829,6 +1848,12 @@ dotnet build .\Samples\FFmpegFreeUI.Ext.PluginApi.Sample\FFmpegFreeUI.Ext.Plugin
 - 装饰型工厂必须返回空，它不会自动显示新的一行；
 - 检查工厂是否抛出异常；
 - 不要复用已经属于另一个父容器的控件实例。
+
+### LakeUI 5 页面为什么出现黑块、重复文字或滚动拖影
+
+先检查插件是否把 `BackColor=Transparent` 的原生 WinForms `Label`、`Panel`、`UserControl` 或 `TableLayoutPanel` 放在 LakeUI GPU 控件或 `ModernPanel1` 背景映射上。原生透明会触发父级 GDI 重绘，它与各自拥有 HWND/swap-chain 的 LakeUI 5 控件是两条合成路径；旧 GDI 帧可能覆盖已经正确 present 的 GPU 帧。
+
+需要透明文字时改用 `HtmlColorLabel` 等 LakeUI GPU 控件；动态控件组使用 `ModernPanel` 作为 GPU 根，让组根映射宿主背景、子控件映射组根，并移除夹在两者之间的透明原生布局容器。无需透明时给 WinForms 控件设置明确的不透明背景。不要靠延时、Timer 或循环 `Invalidate` 修复。最后在实际 FFmpegFreeUI 中分别开启和关闭个性化背景，用桌面捕获验证首次进入、切换、滚动、缩放和最小化恢复；普通 GDI 截屏可能捕获不到 flip-model swap-chain，不能单独作为通过依据。
 
 ### 为什么添加原生下拉项后预设变成“未选择”
 
