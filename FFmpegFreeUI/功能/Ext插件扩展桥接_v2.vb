@@ -410,8 +410,8 @@ Friend Module Ext插件扩展桥接_v2
             .TaskStatus = 获取任务状态(task),
             .进度回调 = Sub(message, fraction) 报告任务插件进度(task, stageId, message, fraction),
             .结果回调 = Sub(pluginId, key, value, displayName, unit)
-                            task.记录插件结果(pluginId, key, value, displayName, unit)
-                        End Sub
+                        task.记录插件结果(pluginId, key, value, displayName, unit)
+                    End Sub
         }
         result.Properties("stepCount") = task.步骤.Count.ToString(CultureInfo.InvariantCulture)
         If task.当前步骤索引 >= 0 AndAlso task.当前步骤索引 < task.步骤.Count Then

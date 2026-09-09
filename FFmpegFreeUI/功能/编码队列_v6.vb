@@ -492,11 +492,11 @@ Public Class 编码队列_v6
         Dim removed As New List(Of 编码任务_v6)
         SyncLock 队列锁
             队列项目.RemoveAll(Function(task)
-                              If Not idSet.Contains(task.ID) OrElse Not task.可移除 Then Return False
-                              removed.Add(task)
-                              任务索引.Remove(task.ID)
-                              Return True
-                          End Function)
+                               If Not idSet.Contains(task.ID) OrElse Not task.可移除 Then Return False
+                               removed.Add(task)
+                               任务索引.Remove(task.ID)
+                               Return True
+                           End Function)
         End SyncLock
         For Each task In removed
             触发插件事件("task.removed", task)
