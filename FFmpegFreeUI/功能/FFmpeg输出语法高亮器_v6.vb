@@ -38,12 +38,12 @@ Public Class FFmpeg输出语法高亮器_v6
         If text.Length = 0 Then Return New ModernTextBox.SyntaxHighlightResult(tokens, 0)
 
         If 编码队列_v6.是否错误输出(text) Then
-            tokens.Add(New ModernTextBox.SyntaxToken(0, text.Length, 颜色_错误))
+            添加片段(tokens, 0, text.Length, 颜色_错误)
             Return New ModernTextBox.SyntaxHighlightResult(tokens, 0)
         End If
 
         If text.Contains("warning", StringComparison.OrdinalIgnoreCase) OrElse text.Contains("deprecated", StringComparison.OrdinalIgnoreCase) Then
-            tokens.Add(New ModernTextBox.SyntaxToken(0, text.Length, 颜色_警告))
+            添加片段(tokens, 0, text.Length, 颜色_警告)
             Return New ModernTextBox.SyntaxHighlightResult(tokens, 0)
         End If
 
@@ -109,6 +109,26 @@ Public Class FFmpeg输出语法高亮器_v6
             Dim tokenEnd = token.StartCol + token.Length
             If token.StartCol < endCol AndAlso startCol < tokenEnd Then Exit Sub
         Next
-        tokens.Add(New ModernTextBox.SyntaxToken(startCol, length, color))
+        tokens.Add(New ModernTextBox.SyntaxToken(startCol, length, 获取当前显示颜色(color)))
     End Sub
+
+    Private Shared Function 获取当前显示颜色(color As Color) As Color
+        If Not 界面主题_v6.当前为浅色模式 Then Return color
+
+        Select Case color.ToArgb()
+            Case 颜色_错误.ToArgb() : Return Color.FromArgb(163, 38, 30)
+            Case 颜色_警告.ToArgb() : Return Color.FromArgb(130, 80, 0)
+            Case 颜色_系统.ToArgb() : Return Color.FromArgb(0, 85, 164)
+            Case 颜色_输入.ToArgb() : Return Color.FromArgb(0, 97, 55)
+            Case 颜色_输出.ToArgb() : Return Color.FromArgb(152, 69, 0)
+            Case 颜色_流编号.ToArgb() : Return Color.FromArgb(113, 54, 143)
+            Case 颜色_流类型.ToArgb() : Return Color.FromArgb(156, 60, 0)
+            Case 颜色_键名.ToArgb() : Return Color.FromArgb(0, 96, 104)
+            Case 颜色_数值.ToArgb() : Return Color.FromArgb(0, 90, 168)
+            Case 颜色_格式.ToArgb() : Return Color.FromArgb(74, 97, 0)
+            Case 颜色_路径.ToArgb() : Return Color.FromArgb(75, 85, 93)
+            Case 颜色_选项.ToArgb() : Return Color.FromArgb(96, 64, 153)
+            Case Else : Return 界面主题_v6.获取当前主题前景色(color)
+        End Select
+    End Function
 End Class

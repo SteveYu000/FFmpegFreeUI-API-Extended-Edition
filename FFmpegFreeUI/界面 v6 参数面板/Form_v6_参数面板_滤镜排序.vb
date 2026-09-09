@@ -159,7 +159,7 @@ Public Class Form_v6_参数面板_滤镜排序
             For Each item In _items
                 Dim lv As New UltraDetailListView.ListItem()
                 Dim 标识符项 As New UltraDetailListView.ListSubItem With {.Text = If(item.显示名称 <> "", item.显示名称, item.滤镜标识符.ToString())}
-                If 可直接编辑滤镜内容(item) Then 标识符项.ForeColor = Color.Orange
+                If 可直接编辑滤镜内容(item) Then 标识符项.ForeColor = 界面主题_v6.获取当前主题前景色(Color.Orange)
                 lv.SubItems.Add(标识符项)
                 lv.SubItems.Add(New UltraDetailListView.ListSubItem With {.Text = item.滤镜目标流类型.ToString()})
                 lv.SubItems.Add(New UltraDetailListView.ListSubItem With {.Text = item.自定义滤镜内容})

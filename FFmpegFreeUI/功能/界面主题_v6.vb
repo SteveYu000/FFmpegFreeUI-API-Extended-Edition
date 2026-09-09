@@ -26,6 +26,7 @@ Public Module 界面主题_v6
     Private ReadOnly 浅色基础背景 As Color = Color.FromArgb(239, 239, 239)
     Private ReadOnly 浅色表面背景 As Color = Color.White
     Private ReadOnly 浅色强调绿色 As Color = Color.FromArgb(0, 122, 0)
+    Private ReadOnly 浅色强调橙色 As Color = Color.FromArgb(145, 58, 0)
 
     <DllImport("dwmapi.dll")>
     Private Function DwmGetColorizationColor(ByRef colorization As UInteger,
@@ -48,9 +49,15 @@ Public Module 界面主题_v6
         End Get
     End Property
 
-    Public Function 获取当前主题前景色(original As Color) As Color
-        Return If(_当前浅色, 转换为浅色(original, "ForeColor"), original)
+    Public Function 获取当前主题前景色(original As Color, Optional 最低对比度 As Double = 4.5R) As Color
+        Return If(_当前浅色, 转换为浅色(original, "ForeColor", Nothing, 最低对比度), original)
     End Function
+
+    Public Sub 应用当前主题到窗体(form As Form)
+        If form Is Nothing OrElse form.IsDisposed Then Return
+        If Not _已初始化 Then 刷新主题(True)
+        应用控件树(form, True)
+    End Sub
 
     ''' <summary>初始化系统主题监听，并立即将当前 Windows“应用模式”应用到已加载界面。</summary>
     Public Sub 初始化()
@@ -66,7 +73,7 @@ Public Module 界面主题_v6
         刷新主题(True)
     End Sub
 
-    ''' <summary>0=跟随 Windows 应用模式；1=始终使用明亮；2=始终使用暗黑。</summary>
+    ''' <summary>0=跟随 Windows 应用模式；1=始终使用浅色模式；2=始终使用深色模式。</summary>
     Public Sub 刷新主题(Optional 强制刷新 As Boolean = False)
         Dim 浅色 As Boolean
         Select Case 设置_v6.实例对象.界面主题
@@ -296,6 +303,11 @@ Public Module 界面主题_v6
             Catch
             End Try
         End If
+
+        If TypeOf target Is ModernTextBox Then
+            Dim textBox = DirectCast(target, ModernTextBox)
+            If textBox.EnableSyntaxHighlight AndAlso textBox.SyntaxHighlighter IsNot Nothing Then textBox.SyntaxHighlighter = textBox.SyntaxHighlighter
+        End If
     End Sub
 
     Private Function 获取或创建快照(target As Object) As 控件主题快照
@@ -335,7 +347,7 @@ Public Module 界面主题_v6
             End Function)
     End Function
 
-    Private Function 转换为浅色(original As Color, propertyName As String, Optional target As Object = Nothing) As Color
+    Private Function 转换为浅色(original As Color, propertyName As String, Optional target As Object = Nothing, Optional 最低对比度 As Double = 4.5R) As Color
         If original.IsEmpty OrElse original.A = 0 Then Return original
 
         Dim name = If(propertyName, String.Empty)
@@ -370,6 +382,7 @@ Public Module 界面主题_v6
                            name.Contains("TextColor", StringComparison.OrdinalIgnoreCase)
         If isForeground Then
             If original.ToArgb() = Color.YellowGreen.ToArgb() Then Return 浅色强调绿色
+            If original.ToArgb() = Color.Orange.ToArgb() Then Return 浅色强调橙色
             Dim alpha = If(original.A < 255, Math.Max(CInt(original.A), 210), 255)
             Dim candidate As Color
             If neutral Then
@@ -385,7 +398,7 @@ Public Module 界面主题_v6
             Else
                 candidate = Color.FromArgb(alpha, original.R, original.G, original.B)
             End If
-            Return 确保浅色前景对比度(candidate, 4.5R)
+            Return 确保浅色前景对比度(candidate, 最低对比度)
         End If
 
         Dim isBorder = name.Contains("Border", StringComparison.OrdinalIgnoreCase) OrElse

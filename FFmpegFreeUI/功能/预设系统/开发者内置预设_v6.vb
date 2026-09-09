@@ -1,5 +1,3 @@
-Imports System.Text.Json
-
 Public Class 开发者内置预设_v6
 
     Public Class 预设项
@@ -166,11 +164,7 @@ Public Class 开发者内置预设_v6
     End Function
 
     Public Shared Function 克隆预设数据(source As 预设数据_v6) As 预设数据_v6
-        If source Is Nothing Then Return Nothing
-        Dim json = JsonSerializer.Serialize(source, JsonSO)
-        Dim result = JsonSerializer.Deserialize(Of 预设数据_v6)(json, JsonSO)
-        预设管理_v6.初始化空集合(result)
-        Return result
+        Return 预设管理_v6.克隆预设数据(source)
     End Function
 
 End Class

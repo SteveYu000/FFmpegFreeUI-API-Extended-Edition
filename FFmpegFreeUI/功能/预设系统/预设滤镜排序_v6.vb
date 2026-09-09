@@ -31,7 +31,7 @@ Partial Public Class 预设管理_v6
 
     Private Shared Sub 迁移旧自定义滤镜字段到排序系统(a As 预设数据_v6)
         If a Is Nothing Then Exit Sub
-        Dim 排序 = If(a.滤镜排序系统, Array.Empty(Of 预设数据_v6.滤镜排序单片结构)()).ToList()
+        Dim 排序 = If(a.滤镜排序系统, Array.Empty(Of 预设数据_v6.滤镜排序单片结构)()).Where(Function(x) x IsNot Nothing).ToList()
         If Not String.IsNullOrWhiteSpace(a.自定义参数_视频滤镜) Then
             Dim 内容 = a.自定义参数_视频滤镜.Trim()
             If Not 排序.Any(Function(x) x.滤镜标识符 = 预设数据_v6.滤镜排序单片结构.标识符枚举.自定义视频滤镜 AndAlso String.Equals(x.自定义滤镜内容, 内容, StringComparison.Ordinal)) Then

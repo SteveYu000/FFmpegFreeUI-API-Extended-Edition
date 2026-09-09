@@ -1,10 +1,27 @@
-Imports System.Globalization
 Imports System.IO
-Imports System.Text
 Imports System.Text.Json
-Imports LakeUI
 
 Partial Public Class 预设管理_v6
+
+    Private Shared ReadOnly 预设复制选项 As New JsonSerializerOptions(JsonSO) With {.WriteIndented = False}
+
+    Public Shared Function 克隆预设数据(source As 预设数据_v6) As 预设数据_v6
+        If source Is Nothing Then Return Nothing
+        Return 创建预设克隆工厂(source).Invoke()
+    End Function
+
+    ' Batch callers serialize once; every task still owns its mutable preset data.
+    Friend Shared Function 创建预设克隆工厂(source As 预设数据_v6) As Func(Of 预设数据_v6)
+        ArgumentNullException.ThrowIfNull(source)
+        Dim data = JsonSerializer.SerializeToUtf8Bytes(source, 预设复制选项)
+        Dim useOutputLocation = source.运行时使用输出位置
+        Return Function()
+                   Dim result = JsonSerializer.Deserialize(Of 预设数据_v6)(data, 预设复制选项)
+                   初始化空集合(result)
+                   result.运行时使用输出位置 = useOutputLocation
+                   Return result
+               End Function
+    End Function
 
     Public Shared ReadOnly Property 音频编码器排序表 As List(Of String)
         Get
@@ -44,9 +61,11 @@ Partial Public Class 预设管理_v6
 
     Public Shared Function 读取预设文件(文件路径 As String) As 预设数据_v6
         If Not File.Exists(文件路径) Then Return Nothing
-        Dim 数据 = JsonSerializer.Deserialize(Of 预设数据_v6)(File.ReadAllText(文件路径), JsonSO)
-        初始化空集合(数据)
-        Return 数据
+        Using stream = File.OpenRead(文件路径)
+            Dim 数据 = JsonSerializer.Deserialize(Of 预设数据_v6)(stream, JsonSO)
+            初始化空集合(数据)
+            Return 数据
+        End Using
     End Function
 
     Public Shared Function 预设包含输出位置(数据 As 预设数据_v6) As Boolean
@@ -63,30 +82,15 @@ Partial Public Class 预设管理_v6
     End Function
 
     Public Shared Sub 写入预设文件(文件路径 As String, 数据 As 预设数据_v6, Optional 保存输出位置 As Boolean? = Nothing)
-        初始化空集合(数据)
-        Directory.CreateDirectory(Path.GetDirectoryName(文件路径))
-        Dim 原计算机名称 = 数据.计算机名称
-        Dim 原输出位置 = 数据.输出位置
-        Dim 原保留子文件夹结构起始点 = 数据.输出位置_保留子文件夹结构起始点
-        Dim 原额外保存输出位置 = 数据.额外保存输出位置
-        Dim 原运行时使用输出位置 = 数据.运行时使用输出位置
+        ArgumentNullException.ThrowIfNull(数据)
+        Dim snapshot = 克隆预设数据(数据)
         Dim 应保存输出位置 = If(保存输出位置.HasValue, 保存输出位置.Value, 预设包含输出位置(数据))
-        Try
-            数据.额外保存输出位置 = False
-            数据.运行时使用输出位置 = False
-            If Not 应保存输出位置 Then
-                数据.计算机名称 = ""
-                数据.输出位置 = ""
-                数据.输出位置_保留子文件夹结构起始点 = ""
-            End If
-            File.WriteAllText(文件路径, JsonSerializer.Serialize(数据, JsonSO), Encoding.UTF8)
-        Finally
-            数据.计算机名称 = 原计算机名称
-            数据.输出位置 = 原输出位置
-            数据.输出位置_保留子文件夹结构起始点 = 原保留子文件夹结构起始点
-            数据.额外保存输出位置 = 原额外保存输出位置
-            数据.运行时使用输出位置 = 原运行时使用输出位置
-        End Try
+        If Not 应保存输出位置 Then
+            snapshot.计算机名称 = ""
+            snapshot.输出位置 = ""
+            snapshot.输出位置_保留子文件夹结构起始点 = ""
+        End If
+        原子文件写入_v6.写入文本(文件路径, JsonSerializer.Serialize(snapshot, JsonSO))
     End Sub
 
     Public Shared Sub 初始化空集合(a As 预设数据_v6)

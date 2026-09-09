@@ -20,8 +20,10 @@ Public NotInheritable Class 任务性能统计_v6
             Return result
         End If
 
+        Dim activeProcessIds = 编码队列_v6.获取队列快照().Select(Function(x) x.当前进程ID).Where(Function(x) x > 0).ToHashSet()
+        activeProcessIds.Add(processId)
         SyncLock 同步锁
-            清理已失效计数器(processId)
+            清理已失效计数器(activeProcessIds)
             Dim counter As MainAppUsageCounter = Nothing
             If Not 计数器表.TryGetValue(processId, counter) Then
                 Try
@@ -53,10 +55,16 @@ Public NotInheritable Class 任务性能统计_v6
         End SyncLock
     End Function
 
-    Private Shared Sub 清理已失效计数器(currentProcessId As Integer)
-        For Each processId In 计数器表.Keys.Where(Function(x) x <> currentProcessId).ToList()
+    Private Shared Sub 清理已失效计数器(activeProcessIds As ISet(Of Integer))
+        For Each processId In 计数器表.Keys.Where(Function(x) Not activeProcessIds.Contains(x)).ToList()
             释放计数器(processId)
         Next
+    End Sub
+
+    Friend Shared Sub 释放进程计数器(processId As Integer)
+        SyncLock 同步锁
+            释放计数器(processId)
+        End SyncLock
     End Sub
 
     Private Shared Sub 释放计数器(processId As Integer)

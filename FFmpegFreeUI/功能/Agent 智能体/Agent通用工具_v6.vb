@@ -60,7 +60,10 @@ Public NotInheritable Class Agent通用工具_v6
     Public Shared Function LimitText(text As String, maxLength As Integer, Optional suffix As String = "...[已截断]") As String
         text = If(text, "")
         If maxLength < 0 OrElse text.Length <= maxLength Then Return text
-        Return String.Concat(text.AsSpan(0, maxLength), If(suffix, ""))
+        suffix = If(suffix, "")
+        If maxLength = 0 Then Return ""
+        If suffix.Length >= maxLength Then Return suffix.Substring(0, maxLength)
+        Return String.Concat(text.AsSpan(0, maxLength - suffix.Length), suffix)
     End Function
 
     Public Shared Function DecodeTextBytes(bytes As Byte()) As String

@@ -142,8 +142,8 @@ Partial Class Form_v6_设置_界面显示
         MCB_界面主题.DropDownSelectedForeColor = Color.White
         MCB_界面主题.HoverBackColor1 = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
         MCB_界面主题.Items.Add("跟随 Windows")
-        MCB_界面主题.Items.Add("明亮")
-        MCB_界面主题.Items.Add("暗黑")
+        MCB_界面主题.Items.Add("浅色模式")
+        MCB_界面主题.Items.Add("深色模式")
         MCB_界面主题.Location = New Point(0, 10)
         MCB_界面主题.Margin = New Padding(2, 2, 2, 2)
         MCB_界面主题.Name = "MCB_界面主题"
@@ -168,7 +168,7 @@ Partial Class Form_v6_设置_界面显示
         HtmlColorLabel2.Padding = New Padding(0, 20, 0, 0)
         HtmlColorLabel2.Size = New Size(712, 43)
         HtmlColorLabel2.TabIndex = 12
-        HtmlColorLabel2.Text = "<span style=""font-size:13; color:Silver"">界面主题</span>   选择应用使用的明亮或暗黑配色，也可跟随 Windows 设置"
+        HtmlColorLabel2.Text = "<span style=""font-size:13; color:Silver"">界面主题</span>   选择应用使用的浅色模式或深色模式配色，也可跟随 Windows 设置"
         '
         ' Panel2
         '

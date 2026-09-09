@@ -15,6 +15,12 @@ Public Class Form_v6_编码队列
     Private 上次列宽Dpi As Single = -1
     Private 正在刷新列表 As Boolean = False
     Private 插件工具栏目标已注册 As Boolean
+    Private ReadOnly 刷新锁 As New Object
+    Private ReadOnly 待刷新任务 As New Dictionary(Of String, 编码任务_v6)(StringComparer.Ordinal)
+    Private 待刷新整表 As Boolean
+    Private 立即刷新已投递 As Boolean
+    Private Shared ReadOnly 刷新间隔 As Integer() = {200, 500, 1000, 2000, 3000}
+    Private WithEvents 队列刷新计时器 As New System.Windows.Forms.Timer With {.Interval = 1000}
 
     Private Sub Form_v6_编码队列_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         UltraDetailListView1.Items.Clear()
@@ -25,7 +31,9 @@ Public Class Form_v6_编码队列
         绑定菜单事件()
         AddHandler 编码队列_v6.队列已变化, AddressOf 队列已变化
         AddHandler 编码队列_v6.任务已更新, AddressOf 任务已更新
+        AddHandler 编码队列_v6.任务需立即刷新, AddressOf 请求立即刷新
         刷新整表()
+        队列刷新计时器.Start()
         请求校准编码队列列宽()
     End Sub
 
@@ -42,26 +50,78 @@ Public Class Form_v6_编码队列
     End Sub
 
     Private Sub Form_v6_编码队列_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
+        RemoveHandler 编码队列_v6.队列已变化, AddressOf 队列已变化
+        RemoveHandler 编码队列_v6.任务已更新, AddressOf 任务已更新
+        RemoveHandler 编码队列_v6.任务需立即刷新, AddressOf 请求立即刷新
+        队列刷新计时器.Stop()
+        队列刷新计时器.Dispose()
         列宽调整计时器.Stop()
         列宽调整计时器.Dispose()
     End Sub
 
     Private Sub 队列已变化()
-        UI执行(Sub() 刷新整表())
+        SyncLock 刷新锁
+            待刷新整表 = True
+        End SyncLock
+        请求立即刷新()
     End Sub
 
     Private Sub 任务已更新(任务 As 编码任务_v6)
         If 任务 Is Nothing Then Exit Sub
-        UI执行(Sub() 刷新任务行(任务))
+        SyncLock 刷新锁
+            待刷新任务(任务.ID) = 任务
+        End SyncLock
     End Sub
 
-    Private Sub UI执行(action As Action)
-        If action Is Nothing OrElse IsDisposed Then Exit Sub
-        If InvokeRequired Then
-            BeginInvoke(action)
-        Else
-            action()
+    Private Sub 队列刷新计时器_Tick(sender As Object, e As EventArgs) Handles 队列刷新计时器.Tick
+        队列刷新计时器.Interval = 刷新间隔(Math.Clamp(设置_v6.实例对象.编码队列刷新速度, 0, 刷新间隔.Length - 1))
+        刷新待处理更改()
+    End Sub
+
+    Private Sub 请求立即刷新()
+        If IsDisposed OrElse Disposing OrElse Not IsHandleCreated Then Exit Sub
+        SyncLock 刷新锁
+            If 立即刷新已投递 Then Exit Sub
+            立即刷新已投递 = True
+        End SyncLock
+        Try
+            ' Coalesce a batch of commands into the next UI turn without waiting for the progress timer.
+            BeginInvoke(Sub()
+                            SyncLock 刷新锁
+                                立即刷新已投递 = False
+                            End SyncLock
+                            If Not IsDisposed AndAlso Not Disposing Then 刷新待处理更改()
+                        End Sub)
+        Catch ex As InvalidOperationException
+            SyncLock 刷新锁
+                立即刷新已投递 = False
+            End SyncLock
+        End Try
+    End Sub
+
+    Private Sub 刷新待处理更改()
+        Dim reload As Boolean
+        Dim changed As List(Of 编码任务_v6)
+        SyncLock 刷新锁
+            reload = 待刷新整表
+            If Not reload AndAlso 待刷新任务.Count = 0 Then Exit Sub
+            changed = 待刷新任务.Values.ToList()
+            待刷新任务.Clear()
+            待刷新整表 = False
+        End SyncLock
+        If reload Then
+            刷新整表()
+            Exit Sub
         End If
+        UltraDetailListView1.BeginUpdate()
+        Try
+            For Each task In changed
+                刷新任务行(task)
+            Next
+        Finally
+            UltraDetailListView1.EndUpdate()
+        End Try
+        更新标题(编码队列_v6.获取队列快照())
     End Sub
 
     Private Sub 刷新整表()
@@ -69,25 +129,23 @@ Public Class Form_v6_编码队列
         正在刷新列表 = True
         UltraDetailListView1.BeginUpdate()
         Try
-            Dim selectedIds = 获取选中任务ID()
+            Dim snapshot = 编码队列_v6.获取队列快照()
+            Dim oldRows = New Dictionary(Of String, UltraDetailListView.ListItem)(任务行)
             UltraDetailListView1.Items.Clear()
             任务行.Clear()
-            For Each task In 编码队列_v6.获取队列快照()
-                Dim item = 创建任务行(task)
+            For Each task In snapshot
+                Dim item As UltraDetailListView.ListItem = Nothing
+                If Not oldRows.TryGetValue(task.ID, item) Then item = 创建任务行(task)
                 UltraDetailListView1.Items.Add(item)
                 任务行(task.ID) = item
                 刷新任务行(task)
             Next
-            If selectedIds.Count > 0 Then
-                Dim index = 编码队列_v6.获取队列快照().FindIndex(Function(x) selectedIds.Contains(x.ID))
-                If index >= 0 Then UltraDetailListView1.SelectedIndex = index
-            End If
-            更新标题()
-            Form_v6_编码队列_任务日志.同步队列选择(获取选中任务ID())
+            更新标题(snapshot)
         Finally
             UltraDetailListView1.EndUpdate()
             正在刷新列表 = False
         End Try
+        Form_v6_编码队列_任务日志.同步队列选择(获取选中任务ID())
     End Sub
 
     Private Function 创建任务行(task As 编码任务_v6) As UltraDetailListView.ListItem
@@ -95,26 +153,15 @@ Public Class Form_v6_编码队列
         For i = 0 To 7
             item.SubItems.Add(New UltraDetailListView.ListSubItem())
         Next
-        展示策略.应用(task, item)
         Return item
     End Function
 
     Private Sub 刷新任务行(task As 编码任务_v6)
         If task Is Nothing Then Exit Sub
         Dim item As UltraDetailListView.ListItem = Nothing
-        If Not 任务行.TryGetValue(task.ID, item) Then
-            刷新整表()
-            Exit Sub
-        End If
-
-        UltraDetailListView1.BeginUpdate()
-        Try
-            展示策略.应用(task, item)
-            item.InvalidateCache()
-        Finally
-            UltraDetailListView1.EndUpdate()
-        End Try
-        更新标题()
+        If Not 任务行.TryGetValue(task.ID, item) Then Exit Sub
+        展示策略.应用(task, item)
+        item.InvalidateCache()
     End Sub
 
     Private Function 获取选中任务ID() As List(Of String)
@@ -124,14 +171,18 @@ Public Class Form_v6_编码队列
             ToList()
     End Function
 
-    Private Sub 更新标题()
-        Dim items = 编码队列_v6.获取队列快照()
-        Dim running = items.Where(Function(x) x.状态 = 编码任务状态_v6.正在处理 OrElse x.状态 = 编码任务状态_v6.已暂停).Count()
-        Dim errors = items.Where(Function(x) x.状态 = 编码任务状态_v6.错误).Count()
+    Private Sub 更新标题(items As List(Of 编码任务_v6))
+        Dim running As Integer = 0
+        Dim errors As Integer = 0
+        For Each task In items
+            If task.状态 = 编码任务状态_v6.正在处理 OrElse task.状态 = 编码任务状态_v6.已暂停 Then running += 1
+            If task.状态 = 编码任务状态_v6.错误 Then errors += 1
+        Next
+        Dim 标签颜色 = System.Drawing.ColorTranslator.ToHtml(界面主题_v6.获取当前主题前景色(Color.DarkGray))
         HtmlColorLabel1.Text =
-            $"<span style=""color:DarkGray"">总数 </span><span style=""font-size:14pt; font-weight:bold; color:CornflowerBlue"">{items.Count}</span>" &
-            $"   <span style=""color:DarkGray"">运行 </span><span style=""font-size:14pt; font-weight:bold; color:YellowGreen"">{running}</span>" &
-            $"   <span style=""color:DarkGray"">错误 </span><span style=""font-size:14pt; font-weight:bold; color:{界面配色_v6.错误文本色Html}"">{errors}</span>"
+            $"<span style=""color:{标签颜色}"">总数 </span><span style=""font-size:14pt; font-weight:bold; color:CornflowerBlue"">{items.Count}</span>" &
+            $"   <span style=""color:{标签颜色}"">运行 </span><span style=""font-size:14pt; font-weight:bold; color:YellowGreen"">{running}</span>" &
+            $"   <span style=""color:{标签颜色}"">错误 </span><span style=""font-size:14pt; font-weight:bold; color:{界面配色_v6.错误文本色Html}"">{errors}</span>"
     End Sub
 
     Private Sub Panel1_SizeChanged(sender As Object, e As EventArgs) Handles Panel1.SizeChanged
@@ -243,7 +294,7 @@ Public Class Form_v6_编码队列
     End Sub
 
     Private Sub 全选任务()
-        If UltraDetailListView1.Items.Count > 0 Then UltraDetailListView1.SelectedIndex = 0
+        UltraDetailListView1.SelectAll()
     End Sub
 
     Private Sub 选中错误任务()

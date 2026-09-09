@@ -11,6 +11,8 @@ Public Class AgentLocalTools
     Public Const PermissionEnvironment As Integer = 1
     Public Const PermissionSystem As Integer = 2
 
+    Private Shared ReadOnly ToolJsonOptions As New JsonSerializerOptions(JsonSO) With {.WriteIndented = False}
+
     Public MustInherit Class ConsoleRunSession
         Implements IDisposable
 
@@ -175,16 +177,17 @@ Public Class AgentLocalTools
                                                           elapsedMilliseconds As Long,
                                                           stdout As String,
                                                           stderr As String) As Dictionary(Of String, Object)
-            Return New Dictionary(Of String, Object) From {
+            Dim result As New Dictionary(Of String, Object) From {
                 {InputPropertyNames(0), inputText},
                 {"working_directory", workingDirectory},
                 {"timeout_seconds", timeoutSeconds},
                 {"timed_out", timedOut},
                 {"exit_code", exitCode},
-                {"elapsed_ms", elapsedMilliseconds},
-                {"stdout", stdout},
-                {"stderr", stderr}
+                {"elapsed_ms", elapsedMilliseconds}
             }
+            If stdout <> "" Then result("stdout") = stdout
+            If stderr <> "" Then result("stderr") = stderr
+            Return result
         End Function
 
         Protected Overridable Function MissingInputMessage() As String
@@ -534,17 +537,17 @@ Public Class AgentLocalTools
             {"skill", New Dictionary(Of String, Object) From {{"type", "string"}, {"description", "skill 名称，默认 ffmpegfreeui"}}},
             {"reference", New Dictionary(Of String, Object) From {{"type", "string"}, {"description", "reference 名称，例如 SKILL.md 或 references/parameter-panel.md"}}}
         }, {"reference"}),
-            FunctionTool("get_parameter_panel_state", "读取当前 3FUI 参数面板的结构化预设 JSON、人类可读总览和命令行预览。", New Dictionary(Of String, Object)),
+            FunctionTool("get_parameter_panel_state", "读取当前参数面板，默认仅返回 overview。需要命令验证或完整预设时按需开启对应 include_*；关闭全部选项会报错。", BuildParameterResultProperties(True, False)),
             FunctionTool("get_parameter_field_info", "按字段名或关键词查询参数面板字段的类型、当前值、候选值和格式规则。填写不熟悉的参数前优先调用，避免猜字段值。", New Dictionary(Of String, Object) From {
             {"fields", New Dictionary(Of String, Object) From {{"type", "array"}, {"items", New Dictionary(Of String, Object) From {{"type", "string"}}}}},
             {"query", New Dictionary(Of String, Object) From {{"type", "string"}, {"description", "可选关键词，用于模糊查找字段名"}}},
             {"include_current_values", New Dictionary(Of String, Object) From {{"type", "boolean"}}}
         }),
-            FunctionTool("apply_parameter_panel_patch", "修改当前 3FUI 参数面板，并返回结构化结果、总览和命令行预览。优先传 changes 对象，键为 预设数据_v6 的属性名；也可传 preset_json 应用完整预设。修改 滤镜排序系统 时必须传完整排序列表，删除内置滤镜会同步清空对应参数页。", New Dictionary(Of String, Object) From {
+            FunctionTool("apply_parameter_panel_patch", "修改参数面板，默认返回变更结果和命令预览；总览、完整预设按需开启 include_*。优先传 changes 对象，键为 预设数据_v6 属性名；也可传 preset_json 应用完整预设。修改 滤镜排序系统 必须传完整排序列表，删除内置滤镜会清空对应参数页。", BuildParameterResultProperties(False, True, New Dictionary(Of String, Object) From {
             {"changes", New Dictionary(Of String, Object) From {{"type", "object"}, {"additionalProperties", True}}},
             {"preset_json", New Dictionary(Of String, Object) From {{"type", "string"}}},
             {"note", New Dictionary(Of String, Object) From {{"type", "string"}}}
-        })
+        }))
         }
 
         If permissionLevel >= PermissionEnvironment Then
@@ -711,7 +714,22 @@ Public Class AgentLocalTools
             AddConsoleToolDefinitions(tools)
         End If
 
-        Return tools
+        Return tools.
+            Where(Function(tool) tool IsNot Nothing).
+            GroupBy(Function(tool) GetToolName(tool), StringComparer.OrdinalIgnoreCase).
+            Select(Function(group) group.First()).
+            ToList()
+    End Function
+
+    Private Shared Function GetToolName(tool As Dictionary(Of String, Object)) As String
+        If tool Is Nothing Then Return ""
+        Dim functionValue As Object = Nothing
+        If Not tool.TryGetValue("function", functionValue) Then Return ""
+        Dim functionData = TryCast(functionValue, Dictionary(Of String, Object))
+        If functionData Is Nothing Then Return ""
+        Dim name As Object = Nothing
+        If functionData.TryGetValue("name", name) Then Return If(name, "").ToString().Trim()
+        Return ""
     End Function
 
     Private Shared Sub AddConsoleToolDefinitions(tools As List(Of Dictionary(Of String, Object)))
@@ -749,7 +767,7 @@ Public Class AgentLocalTools
                 Case "read_agent_skill_reference"
                     Return Agent技能资料库_v6.读取资料(Agent通用工具_v6.GetJsonString(args, "skill", "ffmpegfreeui"), Agent通用工具_v6.GetJsonString(args, "reference"))
                 Case "get_parameter_panel_state"
-                    Return GetParameterPanelState()
+                    Return GetParameterPanelState(args)
                 Case "get_parameter_field_info"
                     Return GetParameterFieldInfo(args)
                 Case "apply_parameter_panel_patch"
@@ -1053,17 +1071,18 @@ Public Class AgentLocalTools
         End Try
 
         If cancelled Then Throw New OperationCanceledException(cancellationToken)
-        Return JsonSerializer.Serialize(New Dictionary(Of String, Object) From {
+        Dim result As New Dictionary(Of String, Object) From {
             {"success", Not timedOut AndAlso exitCode = 0},
             {"executable", executable},
             {"working_directory", workingDirectory},
             {"arguments", arguments},
             {"exit_code", exitCode},
             {"timed_out", timedOut},
-            {"elapsed_ms", CLng(stopwatch.Elapsed.TotalMilliseconds)},
-            {"stdout", stdout},
-            {"stderr", stderr}
-        }, JsonSO)
+            {"elapsed_ms", CLng(stopwatch.Elapsed.TotalMilliseconds)}
+        }
+        If stdout <> "" Then result("stdout") = stdout
+        If stderr <> "" Then result("stderr") = stderr
+        Return JsonSerializer.Serialize(result, JsonSO)
     End Function
 
     Private Shared Function FunctionTool(name As String,
@@ -1084,15 +1103,37 @@ Public Class AgentLocalTools
         }
     End Function
 
-    Private Shared Function GetParameterPanelState() As String
-        Dim preset = 预设管理_v6.从面板创建预设(Form_v6_参数面板)
-        Dim overview = BuildParameterOverview(preset)
-        Dim payload As New Dictionary(Of String, Object) From {
-            {"overview", overview},
-            {"command_preview", BuildParameterCommandPreview(preset)},
-            {"preset_json", JsonSerializer.Serialize(preset, JsonSO)}
+    Private Shared Function BuildParameterResultProperties(defaultOverview As Boolean, defaultCommandPreview As Boolean,
+                                                            Optional properties As Dictionary(Of String, Object) = Nothing) As Dictionary(Of String, Object)
+        Dim result = If(properties, New Dictionary(Of String, Object))
+        Dim views As New Dictionary(Of String, Object) From {
+            {"include_overview", New Dictionary(Of String, Object) From {{"type", "boolean"}, {"default", defaultOverview}, {"description", "返回人类可读总览"}}},
+            {"include_command_preview", New Dictionary(Of String, Object) From {{"type", "boolean"}, {"default", defaultCommandPreview}, {"description", "生成并返回命令行预览"}}},
+            {"include_preset_json", New Dictionary(Of String, Object) From {{"type", "boolean"}, {"default", False}, {"description", "返回完整预设 JSON 字符串，内容较大，仅按需开启"}}}
         }
-        Return JsonSerializer.Serialize(payload, JsonSO)
+        For Each view In views
+            result.Add(view.Key, view.Value)
+        Next
+        Return result
+    End Function
+
+    Private Shared Sub AddParameterResultViews(payload As Dictionary(Of String, Object), preset As 预设数据_v6, args As JsonElement,
+                                              defaultOverview As Boolean, defaultCommandPreview As Boolean)
+        If Agent通用工具_v6.GetJsonBoolean(args, "include_overview", defaultOverview) Then payload("overview") = BuildParameterOverview(preset)
+        If Agent通用工具_v6.GetJsonBoolean(args, "include_command_preview", defaultCommandPreview) Then payload("command_preview") = BuildParameterCommandPreview(preset)
+        If Agent通用工具_v6.GetJsonBoolean(args, "include_preset_json", False) Then payload("preset_json") = JsonSerializer.Serialize(preset, ToolJsonOptions)
+    End Sub
+
+    Private Shared Function GetParameterPanelState(args As JsonElement) As String
+        If Not Agent通用工具_v6.GetJsonBoolean(args, "include_overview", True) AndAlso
+           Not Agent通用工具_v6.GetJsonBoolean(args, "include_command_preview", False) AndAlso
+           Not Agent通用工具_v6.GetJsonBoolean(args, "include_preset_json", False) Then
+            Return JsonSerializer.Serialize(New Dictionary(Of String, Object) From {{"error", "至少开启一个 include_* 返回选项。"}}, ToolJsonOptions)
+        End If
+        Dim preset = 预设管理_v6.从面板创建预设(Form_v6_参数面板)
+        Dim payload As New Dictionary(Of String, Object)
+        AddParameterResultViews(payload, preset, args, True, False)
+        Return JsonSerializer.Serialize(payload, ToolJsonOptions)
     End Function
 
     Private Shared Function ApplyParameterPanelPatch(args As JsonElement) As String
@@ -1103,6 +1144,7 @@ Public Class AgentLocalTools
         Dim requestedChanges As New List(Of Dictionary(Of String, Object))
         If args.ValueKind = JsonValueKind.Object AndAlso args.TryGetProperty("preset_json", presetJson) AndAlso presetJson.ValueKind = JsonValueKind.String AndAlso presetJson.GetString() <> "" Then
             preset = JsonSerializer.Deserialize(Of 预设数据_v6)(presetJson.GetString(), JsonSO)
+            If preset Is Nothing Then Return "preset_json 必须是预设对象，不能为 null。"
             explicitFilterOrderChange = JsonObjectHasProperty(presetJson.GetString(), NameOf(预设数据_v6.滤镜排序系统))
             requestedChanges.Add(New Dictionary(Of String, Object) From {
                 {"field", "preset_json"},
@@ -1137,12 +1179,10 @@ Public Class AgentLocalTools
             {"message", "已应用参数面板修改"},
             {"requested_changes", requestedChanges},
             {"effective_changed_fields", BuildChangedFieldList(previousPreset, actualPreset)},
-            {"filter_order_requested", explicitFilterOrderChange},
-            {"overview", BuildParameterOverview(actualPreset)},
-            {"command_preview", BuildParameterCommandPreview(actualPreset)},
-            {"preset_json", JsonSerializer.Serialize(actualPreset, JsonSO)}
+            {"filter_order_requested", explicitFilterOrderChange}
         }
-        Return JsonSerializer.Serialize(payload, JsonSO)
+        AddParameterResultViews(payload, actualPreset, args, False, True)
+        Return JsonSerializer.Serialize(payload, ToolJsonOptions)
     End Function
 
     Private Shared Function SyncParameterPanelToQueue() As String
@@ -1615,6 +1655,12 @@ Public Class AgentLocalTools
         Public Property IndexById As New Dictionary(Of String, Integer)(StringComparer.OrdinalIgnoreCase)
     End Class
 
+    Private Shared Sub AddQueueDiagnostics(payload As Dictionary(Of String, Object), resolution As QueueTargetResolution)
+        If resolution.MissingIds.Count > 0 Then payload("missing_ids") = resolution.MissingIds
+        If resolution.MissingIndexes.Count > 0 Then payload("missing_indexes") = resolution.MissingIndexes
+        If resolution.Errors.Count > 0 Then payload("errors") = resolution.Errors
+    End Sub
+
     Private Shared Function GetQueueSummary(args As JsonElement) As String
         Dim snapshot = 编码队列_v6.获取队列快照()
         Dim resolution = ResolveQueueTarget(args, snapshot, True)
@@ -1633,7 +1679,7 @@ Public Class AgentLocalTools
             ToList()
 
         If Not HasQueueQueryArguments(args) AndAlso resolution.Errors.Count = 0 Then
-            Return JsonSerializer.Serialize(items, JsonSO)
+            Return JsonSerializer.Serialize(items, ToolJsonOptions)
         End If
 
         Dim payload As New Dictionary(Of String, Object) From {
@@ -1644,12 +1690,10 @@ Public Class AgentLocalTools
             {"has_more", offset + items.Count < selectedCountBeforePaging},
             {"target_all", resolution.RequestedAll},
             {"used_default_all", resolution.UsedDefaultAll},
-            {"tasks", items},
-            {"missing_ids", resolution.MissingIds},
-            {"missing_indexes", resolution.MissingIndexes},
-            {"errors", resolution.Errors}
+            {"tasks", items}
         }
-        Return JsonSerializer.Serialize(payload, JsonSO)
+        AddQueueDiagnostics(payload, resolution)
+        Return JsonSerializer.Serialize(payload, ToolJsonOptions)
     End Function
 
     Private Shared Function GetQueueTaskLogs(args As JsonElement) As String
@@ -1668,12 +1712,10 @@ Public Class AgentLocalTools
             {"target_all", resolution.RequestedAll},
             {"modes", modes},
             {"log_limit", logLimit},
-            {"tasks", items},
-            {"missing_ids", resolution.MissingIds},
-            {"missing_indexes", resolution.MissingIndexes},
-            {"errors", resolution.Errors}
+            {"tasks", items}
         }
-        Return JsonSerializer.Serialize(payload, JsonSO)
+        AddQueueDiagnostics(payload, resolution)
+        Return JsonSerializer.Serialize(payload, ToolJsonOptions)
     End Function
 
     Private Shared Function ControlQueueTasks(args As JsonElement) As String
@@ -1730,14 +1772,12 @@ Public Class AgentLocalTools
             {"queue_count_before", snapshotBefore.Count},
             {"queue_count_after", snapshotAfter.Count},
             {"matched_ids", ids},
-            {"missing_ids", resolution.MissingIds},
-            {"missing_indexes", resolution.MissingIndexes},
-            {"errors", resolution.Errors},
             {"before", beforeItems},
             {"after", afterItems},
             {"message", BuildQueueActionMessage(action, ids.Count, eligibleCount, resolution.Errors)}
         }
-        Return JsonSerializer.Serialize(payload, JsonSO)
+        AddQueueDiagnostics(payload, resolution)
+        Return JsonSerializer.Serialize(payload, ToolJsonOptions)
     End Function
 
     Private Shared Function ResolveQueueTarget(args As JsonElement, snapshot As List(Of 编码任务_v6), defaultAll As Boolean) As QueueTargetResolution
@@ -1865,7 +1905,7 @@ Public Class AgentLocalTools
             item("command_preview_text") = 编码队列_v6.获取任务实际命令行文本(task)
             item("actual_command_text") = 编码队列_v6.获取任务执行命令行文本(task)
         End If
-        If includePresetJson Then item("preset_json") = If(task.预设数据 Is Nothing, "", JsonSerializer.Serialize(task.预设数据, JsonSO))
+        If includePresetJson Then item("preset_json") = If(task.预设数据 Is Nothing, "", JsonSerializer.Serialize(task.预设数据, ToolJsonOptions))
         Return item
     End Function
 

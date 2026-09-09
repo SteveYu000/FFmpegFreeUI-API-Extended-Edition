@@ -15,6 +15,7 @@ Public Class Form_v6_编码队列_任务日志
     Private 窗体已加载 As Boolean = False
     Private 待刷新当前任务 As Boolean = False
     Private 待强制重载 As Boolean = False
+    Private 后台任务待刷新 As Integer
     Private 日志刷新令牌 As Integer = 0
     Private 日志刷新取消源 As Threading.CancellationTokenSource
     Private ReadOnly 刷新计时器 As New Timer With {.Interval = 500}
@@ -92,6 +93,7 @@ Public Class Form_v6_编码队列_任务日志
         AddHandler 编码队列_v6.任务已更新, AddressOf 任务已更新
         AddHandler 编码队列_v6.队列已变化, AddressOf 队列已变化
         窗体已加载 = True
+        刷新计时器.Start()
         If 当前任务ID = "" Then
             刷新空状态("未选择任务")
         Else
@@ -115,7 +117,7 @@ Public Class Form_v6_编码队列_任务日志
 
     Private Sub 任务已更新(任务 As 编码任务_v6)
         If 任务 Is Nothing OrElse 任务.ID <> 当前任务ID Then Exit Sub
-        UI执行(Sub() 请求刷新当前任务(False))
+        Threading.Interlocked.Exchange(后台任务待刷新, 1)
     End Sub
 
     Private Sub 队列已变化()
@@ -129,9 +131,15 @@ Public Class Form_v6_编码队列_任务日志
     End Sub
 
     Private Sub UI执行(action As Action)
-        If action Is Nothing OrElse IsDisposed Then Exit Sub
+        If action Is Nothing OrElse IsDisposed OrElse Disposing Then Exit Sub
         If InvokeRequired Then
-            BeginInvoke(action)
+            Try
+                BeginInvoke(Sub()
+                                If Not IsDisposed AndAlso Not Disposing Then action()
+                            End Sub)
+            Catch ex As InvalidOperationException
+                ' The window may close between the event and BeginInvoke.
+            End Try
         Else
             action()
         End If
@@ -144,7 +152,7 @@ Public Class Form_v6_编码队列_任务日志
     End Sub
 
     Private Sub 刷新计时器_Tick(sender As Object, e As EventArgs)
-        刷新计时器.Stop()
+        If Threading.Interlocked.Exchange(后台任务待刷新, 0) <> 0 Then 待刷新当前任务 = True
         If Not 待刷新当前任务 Then Exit Sub
 
         Dim forceReload = 待强制重载

@@ -187,9 +187,9 @@ PowerShell 优先用于只读检查、诊断、结构化计算和用户明确要
 
 - `list_agent_skills`：列出 skill 和 reference 索引。遇到 3FUI 具体机制、字段、队列、联网或推荐问题时先调用。
 - `read_agent_skill_reference`：读取指定 reference。参数为 `skill`（默认 `ffmpegfreeui`）和 `reference`；只读取当前问题相关章节。
-- `get_parameter_panel_state`：读取当前参数面板的 `preset_json`、总览和 `command_preview`。判断当前配置时优先使用它。
+- `get_parameter_panel_state`：默认只返回当前参数面板的 `overview`。按需设置 `include_command_preview=true` 或 `include_preset_json=true`，无需总览时设置 `include_overview=false`；至少开启一项。
 - `get_parameter_field_info`：查询字段类型、当前值、候选值、枚举和格式规则。可传 `fields`、`query`、`include_current_values`；不熟悉字段时先查再改。
-- `apply_parameter_panel_patch`：修改当前参数面板。优先传 `changes`，必要时才传完整 `preset_json`，返回 `actual_changed_fields`、总览和命令预览；它不会自动修改已入队任务。
+- `apply_parameter_panel_patch`：修改当前参数面板。优先传 `changes`，必要时才传完整 `preset_json`，默认返回 `requested_changes`、`effective_changed_fields` 和命令预览；总览和完整预设分别用 `include_overview=true`、`include_preset_json=true` 获取，命令预览可用 `include_command_preview=false` 关闭。它不会自动修改已入队任务。
 
 ## 环境访问工具
 
@@ -232,9 +232,9 @@ PowerShell 优先用于只读检查、诊断、结构化计算和用户明确要
 
 ## 数据模型
 
-参数面板状态会结构化为 `预设数据_v6`。`预设管理_v6.从面板创建预设` 从控件生成预设数据；`预设管理_v6.显示预设` 把预设数据写回各页。`get_parameter_panel_state` 是判断当前设置的首选工具，返回 `preset_json`、人类可读总览和 `command_preview`。
+参数面板状态会结构化为 `预设数据_v6`。`预设管理_v6.从面板创建预设` 从控件生成预设数据；`预设管理_v6.显示预设` 把预设数据写回各页。`get_parameter_panel_state` 默认仅返回人类可读 `overview`；`include_command_preview=true` 返回命令预览，`include_preset_json=true` 返回完整预设 JSON 字符串，`include_overview=false` 关闭总览。至少开启一个返回选项；未返回的部分不会生成，不能视为空配置。
 
-`apply_parameter_panel_patch` 只修改当前参数面板，不同步队列。优先传 `changes` 对象，键必须是 `预设数据_v6` 顶层属性名；必要时才传完整 `preset_json`。返回值会包含请求字段、实际变化字段、总览、命令行预览和规范化后的 preset_json。
+`apply_parameter_panel_patch` 只修改当前参数面板，不同步队列。优先传 `changes` 对象，键必须是 `预设数据_v6` 顶层属性名；必要时才传完整 `preset_json`。默认返回请求字段、`effective_changed_fields` 和命令行预览，不重复返回总览和完整预设。可按需开启 `include_overview`、`include_preset_json`，或关闭 `include_command_preview`；需要确认规范化后的字段值时，用 `get_parameter_field_info` 定向查询或请求完整预设。
 
 ## 字段查询
 
@@ -274,7 +274,7 @@ PowerShell 优先用于只读检查、诊断、结构化计算和用户明确要
 
 ### 多轨操作顺序
 
-1. 用户只提到 `保留第二条音轨`、`给指定视频流加滤镜` 等单文件目标时，先读 `get_parameter_panel_state` 和 `get_parameter_field_info`，修改流控制字段，再检查命令预览中的 `-map`。
+1. 用户只提到 `保留第二条音轨`、`给指定视频流加滤镜` 等单文件目标时，先读 `get_parameter_panel_state` 和 `get_parameter_field_info`，修改流控制字段，再检查命令预览中的 `-map`；读取状态时需显式传 `include_command_preview=true` 才返回命令预览。
 2. 用户给出多个文件，并要求每个文件的不同轨道共同进入一个输出时，使用 `get_integrated_tool_state(tool=mux)`，再用 `configure_integrated_tool` 传入 `files` 对象数组；不要把多个文件路径塞进参数面板流控制字段。
 3. 混流前确认各输入的编码、时间基、分辨率、采样率和容器兼容性；混流本身通常不转码，若需要统一编码或滤镜，应先分别处理或改用参数面板任务。
 4. 目标只是抽出一条或多条流时，不要配置 mux；使用抽流状态中的全局索引调用一次 `extract`。
@@ -319,7 +319,7 @@ CRF、CQP、VBR、CBR、TPE 分支不同。NVENC 的 CQP/VBR/CBR 和 AMF 的 CQP
 
 内置滤镜由对应 `预设数据_v6` 字段是否启用自动同步到 `滤镜排序系统`。排序系统按视频链和音频链分开生成，顺序决定滤镜链顺序。修改 `滤镜排序系统` 必须传完整排序列表，不是增量追加。删除内置滤镜会按用户在排序页删除一样，清空对应参数页字段。
 
-旧的 `自定义参数_视频滤镜` 和 `自定义参数_音频滤镜` 会迁移为排序系统里的自定义视频/音频滤镜。Agent 修改滤镜时要优先读当前 preset_json，保留无关排序项，只调整用户要求的项目。
+旧的 `自定义参数_视频滤镜` 和 `自定义参数_音频滤镜` 会迁移为排序系统里的自定义视频/音频滤镜。Agent 修改滤镜时要优先用 `get_parameter_panel_state` 的 `include_preset_json=true` 读取当前完整预设，保留无关排序项，只调整用户要求的项目。
 
 ## filter 与 filter_complex
 
@@ -346,6 +346,8 @@ CRF、CQP、VBR、CBR、TPE 分支不同。NVENC 的 CQP/VBR/CBR 和 AMF 的 CQP
 `get_queue_task_logs` 读取指定任务日志。默认一次返回四档：`all`、`latest_non_progress`、`errors`、`current_stage`。先用 `get_queue_summary` 获取任务 ID 或序号，再读日志。日志可能很长，优先读指定任务和指定档位。
 
 `control_queue_tasks` 支持 `start`、`pause`、`resume`、`stop`、`remove`、`reset`。可以按 ID 或 1-based 序号指定任务，也可以 `target=all` 控制全部。停止或移除全部必须是用户明确要求。工具返回会包含匹配任务、可执行数量、前后状态和错误。
+
+队列摘要、日志和控制结果仅在非空时返回 `missing_ids`、`missing_indexes`、`errors`，缺省表示没有对应问题；空 `tasks`、日志数组、控制前后数组仍保留。返回 JSON 使用紧凑格式，不改变字段类型、日志顺序、分页和权限行为。
 
 `sync_parameter_panel_to_queue` 只能在用户明确要求同步队列时调用，且只同步未开始的预设任务。它不会修改已经开始、暂停、完成、出错或纯命令行任务。
 

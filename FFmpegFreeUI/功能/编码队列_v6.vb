@@ -33,7 +33,14 @@ Public Class 编码队列_v6
         Public Property 输出文件 As String = ""
     End Class
 
-    Public Shared ReadOnly Property 队列 As New List(Of 编码任务_v6)
+    Private Shared ReadOnly 队列项目 As New List(Of 编码任务_v6)
+    Private Shared ReadOnly 任务索引 As New Dictionary(Of String, 编码任务_v6)(StringComparer.Ordinal)
+
+    Public Shared ReadOnly Property 队列 As IReadOnlyList(Of 编码任务_v6)
+        Get
+            Return 获取队列快照().AsReadOnly()
+        End Get
+    End Property
     Private Shared ReadOnly 队列锁 As New Object
     Private Shared 调度中 As Boolean = False
     Private Shared 自动调度已暂停 As Boolean = False
@@ -47,6 +54,7 @@ Public Class 编码队列_v6
 
     Public Shared Event 队列已变化()
     Public Shared Event 任务已更新(任务 As 编码任务_v6)
+    Friend Shared Event 任务需立即刷新()
     Friend Shared Event 插件事件已触发(事件名称 As String, 任务 As 编码任务_v6, 日志 As 编码任务日志条目_v6)
 
     Public Shared Property 错误输出匹配字符串列表 As New List(Of String) From {"Error", "Invalid", "cannot", "failed", "not supported", "require", "must be", "Could not", "is experimental", "if you want to use it", "Nothing was written", "Unable to choose"}
@@ -77,26 +85,28 @@ Public Class 编码队列_v6
 
     Public Shared Function 获取队列快照() As List(Of 编码任务_v6)
         SyncLock 队列锁
-            Return 队列.ToList()
+            Return 队列项目.ToList()
         End SyncLock
     End Function
 
     Public Shared Function 根据ID获取任务(id As String) As 编码任务_v6
         If String.IsNullOrWhiteSpace(id) Then Return Nothing
         SyncLock 队列锁
-            Return 队列.FirstOrDefault(Function(x) x.ID = id)
+            Dim task As 编码任务_v6 = Nothing
+            任务索引.TryGetValue(id, task)
+            Return task
         End SyncLock
     End Function
 
     Public Shared Function 获取进行中任务数量() As Integer
         SyncLock 队列锁
-            Return 队列.Where(Function(x) 是否进行中任务(x)).Count()
+            Return 队列项目.Where(Function(x) 是否进行中任务(x)).Count()
         End SyncLock
     End Function
 
     Public Shared Function 获取未处理任务数量() As Integer
         SyncLock 队列锁
-            Return 队列.Where(Function(x) x.状态 = 编码任务状态_v6.未处理).Count()
+            Return 队列项目.Where(Function(x) x.状态 = 编码任务状态_v6.未处理).Count()
         End SyncLock
     End Function
 
@@ -124,7 +134,7 @@ Public Class 编码队列_v6
         Dim changed As New List(Of 编码任务_v6)
 
         SyncLock 队列锁
-            For Each task In 队列
+            For Each task In 队列项目
                 If task.状态 <> 编码任务状态_v6.未处理 Then Continue For
                 If task.预设数据 Is Nothing AndAlso String.IsNullOrWhiteSpace(task.命令行) Then Continue For
 
@@ -153,7 +163,7 @@ Public Class 编码队列_v6
         End If
 
         Dim json = Text.Json.JsonSerializer.Serialize(cache, JsonSO)
-        File.WriteAllText(未处理任务缓存文件路径, json, New UTF8Encoding(False))
+        原子文件写入_v6.写入文本(未处理任务缓存文件路径, json)
         Return cache.任务.Count
     End Function
 
@@ -186,7 +196,10 @@ Public Class 编码队列_v6
 
         If restored.Count > 0 Then
             SyncLock 队列锁
-                队列.AddRange(restored)
+                队列项目.AddRange(restored)
+                For Each task In restored
+                    任务索引.Add(task.ID, task)
+                Next
             End SyncLock
             For Each task In restored
                 触发插件事件("task.added", task)
@@ -208,7 +221,11 @@ Public Class 编码队列_v6
     Private Shared Function 读取未处理任务缓存文件() As 未处理任务缓存文件_v6
         If Not File.Exists(未处理任务缓存文件路径) Then Return Nothing
         Dim json = File.ReadAllText(未处理任务缓存文件路径, Encoding.UTF8)
-        Return Text.Json.JsonSerializer.Deserialize(Of 未处理任务缓存文件_v6)(json, JsonSO)
+        Dim cache = Text.Json.JsonSerializer.Deserialize(Of 未处理任务缓存文件_v6)(json, JsonSO)
+        If cache Is Nothing OrElse cache.版本 <> 1 OrElse cache.任务 Is Nothing Then
+            Throw New InvalidDataException("未处理任务缓存格式或版本不受支持")
+        End If
+        Return cache
     End Function
 
     Public Shared Sub 停止所有进行中任务()
@@ -216,7 +233,8 @@ Public Class 编码队列_v6
         Dim changed As New List(Of 编码任务_v6)
 
         SyncLock 队列锁
-            For Each task In 队列
+            自动调度已暂停 = True
+            For Each task In 队列项目
                 If task.状态 = 编码任务状态_v6.未处理 AndAlso task.允许自动启动 Then
                     task.允许自动启动 = False
                     changed.Add(task)
@@ -250,6 +268,7 @@ Public Class 编码队列_v6
     Private Shared Function 添加预设任务批量(specs As IEnumerable(Of 批量预设任务输入_v6), 预设数据 As 预设数据_v6) As List(Of 编码任务_v6)
         Dim added As New List(Of 编码任务_v6)
         If 预设数据 Is Nothing Then Return added
+        Dim clonePreset = 预设管理_v6.创建预设克隆工厂(预设数据)
         For Each spec In If(specs, Array.Empty(Of 批量预设任务输入_v6)())
             If spec Is Nothing OrElse String.IsNullOrWhiteSpace(spec.输入文件) Then Continue For
 
@@ -257,7 +276,7 @@ Public Class 编码队列_v6
                 .输入文件 = spec.输入文件,
                 .输出文件 = If(spec.输出文件, ""),
                 .任务名称 = 应用任务名称混淆(If(String.IsNullOrWhiteSpace(spec.任务名称), Path.GetFileName(spec.输入文件), spec.任务名称)),
-                .预设数据 = 克隆预设(预设数据)
+                .预设数据 = clonePreset()
             }
             Dim context = Ext插件扩展桥接_v2.创建任务管线上下文(Ext插件处理阶段_v2.加入队列之前, task)
             context.Properties("taskName") = task.任务名称
@@ -269,7 +288,10 @@ Public Class 编码队列_v6
         Next
         If added.Count = 0 Then Return added
         SyncLock 队列锁
-            队列.AddRange(added)
+            队列项目.AddRange(added)
+            For Each task In added
+                任务索引.Add(task.ID, task)
+            Next
         End SyncLock
         For Each task In added
             触发插件事件("task.added", task)
@@ -293,7 +315,8 @@ Public Class 编码队列_v6
         Dim processedTaskName As String = Nothing
         If context.Properties.TryGetValue("taskName", processedTaskName) Then task.任务名称 = If(processedTaskName, "")
         SyncLock 队列锁
-            队列.Add(task)
+            队列项目.Add(task)
+            任务索引.Add(task.ID, task)
         End SyncLock
         触发插件事件("task.added", task)
         RaiseEvent 队列已变化()
@@ -321,68 +344,35 @@ Public Class 编码队列_v6
     End Function
 
     Public Shared Function 同步未处理预设任务(预设数据 As 预设数据_v6) As 预设同步结果
-        Dim result As New 预设同步结果
-        If 预设数据 Is Nothing Then Return result
-
-        Dim changed As New List(Of 编码任务_v6)
-        SyncLock 队列锁
-            For Each task In 队列
-                If task.预设数据 Is Nothing Then
-                    result.已跳过非预设任务 += 1
-                    Continue For
-                End If
-
-                If task.状态 <> 编码任务状态_v6.未处理 Then
-                    result.已跳过不可修改任务 += 1
-                    Continue For
-                End If
-
-                task.预设数据 = 克隆预设(预设数据)
-                If task.输出文件由自动命名生成 Then
-                    task.输出文件 = ""
-                    task.输出文件由自动命名生成 = False
-                End If
-                task.步骤.Clear()
-                task.当前步骤索引 = -1
-                task.媒体总时长 = ""
-                task.AviSynthCachePath = ""
-                task.VapourSynthCachePath = ""
-                task.进度 = New 编码进度_v6
-                changed.Add(task)
-                result.已更新 += 1
-            Next
-        End SyncLock
-
-        If changed.Count > 0 Then
-            广播任务更新(changed)
-            RaiseEvent 队列已变化()
-        End If
-        Return result
+        Return 同步预设任务核心(Nothing, 预设数据)
     End Function
 
     Public Shared Function 同步指定未处理预设任务(ids As IEnumerable(Of String), 预设数据 As 预设数据_v6) As 预设同步结果
+        Return 同步预设任务核心(New HashSet(Of String)(If(ids, Array.Empty(Of String)())), 预设数据)
+    End Function
+
+    Private Shared Function 同步预设任务核心(idSet As HashSet(Of String), 预设数据 As 预设数据_v6) As 预设同步结果
         Dim result As New 预设同步结果
         If 预设数据 Is Nothing Then Return result
-
-        Dim idSet As New HashSet(Of String)(If(ids, Array.Empty(Of String)()))
-        If idSet.Count = 0 Then Return result
+        If idSet IsNot Nothing AndAlso idSet.Count = 0 Then Return result
+        Dim clonePreset = 预设管理_v6.创建预设克隆工厂(预设数据)
 
         Dim changed As New List(Of 编码任务_v6)
         SyncLock 队列锁
-            For Each task In 队列
-                If Not idSet.Contains(task.ID) Then Continue For
+            For Each task In 队列项目
+                If idSet IsNot Nothing AndAlso Not idSet.Contains(task.ID) Then Continue For
 
                 If task.预设数据 Is Nothing Then
                     result.已跳过非预设任务 += 1
                     Continue For
                 End If
 
-                If task.状态 <> 编码任务状态_v6.未处理 Then
+                If task.状态 <> 编码任务状态_v6.未处理 OrElse task.正在执行 Then
                     result.已跳过不可修改任务 += 1
                     Continue For
                 End If
 
-                task.预设数据 = 克隆预设(预设数据)
+                task.预设数据 = clonePreset()
                 If task.输出文件由自动命名生成 Then
                     task.输出文件 = ""
                     task.输出文件由自动命名生成 = False
@@ -406,12 +396,7 @@ Public Class 编码队列_v6
     End Function
 
     Public Shared Function 克隆预设(source As 预设数据_v6) As 预设数据_v6
-        If source Is Nothing Then Return Nothing
-        Dim json = Text.Json.JsonSerializer.Serialize(source, JsonSO)
-        Dim result = Text.Json.JsonSerializer.Deserialize(Of 预设数据_v6)(json, JsonSO)
-        预设管理_v6.初始化空集合(result)
-        If result IsNot Nothing Then result.运行时使用输出位置 = source.运行时使用输出位置
-        Return result
+        Return 预设管理_v6.克隆预设数据(source)
     End Function
 
     Public Shared Sub 开始任务(ids As IEnumerable(Of String))
@@ -420,12 +405,10 @@ Public Class 编码队列_v6
 
         Dim starting As New List(Of KeyValuePair(Of 编码任务_v6, Long))
         SyncLock 队列锁
-            For Each task In 队列
+            For Each task In 队列项目
                 If idSet.Contains(task.ID) AndAlso task.状态 = 编码任务状态_v6.未处理 Then
                     Dim 执行标识 = task.开始执行()
                     If 执行标识 = 0 Then Continue For
-                    task.状态 = 编码任务状态_v6.正在处理
-                    为任务保留输出文件(task)
                     标记任务已实际启动()
                     starting.Add(New KeyValuePair(Of 编码任务_v6, Long)(task, 执行标识))
                 End If
@@ -479,23 +462,27 @@ Public Class 编码队列_v6
 
     Public Shared Sub 取消自动开始任务(ids As IEnumerable(Of String))
         Dim changed As New List(Of 编码任务_v6)
-        For Each task In 获取指定任务(ids)
-            If task.状态 = 编码任务状态_v6.未处理 AndAlso task.允许自动启动 Then
-                task.允许自动启动 = False
-                changed.Add(task)
-            End If
-        Next
+        SyncLock 队列锁
+            For Each task In 获取指定任务(ids)
+                If task.状态 = 编码任务状态_v6.未处理 AndAlso task.允许自动启动 Then
+                    task.允许自动启动 = False
+                    changed.Add(task)
+                End If
+            Next
+        End SyncLock
         广播任务更新(changed)
     End Sub
 
     Public Shared Sub 重置任务(ids As IEnumerable(Of String))
         Dim changed As New List(Of 编码任务_v6)
-        For Each task In 获取指定任务(ids)
-            If task.可重置 Then
-                task.重置()
-                changed.Add(task)
-            End If
-        Next
+        SyncLock 队列锁
+            For Each task In 获取指定任务(ids)
+                If task.可重置 Then
+                    task.重置()
+                    changed.Add(task)
+                End If
+            Next
+        End SyncLock
         广播任务更新(changed)
     End Sub
 
@@ -504,12 +491,12 @@ Public Class 编码队列_v6
         If idSet.Count = 0 Then Exit Sub
         Dim removed As New List(Of 编码任务_v6)
         SyncLock 队列锁
-            For i = 队列.Count - 1 To 0 Step -1
-                If idSet.Contains(队列(i).ID) AndAlso 队列(i).可移除 Then
-                    removed.Add(队列(i))
-                    队列.RemoveAt(i)
-                End If
-            Next
+            队列项目.RemoveAll(Function(task)
+                              If Not idSet.Contains(task.ID) OrElse Not task.可移除 Then Return False
+                              removed.Add(task)
+                              任务索引.Remove(task.ID)
+                              Return True
+                          End Function)
         End SyncLock
         For Each task In removed
             触发插件事件("task.removed", task)
@@ -530,7 +517,7 @@ Public Class 编码队列_v6
     Public Shared Sub 应用自动开始任务设置(自动开始 As Boolean)
         Dim changed As New List(Of 编码任务_v6)
         SyncLock 队列锁
-            For Each task In 队列
+            For Each task In 队列项目
                 If task.状态 = 编码任务状态_v6.未处理 AndAlso task.允许自动启动 <> 自动开始 Then
                     task.允许自动启动 = 自动开始
                     changed.Add(task)
@@ -549,16 +536,15 @@ Public Class 编码队列_v6
 
     Public Shared Function 重新排序(idsInOrder As IEnumerable(Of String)) As Boolean
         Dim ids = If(idsInOrder, Array.Empty(Of String)()).Where(Function(x) Not String.IsNullOrWhiteSpace(x)).ToList()
-        If ids.Count = 0 Then Return False
+        If ids.Count = 0 OrElse ids.Distinct(StringComparer.Ordinal).Count() <> ids.Count Then Return False
         SyncLock 队列锁
-            If ids.Count <> 队列.Count Then Return False
-            For i = 0 To 队列.Count - 1
-                If Not 队列(i).可排序 AndAlso ids(i) <> 队列(i).ID Then Return False
+            If ids.Count <> 队列项目.Count Then Return False
+            For i = 0 To 队列项目.Count - 1
+                If Not 队列项目(i).可排序 AndAlso ids(i) <> 队列项目(i).ID Then Return False
             Next
-            Dim map = 队列.ToDictionary(Function(x) x.ID)
-            If ids.Any(Function(id) Not map.ContainsKey(id)) Then Return False
-            队列.Clear()
-            队列.AddRange(ids.Select(Function(id) map(id)))
+            If ids.Any(Function(id) Not 任务索引.ContainsKey(id)) Then Return False
+            队列项目.Clear()
+            队列项目.AddRange(ids.Select(Function(id) 任务索引(id)))
         End SyncLock
         RaiseEvent 队列已变化()
         请求调度()
@@ -577,21 +563,21 @@ Public Class 编码队列_v6
         Dim idSet As New HashSet(Of String)(If(ids, Array.Empty(Of String)()))
         If idSet.Count = 0 Then Exit Sub
         SyncLock 队列锁
-            If 队列.Any(Function(x) idSet.Contains(x.ID) AndAlso Not x.可排序) Then Exit Sub
+            If 队列项目.Any(Function(x) idSet.Contains(x.ID) AndAlso Not x.可排序) Then Exit Sub
             If direction < 0 Then
-                For i = 1 To 队列.Count - 1
-                    If idSet.Contains(队列(i).ID) AndAlso Not idSet.Contains(队列(i - 1).ID) AndAlso 队列(i - 1).可排序 Then
-                        Dim temp = 队列(i - 1)
-                        队列(i - 1) = 队列(i)
-                        队列(i) = temp
+                For i = 1 To 队列项目.Count - 1
+                    If idSet.Contains(队列项目(i).ID) AndAlso Not idSet.Contains(队列项目(i - 1).ID) AndAlso 队列项目(i - 1).可排序 Then
+                        Dim temp = 队列项目(i - 1)
+                        队列项目(i - 1) = 队列项目(i)
+                        队列项目(i) = temp
                     End If
                 Next
             Else
-                For i = 队列.Count - 2 To 0 Step -1
-                    If idSet.Contains(队列(i).ID) AndAlso Not idSet.Contains(队列(i + 1).ID) AndAlso 队列(i + 1).可排序 Then
-                        Dim temp = 队列(i + 1)
-                        队列(i + 1) = 队列(i)
-                        队列(i) = temp
+                For i = 队列项目.Count - 2 To 0 Step -1
+                    If idSet.Contains(队列项目(i).ID) AndAlso Not idSet.Contains(队列项目(i + 1).ID) AndAlso 队列项目(i + 1).可排序 Then
+                        Dim temp = 队列项目(i + 1)
+                        队列项目(i + 1) = 队列项目(i)
+                        队列项目(i) = temp
                     End If
                 Next
             End If
@@ -614,8 +600,8 @@ Public Class 编码队列_v6
                          Dim shouldCheckCompletion As Boolean
                          SyncLock 队列锁
                              调度中 = False
-                             Dim running = 队列.Where(Function(x) 是否进行中任务(x) OrElse x.正在执行).Count()
-                             shouldRunAgain = Not 自动调度已暂停 AndAlso running < 获取并发上限() AndAlso 队列.Any(Function(x) x.状态 = 编码任务状态_v6.未处理 AndAlso x.允许自动启动 AndAlso Not x.正在执行)
+                             Dim running = 队列项目.Where(Function(x) 是否进行中任务(x) OrElse x.正在执行).Count()
+                             shouldRunAgain = Not 自动调度已暂停 AndAlso running < 获取并发上限() AndAlso 队列项目.Any(Function(x) x.状态 = 编码任务状态_v6.未处理 AndAlso x.允许自动启动 AndAlso Not x.正在执行)
                              shouldCheckCompletion = 完成提示待调度结束检查
                              If Not shouldRunAgain Then 完成提示待调度结束检查 = False
                          End SyncLock
@@ -634,17 +620,15 @@ Public Class 编码队列_v6
             Dim 执行标识 As Long = 0
             SyncLock 队列锁
                 If 自动调度已暂停 Then Exit Do
-                Dim running = 队列.Where(Function(x) 是否进行中任务(x) OrElse x.正在执行).Count()
+                Dim running = 队列项目.Where(Function(x) 是否进行中任务(x) OrElse x.正在执行).Count()
                 If running >= 获取并发上限() Then Exit Do
-                nextTask = 队列.FirstOrDefault(Function(x) x.状态 = 编码任务状态_v6.未处理 AndAlso x.允许自动启动 AndAlso Not x.正在执行)
+                nextTask = 队列项目.FirstOrDefault(Function(x) x.状态 = 编码任务状态_v6.未处理 AndAlso x.允许自动启动 AndAlso Not x.正在执行)
                 If nextTask Is Nothing Then Exit Do
                 执行标识 = nextTask.开始执行()
                 If 执行标识 = 0 Then Continue Do
-                nextTask.状态 = 编码任务状态_v6.正在处理
-                为任务保留输出文件(nextTask)
                 标记任务已实际启动()
             End SyncLock
-            RaiseEvent 任务已更新(nextTask)
+            通知任务更新(nextTask)
             触发插件事件("task.started", nextTask)
             异步执行任务(nextTask, 执行标识)
         Loop
@@ -655,8 +639,9 @@ Public Class 编码队列_v6
                                      Try
                                          Await task.开始Async(执行标识)
                                      Finally
-                                         Dim 因手动停止结束 = task.结束执行()
-                                         任务执行结束后处理(因手动停止结束)
+                                         task.结束执行()
+                                         通知任务更新(task)
+                                         请求调度(True)
                                      End Try
                                  End Function)
     End Sub
@@ -670,7 +655,7 @@ Public Class 编码队列_v6
         Dim idSet As New HashSet(Of String)(If(ids, Array.Empty(Of String)()))
         If idSet.Count = 0 Then Return New List(Of 编码任务_v6)
         SyncLock 队列锁
-            Return 队列.Where(Function(x) idSet.Contains(x.ID)).ToList()
+            Return 队列项目.Where(Function(x) idSet.Contains(x.ID)).ToList()
         End SyncLock
     End Function
 
@@ -682,13 +667,17 @@ Public Class 编码队列_v6
 
     Private Shared Sub 广播任务更新(tasks As IEnumerable(Of 编码任务_v6))
         If tasks Is Nothing Then Exit Sub
+        Dim hasChanges As Boolean = False
         For Each task In tasks
             RaiseEvent 任务已更新(task)
+            hasChanges = True
         Next
+        If hasChanges Then RaiseEvent 任务需立即刷新()
     End Sub
 
-    Friend Shared Sub 通知任务更新(task As 编码任务_v6)
+    Friend Shared Sub 通知任务更新(task As 编码任务_v6, Optional 立即刷新 As Boolean = True)
         RaiseEvent 任务已更新(task)
+        If 立即刷新 Then RaiseEvent 任务需立即刷新()
     End Sub
 
     Friend Shared Sub 触发插件事件(事件名称 As String, task As 编码任务_v6, Optional 日志 As 编码任务日志条目_v6 = Nothing)
@@ -697,7 +686,9 @@ Public Class 编码队列_v6
     End Sub
 
     Friend Shared Sub 标记任务出错()
-        全部任务已完成是否有错误 = True
+        SyncLock 队列锁
+            全部任务已完成是否有错误 = True
+        End SyncLock
     End Sub
 
     Private Shared Sub 标记任务已实际启动()
@@ -705,28 +696,19 @@ Public Class 编码队列_v6
         完成提示待播放 = True
     End Sub
 
-    Private Shared Sub 任务执行结束后处理(因手动停止结束 As Boolean)
-        If Not 因手动停止结束 Then
-            SyncLock 队列锁
-                自动调度已暂停 = False
-            End SyncLock
-        End If
-        请求调度(True)
-    End Sub
-
     Private Shared Sub 检查全部完成提示()
         Dim shouldPlay As Boolean = False
         Dim hasError As Boolean = False
         SyncLock 队列锁
             If Not 完成提示待播放 Then Exit Sub
-            If 队列.Count = 0 Then
+            If 队列项目.Count = 0 Then
                 完成提示待播放 = False
                 全部任务已完成是否有错误 = False
                 Exit Sub
             End If
-            If 队列.Any(Function(x) x.状态 = 编码任务状态_v6.未处理 OrElse x.状态 = 编码任务状态_v6.正在处理 OrElse x.状态 = 编码任务状态_v6.已暂停) Then Exit Sub
+            If 队列项目.Any(Function(x) x.状态 = 编码任务状态_v6.未处理 OrElse x.状态 = 编码任务状态_v6.正在处理 OrElse x.状态 = 编码任务状态_v6.已暂停) Then Exit Sub
             shouldPlay = True
-            hasError = 全部任务已完成是否有错误 OrElse 队列.Any(Function(x) x.状态 = 编码任务状态_v6.错误)
+            hasError = 全部任务已完成是否有错误 OrElse 队列项目.Any(Function(x) x.状态 = 编码任务状态_v6.错误)
             完成提示待播放 = False
             全部任务已完成是否有错误 = False
         End SyncLock
@@ -893,6 +875,8 @@ Public Class 编码队列_v6
                                             optionValue As 预设数据_v6.自动命名选项,
                                             Optional 已保留输出路径 As ISet(Of String) = Nothing) As String
         Select Case optionValue
+            Case 预设数据_v6.自动命名选项.附加_递增时间戳
+                Return 获取递增输出路径(输出路径, 已保留输出路径)
             Case 预设数据_v6.自动命名选项.附加_递增数字
                 Return 获取递增输出路径(输出路径, 已保留输出路径)
             Case 预设数据_v6.自动命名选项.附加_2位结尾序号
@@ -1078,13 +1062,18 @@ Public Class 编码队列_v6
         Return Not File.Exists(输出路径) AndAlso (已保留输出路径 Is Nothing OrElse Not 已保留输出路径.Contains(输出路径))
     End Function
 
-    ' 必须在持有“队列锁”时调用，确保运行中和停止中的任务预留不同名称。
-    Private Shared Sub 为任务保留输出文件(task As 编码任务_v6)
+    Friend Shared Sub 为任务保留输出文件(task As 编码任务_v6)
+        SyncLock 队列锁
+            保留输出文件核心(task)
+        End SyncLock
+    End Sub
+
+    Private Shared Sub 保留输出文件核心(task As 编码任务_v6)
         If task Is Nothing OrElse task.预设数据 Is Nothing Then Exit Sub
         If Not String.IsNullOrWhiteSpace(task.输出文件) AndAlso Not task.输出文件由自动命名生成 Then Exit Sub
 
         Dim 已保留输出路径 As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
-        For Each other In 队列
+        For Each other In 队列项目
             If other Is task OrElse (Not 是否进行中任务(other) AndAlso Not other.正在执行) OrElse String.IsNullOrWhiteSpace(other.输出文件) Then Continue For
             已保留输出路径.Add(other.输出文件)
         Next
@@ -1102,1180 +1091,14 @@ Public Class 编码队列_v6
                String.Equals(If(task.输出文件, ""), If(处理前输出文件, ""), StringComparison.OrdinalIgnoreCase) Then
                 task.输出文件 = ""
                 task.输出文件由自动命名生成 = False
-                为任务保留输出文件(task)
+                保留输出文件核心(task)
             ElseIf 处理前由自动命名生成 AndAlso String.IsNullOrWhiteSpace(task.输出文件) Then
                 task.输出文件由自动命名生成 = False
-                为任务保留输出文件(task)
+                保留输出文件核心(task)
             ElseIf Not String.Equals(If(task.输出文件, ""), If(处理前输出文件, ""), StringComparison.OrdinalIgnoreCase) Then
                 task.输出文件由自动命名生成 = False
             End If
         End SyncLock
     End Sub
 
-End Class
-
-Public Enum 编码任务状态_v6
-    未处理 = 0
-    正在处理 = 1
-    已暂停 = 2
-    已完成 = 10
-    已停止 = 20
-    错误 = 99
-End Enum
-
-Public Enum 编码步骤状态_v6
-    未处理 = 0
-    正在处理 = 1
-    已完成 = 10
-    已停止 = 20
-    错误 = 99
-End Enum
-
-Public Enum 编码任务日志类别_v6
-    系统 = 0
-    输出 = 1
-    进度 = 2
-    错误 = 3
-End Enum
-
-Public Enum 编码任务日志显示模式_v6
-    全部输出 = 0
-    最新输出不含进度 = 1
-    仅错误信息 = 2
-    当前阶段输出 = 3
-End Enum
-
-Public Class 编码任务日志条目_v6
-    Public Property 序号 As Long
-    Public Property 时间 As DateTime
-    Public Property 阶段名 As String = ""
-    Public Property 文本 As String = ""
-    Public Property 类别 As 编码任务日志类别_v6 = 编码任务日志类别_v6.输出
-    Public Property 是否错误 As Boolean = False
-End Class
-
-Public Class 编码任务日志版本信息_v6
-    Public Property 日志版本号 As Long = 0
-    Public Property 日志结构版本号 As Long = 0
-End Class
-
-Public Class 编码任务日志快照_v6
-    Public Property 条目 As New List(Of 编码任务日志条目_v6)
-    Public Property 日志版本号 As Long = 0
-    Public Property 日志结构版本号 As Long = 0
-End Class
-
-''' <summary>一个插件为编码任务发布的结构化结果。</summary>
-Public Class 编码任务插件结果_v6
-    Public Property 插件ID As String = ""
-    Public Property 键 As String = ""
-    Public Property 值 As String = ""
-    Public Property 显示名称 As String = ""
-    Public Property 单位 As String = ""
-    Public Property 序号 As Long
-    Public Property 更新时间 As DateTime
-End Class
-
-Public Class 编码任务_v6
-    Public Property ID As String = Guid.NewGuid().ToString("N")
-    Public Property 任务名称 As String = ""
-    Public Property 输入文件 As String = ""
-    Public Property 输出文件 As String = ""
-    Public Property 输出文件由自动命名生成 As Boolean = False
-    Public Property 预设数据 As 预设数据_v6
-    Public Property 命令行 As String = ""
-    Public Property 状态 As 编码任务状态_v6 = 编码任务状态_v6.未处理
-    Public Property 步骤 As New List(Of 编码步骤_v6)
-    Public Property 当前步骤索引 As Integer = -1
-    Public Property 允许自动启动 As Boolean = 设置_v6.实例对象.自动开始任务选项 = 0
-    Public Property 手动停止 As Boolean = False
-    Public Property 实时输出 As String = ""
-    Public Property 错误列表 As New List(Of String)
-    Public Property 非进度输出列表 As New List(Of String)
-    Public Property 进度 As New 编码进度_v6
-    Public Property 任务耗时计时器 As New Stopwatch
-    Public Property 输入文件大小 As Long = 0
-    Public Property 媒体总时长 As String = ""
-    Public Property AviSynthCachePath As String = ""
-    Public Property VapourSynthCachePath As String = ""
-    Public Property 最新底部日志文本 As String = ""
-    Public Property 最新底部日志是否错误 As Boolean = False
-    Public Property 日志版本号 As Long = 0
-    Public Property 日志结构版本号 As Long = 0
-    Public Property 插件结果版本号 As Long = 0
-
-    Private 当前进程 As Process
-    Private ReadOnly 状态锁 As New Object
-    Private 当前执行取消源 As Threading.CancellationTokenSource
-    Private 正在执行标记 As Boolean = False
-    Private 当前执行已请求停止 As Boolean = False
-    Private 执行版本 As Long = 0
-    Private ReadOnly 日志锁 As New Object
-    Private ReadOnly 完整日志缓存 As New List(Of 编码任务日志条目_v6)
-    Private 日志序号 As Long = 0
-    Private 进度日志数量 As Integer = 0
-    Private 最新原始日志文本 As String = ""
-    Private 最新原始日志是否错误 As Boolean = False
-    Private 最新非进度日志文本 As String = ""
-    Private 最新非进度日志是否错误 As Boolean = False
-    Private 上次进度日志提交时间 As DateTime = DateTime.MinValue
-    Private ReadOnly 插件结果锁 As New Object
-    Private ReadOnly 插件结果表 As New Dictionary(Of String, 编码任务插件结果_v6)(StringComparer.OrdinalIgnoreCase)
-    Private 插件结果序号 As Long = 0
-
-    Public ReadOnly Property 可移除 As Boolean
-        Get
-            Return 状态 = 编码任务状态_v6.未处理 OrElse 状态 = 编码任务状态_v6.已完成 OrElse 状态 = 编码任务状态_v6.已停止 OrElse 状态 = 编码任务状态_v6.错误
-        End Get
-    End Property
-
-    Public ReadOnly Property 可重置 As Boolean
-        Get
-            Return 状态 = 编码任务状态_v6.已完成 OrElse 状态 = 编码任务状态_v6.已停止 OrElse 状态 = 编码任务状态_v6.错误
-        End Get
-    End Property
-
-    Public ReadOnly Property 可停止 As Boolean
-        Get
-            Return 状态 = 编码任务状态_v6.正在处理 OrElse 状态 = 编码任务状态_v6.已暂停 OrElse 状态 = 编码任务状态_v6.错误
-        End Get
-    End Property
-
-    Public ReadOnly Property 可排序 As Boolean
-        Get
-            Return 状态 <> 编码任务状态_v6.正在处理 AndAlso 状态 <> 编码任务状态_v6.已暂停
-        End Get
-    End Property
-
-    Public ReadOnly Property 当前步骤 As 编码步骤_v6
-        Get
-            If 当前步骤索引 < 0 OrElse 当前步骤索引 >= 步骤.Count Then Return Nothing
-            Return 步骤(当前步骤索引)
-        End Get
-    End Property
-
-    Public ReadOnly Property 当前进程ID As Integer
-        Get
-            Try
-                Dim process = 当前进程
-                If process Is Nothing OrElse process.HasExited Then Return 0
-                Return process.Id
-            Catch
-                Return 0
-            End Try
-        End Get
-    End Property
-
-    Public ReadOnly Property 正在执行 As Boolean
-        Get
-            SyncLock 状态锁
-                Return 正在执行标记
-            End SyncLock
-        End Get
-    End Property
-
-    Friend Function 开始执行() As Long
-        SyncLock 状态锁
-            If 正在执行标记 Then Return 0
-            当前执行取消源?.Dispose()
-            当前执行取消源 = New Threading.CancellationTokenSource
-            正在执行标记 = True
-            当前执行已请求停止 = False
-            执行版本 += 1
-            Return 执行版本
-        End SyncLock
-    End Function
-
-    Friend Function 结束执行() As Boolean
-        SyncLock 状态锁
-            Dim result = 当前执行已请求停止
-            正在执行标记 = False
-            当前执行已请求停止 = False
-            当前执行取消源?.Dispose()
-            当前执行取消源 = Nothing
-            Return result
-        End SyncLock
-    End Function
-
-    Private Function 获取当前执行取消令牌(执行标识 As Long) As Threading.CancellationToken
-        SyncLock 状态锁
-            If Not 正在执行标记 OrElse 执行版本 <> 执行标识 OrElse 当前执行取消源 Is Nothing Then
-                Return New Threading.CancellationToken(True)
-            End If
-            Return 当前执行取消源.Token
-        End SyncLock
-    End Function
-
-    Private Sub 使当前执行失效()
-        SyncLock 状态锁
-            If 正在执行标记 Then 执行版本 += 1
-        End SyncLock
-    End Sub
-
-    Private Function 是当前执行(执行标识 As Long) As Boolean
-        SyncLock 状态锁
-            Return 正在执行标记 AndAlso 执行版本 = 执行标识
-        End SyncLock
-    End Function
-
-    Public ReadOnly Property 当前进程名称 As String
-        Get
-            Try
-                Dim process = 当前进程
-                If process Is Nothing OrElse process.HasExited Then Return ""
-                Dim fileName = If(process.StartInfo?.FileName, "")
-                If String.IsNullOrWhiteSpace(fileName) Then Return "ffmpeg"
-                Return Path.GetFileNameWithoutExtension(fileName)
-            Catch
-                Return ""
-            End Try
-        End Get
-    End Property
-
-    Public Function 获取日志快照(Optional 显示模式 As 编码任务日志显示模式_v6 = 编码任务日志显示模式_v6.全部输出) As List(Of 编码任务日志条目_v6)
-        SyncLock 日志锁
-            Return 筛选日志条目(显示模式)
-        End SyncLock
-    End Function
-
-    Public Function 获取日志版本信息() As 编码任务日志版本信息_v6
-        SyncLock 日志锁
-            Return New 编码任务日志版本信息_v6 With {
-                .日志版本号 = 日志版本号,
-                .日志结构版本号 = 日志结构版本号
-            }
-        End SyncLock
-    End Function
-
-    Public Function 获取日志快照数据(Optional 显示模式 As 编码任务日志显示模式_v6 = 编码任务日志显示模式_v6.全部输出,
-                              Optional 阶段名 As String = Nothing) As 编码任务日志快照_v6
-        SyncLock 日志锁
-            Return New 编码任务日志快照_v6 With {
-                .条目 = 筛选日志条目(显示模式, 阶段名),
-                .日志版本号 = 日志版本号,
-                .日志结构版本号 = 日志结构版本号
-            }
-        End SyncLock
-    End Function
-
-    Private Function 筛选日志条目(显示模式 As 编码任务日志显示模式_v6, Optional 指定阶段名 As String = Nothing) As List(Of 编码任务日志条目_v6)
-        Select Case 显示模式
-            Case 编码任务日志显示模式_v6.最新输出不含进度
-                Return 完整日志缓存.Where(Function(x) x.类别 <> 编码任务日志类别_v6.进度).ToList()
-            Case 编码任务日志显示模式_v6.仅错误信息
-                Return 完整日志缓存.Where(Function(x) x.是否错误 OrElse x.类别 = 编码任务日志类别_v6.错误).ToList()
-            Case 编码任务日志显示模式_v6.当前阶段输出
-                Dim stageName = If(指定阶段名, If(当前步骤?.显示名称, ""))
-                If String.IsNullOrWhiteSpace(stageName) Then Return New List(Of 编码任务日志条目_v6)
-                Return 完整日志缓存.Where(Function(x) String.Equals(x.阶段名, stageName, StringComparison.Ordinal)).ToList()
-            Case Else
-                Return 完整日志缓存.ToList()
-        End Select
-    End Function
-
-    Public Function 获取日志文本(Optional 显示模式 As 编码任务日志显示模式_v6 = 编码任务日志显示模式_v6.全部输出) As String
-        Return String.Join(vbCrLf, 获取日志快照(显示模式).Select(Function(x) x.文本))
-    End Function
-
-    Public Function 获取插件结果快照() As List(Of 编码任务插件结果_v6)
-        SyncLock 插件结果锁
-            Return 插件结果表.Values.
-                OrderBy(Function(item) item.序号).
-                Select(Function(item) New 编码任务插件结果_v6 With {
-                    .插件ID = item.插件ID,
-                    .键 = item.键,
-                    .值 = item.值,
-                    .显示名称 = item.显示名称,
-                    .单位 = item.单位,
-                    .序号 = item.序号,
-                    .更新时间 = item.更新时间
-                }).
-                ToList()
-        End SyncLock
-    End Function
-
-    Friend Sub 记录插件结果(pluginId As String, key As String, value As String, displayName As String, unit As String)
-        Dim normalizedPluginId = If(pluginId, "").Trim()
-        Dim normalizedKey = If(key, "").Trim()
-        If normalizedPluginId = "" OrElse normalizedKey = "" Then Exit Sub
-
-        Dim result As 编码任务插件结果_v6 = Nothing
-        SyncLock 插件结果锁
-            Dim storageKey = normalizedPluginId & ChrW(31) & normalizedKey
-            If Not 插件结果表.TryGetValue(storageKey, result) Then
-                插件结果序号 += 1
-                result = New 编码任务插件结果_v6 With {
-                    .插件ID = normalizedPluginId,
-                    .键 = normalizedKey,
-                    .序号 = 插件结果序号
-                }
-                插件结果表(storageKey) = result
-            End If
-            result.值 = If(value, "")
-            result.显示名称 = If(displayName, "").Trim()
-            result.单位 = If(unit, "").Trim()
-            result.更新时间 = DateTime.Now
-            插件结果版本号 += 1
-        End SyncLock
-
-        Dim title = If(result.显示名称 = "", result.键, result.显示名称)
-        Dim suffix = If(result.单位 = "", "", " " & result.单位)
-        追加日志($"[插件结果/{result.插件ID}] {title}：{result.值}{suffix}", 编码任务日志类别_v6.系统)
-    End Sub
-
-    Private Sub 清空插件结果()
-        SyncLock 插件结果锁
-            插件结果表.Clear()
-            插件结果序号 = 0
-            插件结果版本号 += 1
-        End SyncLock
-    End Sub
-
-    Public Sub 追加日志(文本 As String, Optional 类别 As 编码任务日志类别_v6 = 编码任务日志类别_v6.输出, Optional 步骤项 As 编码步骤_v6 = Nothing, Optional 强制错误 As Boolean = False, Optional 通知更新 As Boolean = True)
-        If 文本 Is Nothing Then Exit Sub
-        Dim stageName = If(步骤项?.显示名称, If(当前步骤?.显示名称, ""))
-        Dim isError = 强制错误 OrElse 类别 = 编码任务日志类别_v6.错误 OrElse 编码队列_v6.是否错误输出(文本)
-        Dim addedEntry As 编码任务日志条目_v6 = Nothing
-        SyncLock 日志锁
-            If 类别 = 编码任务日志类别_v6.进度 AndAlso Not isError Then
-                Dim nowTime = DateTime.Now
-                If (nowTime - 上次进度日志提交时间).TotalMilliseconds < 1000 Then Exit Sub
-                上次进度日志提交时间 = nowTime
-            End If
-
-            日志序号 += 1
-            addedEntry = New 编码任务日志条目_v6 With {
-                .序号 = 日志序号,
-                .时间 = DateTime.Now,
-                .阶段名 = stageName,
-                .文本 = 文本,
-                .类别 = If(isError, 编码任务日志类别_v6.错误, 类别),
-                .是否错误 = isError
-            }
-            完整日志缓存.Add(addedEntry)
-            If addedEntry.类别 = 编码任务日志类别_v6.进度 Then 进度日志数量 += 1
-            日志版本号 += 1
-            实时输出 = 文本
-
-            最新原始日志文本 = 文本
-            最新原始日志是否错误 = isError
-            If addedEntry.类别 <> 编码任务日志类别_v6.进度 Then
-                非进度输出列表.Add(文本)
-                最新非进度日志文本 = 文本
-                最新非进度日志是否错误 = isError
-            End If
-            If isError Then 错误列表.Add(文本)
-            更新最新底部日志()
-            裁剪日志缓存()
-        End SyncLock
-        If addedEntry IsNot Nothing Then
-            If addedEntry.类别 = 编码任务日志类别_v6.进度 Then
-                编码队列_v6.触发插件事件("task.progress", Me, addedEntry)
-            Else
-                编码队列_v6.触发插件事件("task.log", Me, addedEntry)
-            End If
-        End If
-        If 通知更新 Then 编码队列_v6.通知任务更新(Me)
-    End Sub
-
-    Public Sub 清空日志(Optional 通知更新 As Boolean = True)
-        SyncLock 日志锁
-            完整日志缓存.Clear()
-            进度日志数量 = 0
-            错误列表.Clear()
-            非进度输出列表.Clear()
-            实时输出 = ""
-            最新底部日志文本 = ""
-            最新底部日志是否错误 = False
-            最新原始日志文本 = ""
-            最新原始日志是否错误 = False
-            最新非进度日志文本 = ""
-            最新非进度日志是否错误 = False
-            上次进度日志提交时间 = DateTime.MinValue
-            日志版本号 += 1
-            日志结构版本号 += 1
-        End SyncLock
-        If 通知更新 Then 编码队列_v6.通知任务更新(Me)
-    End Sub
-
-    Private Sub 更新最新底部日志()
-        最新底部日志文本 = 最新原始日志文本
-        最新底部日志是否错误 = 最新原始日志是否错误
-    End Sub
-
-    Private Sub 裁剪日志缓存()
-        Dim limit = 获取日志保留行数()
-        If limit <= 0 Then Exit Sub
-        If 完整日志缓存.Count <= limit OrElse 进度日志数量 <= 0 Then Exit Sub
-
-        Dim removeCount = Math.Min(完整日志缓存.Count - limit, 进度日志数量)
-        Dim removed As Integer = 0
-        Dim retained As New List(Of 编码任务日志条目_v6)(完整日志缓存.Count - removeCount)
-        For Each entry In 完整日志缓存
-            If removed < removeCount AndAlso entry.类别 = 编码任务日志类别_v6.进度 Then
-                removed += 1
-            Else
-                retained.Add(entry)
-            End If
-        Next
-        If removed = 0 Then Exit Sub
-
-        完整日志缓存.Clear()
-        完整日志缓存.AddRange(retained)
-        进度日志数量 -= removed
-        日志结构版本号 += 1
-    End Sub
-
-    Private Shared Function 获取日志保留行数() As Integer
-        Select Case 设置_v6.实例对象.任务日志保留行数选项
-            Case 0 : Return 100
-            Case 1 : Return 500
-            Case 2 : Return 1000
-            Case 3 : Return 0
-            Case Else : Return 500
-        End Select
-    End Function
-
-    Public Async Function 开始Async(执行标识 As Long) As Task
-        Dim cancellationToken = 获取当前执行取消令牌(执行标识)
-        Dim 计划步骤全部成功 As Boolean = False
-        SyncLock 状态锁
-            If Not 正在执行标记 OrElse 执行版本 <> 执行标识 Then Exit Function
-            If 手动停止 OrElse 状态 = 编码任务状态_v6.已停止 Then Exit Function
-            状态 = 编码任务状态_v6.正在处理
-        End SyncLock
-        Try
-            Try
-                清空日志(False)
-                清空插件结果()
-                进度 = New 编码进度_v6
-                任务耗时计时器.Restart()
-                追加日志($"[3FUI] 任务开始：{If(任务名称 <> "", 任务名称, Path.GetFileName(输入文件))}", 编码任务日志类别_v6.系统, Nothing, False, False)
-            Dim 处理前输出文件 = 输出文件
-            Dim 处理前由自动命名生成 = 输出文件由自动命名生成
-            Dim beforePrepare = Ext插件扩展桥接_v2.创建任务管线上下文(Ext插件处理阶段_v2.准备任务之前, Me)
-            Await Ext插件扩展桥接_v2.执行异步阶段Async(Ext插件处理阶段_v2.准备任务之前, beforePrepare, cancellationToken).ConfigureAwait(False)
-            Ext插件扩展桥接_v2.应用任务管线上下文(Me, beforePrepare)
-            编码队列_v6.刷新插件处理后的输出文件(Me, 处理前输出文件, 处理前由自动命名生成)
-            cancellationToken.ThrowIfCancellationRequested()
-            准备输入输出与步骤()
-
-            Dim afterPrepare = Ext插件扩展桥接_v2.创建任务管线上下文(Ext插件处理阶段_v2.准备任务之后, Me)
-            afterPrepare.Properties("stepCount") = 步骤.Count.ToString(Globalization.CultureInfo.InvariantCulture)
-            Await Ext插件扩展桥接_v2.执行异步阶段Async(Ext插件处理阶段_v2.准备任务之后, afterPrepare, cancellationToken).ConfigureAwait(False)
-            Dim afterPresetJson = Ext插件扩展桥接_v2.序列化预设(预设数据)
-            Dim needsRebuild = Not String.Equals(afterPrepare.PresetJson, afterPresetJson, StringComparison.Ordinal) OrElse
-                               Not String.Equals(afterPrepare.InputPath, 输入文件, StringComparison.Ordinal) OrElse
-                               Not String.Equals(afterPrepare.OutputPath, 输出文件, StringComparison.Ordinal) OrElse
-                               Not String.Equals(afterPrepare.CommandLine, 命令行, StringComparison.Ordinal)
-            If needsRebuild Then
-                处理前输出文件 = 输出文件
-                处理前由自动命名生成 = 输出文件由自动命名生成
-                Ext插件扩展桥接_v2.应用任务管线上下文(Me, afterPrepare)
-                编码队列_v6.刷新插件处理后的输出文件(Me, 处理前输出文件, 处理前由自动命名生成)
-                准备输入输出与步骤()
-            End If
-            进度.当前阶段 = ""
-            进度.百分比 = 0
-            进度.进度文本 = ""
-            If Not 是当前执行(执行标识) Then Exit Try
-            设定系统状态_v6()
-            编码队列_v6.通知任务更新(Me)
-
-            当前步骤索引 = 0
-            While 当前步骤索引 < 步骤.Count
-                Dim stepItem = 步骤(当前步骤索引)
-                stepItem.状态 = 编码步骤状态_v6.正在处理
-                进度.当前阶段 = stepItem.显示名称
-                追加日志($"[3FUI] 开始阶段：{stepItem.显示名称}", 编码任务日志类别_v6.系统, stepItem, False, False)
-                编码队列_v6.通知任务更新(Me)
-                Dim exitCode = Await 运行步骤Async(stepItem, cancellationToken)
-                If Not 是当前执行(执行标识) Then Exit While
-                If 手动停止 Then
-                    stepItem.状态 = 编码步骤状态_v6.已停止
-                    状态 = 编码任务状态_v6.已停止
-                    追加日志("[3FUI] 任务已手动停止", 编码任务日志类别_v6.系统, stepItem, False, False)
-                    手动停止后清理输出()
-                    Exit While
-                End If
-                If exitCode <> 0 Then
-                    stepItem.状态 = 编码步骤状态_v6.错误
-                    状态 = 编码任务状态_v6.错误
-                    追加日志($"[3FUI] 阶段 {stepItem.显示名称} 退出码 {exitCode}", 编码任务日志类别_v6.错误, stepItem, True, False)
-                    编码队列_v6.标记任务出错()
-                    失败后清理输出()
-                    Exit While
-                End If
-                stepItem.状态 = 编码步骤状态_v6.已完成
-                追加日志($"[3FUI] 完成阶段：{stepItem.显示名称}", 编码任务日志类别_v6.系统, stepItem, False, False)
-                If stepItem.阶段 = 预设数据_v6.命令行阶段.FFprobe获取时长 Then
-                    媒体总时长 = 提取FFprobe时长(stepItem.输出缓存)
-                    If String.IsNullOrWhiteSpace(媒体总时长) Then
-                        状态 = 编码任务状态_v6.错误
-                        追加日志("[3FUI] ffprobe 未能获取媒体总时长", 编码任务日志类别_v6.错误, stepItem, True, False)
-                        编码队列_v6.标记任务出错()
-                        Exit While
-                    End If
-                    追加日志($"[3FUI] 已获取媒体总时长：{媒体总时长}s", 编码任务日志类别_v6.系统, stepItem, False, False)
-                    重建编码步骤()
-                    当前步骤索引 = 0
-                    Continue While
-                End If
-                当前步骤索引 += 1
-            End While
-
-            If 是当前执行(执行标识) AndAlso 状态 = 编码任务状态_v6.正在处理 Then
-                计划步骤全部成功 = True
-                Dim afterComplete = Ext插件扩展桥接_v2.创建任务管线上下文(Ext插件处理阶段_v2.任务成功之后, Me)
-                afterComplete.TaskStatus = "succeeded"
-                afterComplete.Properties("elapsedMilliseconds") = CLng(任务耗时计时器.Elapsed.TotalMilliseconds).ToString(CultureInfo.InvariantCulture)
-                Await Ext插件扩展桥接_v2.执行异步阶段Async(Ext插件处理阶段_v2.任务成功之后, afterComplete, cancellationToken).ConfigureAwait(False)
-                cancellationToken.ThrowIfCancellationRequested()
-                If Not 是当前执行(执行标识) Then Exit Try
-                状态 = 编码任务状态_v6.已完成
-                进度.百分比 = 1
-                进度.进度文本 = "100%"
-                完成后处理输出时间()
-                追加日志("[3FUI] 任务完成", 编码任务日志类别_v6.系统, Nothing, False, False)
-            End If
-            Catch ex As OperationCanceledException When cancellationToken.IsCancellationRequested
-                If 是当前执行(执行标识) Then
-                    手动停止 = True
-                    状态 = 编码任务状态_v6.已停止
-                    追加日志("[3FUI] 任务已取消", 编码任务日志类别_v6.系统, 当前步骤, False, False)
-                    If Not 计划步骤全部成功 Then 手动停止后清理输出()
-                End If
-            Catch ex As Exception
-                If Not 是当前执行(执行标识) Then Exit Try
-                状态 = If(手动停止, 编码任务状态_v6.已停止, 编码任务状态_v6.错误)
-                Dim logCategory = If(状态 = 编码任务状态_v6.已停止, 编码任务日志类别_v6.系统, 编码任务日志类别_v6.错误)
-                追加日志("[3FUI] " & ex.Message, logCategory, 当前步骤, 状态 = 编码任务状态_v6.错误, False)
-                If 状态 = 编码任务状态_v6.错误 Then 编码队列_v6.标记任务出错()
-            End Try
-
-            ' VB.NET 不允许在 Finally 中 Await，因此终态处理位于受外层 Finally 保护的正常 Try 区域。
-            If 是当前执行(执行标识) Then
-                If 状态 = 编码任务状态_v6.错误 Then
-                    Await 安全执行终态插件阶段Async(Ext插件处理阶段_v2.任务失败之后).ConfigureAwait(False)
-                End If
-                Await 安全执行终态插件阶段Async(Ext插件处理阶段_v2.任务结束之后).ConfigureAwait(False)
-            End If
-        Finally
-            任务耗时计时器.Stop()
-            用户使用统计_v6.记录编码任务执行结果(状态 = 编码任务状态_v6.已完成, 任务耗时计时器.Elapsed)
-            释放进程()
-            清理帧服务器缓存()
-            恢复系统状态_v6()
-            编码队列_v6.通知任务更新(Me)
-            If 状态 = 编码任务状态_v6.已完成 Then
-                编码队列_v6.触发插件事件("task.completed", Me)
-            ElseIf 状态 = 编码任务状态_v6.错误 Then
-                编码队列_v6.触发插件事件("task.failed", Me)
-            End If
-        End Try
-    End Function
-
-    Private Async Function 安全执行终态插件阶段Async(stageId As String) As Task
-        Try
-            Dim context = Ext插件扩展桥接_v2.创建任务管线上下文(stageId, Me)
-            context.Properties("elapsedMilliseconds") = CLng(任务耗时计时器.Elapsed.TotalMilliseconds).ToString(CultureInfo.InvariantCulture)
-            Await Ext插件扩展桥接_v2.执行异步阶段Async(stageId, context, Threading.CancellationToken.None).ConfigureAwait(False)
-        Catch ex As Exception
-            追加日志($"[3FUI] 终态插件处理失败：{ex.Message}", 编码任务日志类别_v6.错误, 当前步骤, True, False)
-        End Try
-    End Function
-
-    Private Sub 准备输入输出与步骤()
-        If File.Exists(输入文件) Then
-            Try
-                输入文件大小 = New FileInfo(输入文件).Length
-            Catch
-            End Try
-        End If
-
-        If 预设数据 IsNot Nothing Then
-            预设管理_v6.初始化空集合(预设数据)
-            生成帧服务器脚本()
-            If String.IsNullOrWhiteSpace(输出文件) Then 输出文件 = 编码队列_v6.计算输出位置_v6(输入文件, 预设数据, True)
-            重建编码步骤()
-        Else
-            步骤.Clear()
-            步骤.Add(New 编码步骤_v6 With {
-                .阶段 = 预设数据_v6.命令行阶段.普通单次,
-                .命令行 = 命令行,
-                .显示名称 = "命令行"
-            })
-        End If
-        If 步骤.Count = 0 Then Throw New InvalidOperationException("没有可执行的编码步骤")
-    End Sub
-
-    Private Sub 重建编码步骤()
-        If 预设数据 Is Nothing Then Exit Sub
-        Dim generated = 预设管理_v6.生成阶段化命令行(预设数据, 输入文件, 输出文件, 媒体总时长, ID)
-        步骤.Clear()
-        For Each item In generated
-            If item.阶段 = 预设数据_v6.命令行阶段.FFprobe获取时长 AndAlso Not String.IsNullOrWhiteSpace(媒体总时长) Then Continue For
-            步骤.Add(New 编码步骤_v6 With {
-                .阶段 = item.阶段,
-                .进程文件名 = item.进程文件名,
-                .工作目录 = item.工作目录,
-                .命令行 = item.命令行,
-                .滤镜图 = item.滤镜图,
-                .映射参数 = item.映射参数,
-                .输出滤镜参数 = item.输出滤镜参数,
-                .需要媒体总时长 = item.需要媒体总时长,
-                .说明 = item.说明,
-                .显示名称 = If(String.IsNullOrWhiteSpace(item.显示名称), 获取阶段显示名称(item.阶段), item.显示名称),
-                .是插件步骤 = item.是插件步骤,
-                .插件ID = item.插件ID,
-                .插件提供器ID = item.插件提供器ID,
-                .插件步骤ID = item.插件步骤ID,
-                .使用宿主FFmpeg参数包装 = item.使用宿主FFmpeg参数包装,
-                .解析FFmpeg进度 = item.解析FFmpeg进度
-            })
-        Next
-    End Sub
-
-    Private Async Function 运行步骤Async(stepItem As 编码步骤_v6,
-                                     cancellationToken As Threading.CancellationToken) As Task(Of Integer)
-        Dim tcs As New TaskCompletionSource(Of Integer)(TaskCreationOptions.RunContinuationsAsynchronously)
-        Dim process As New Process()
-        当前进程 = process
-        process.StartInfo.FileName = If(Not String.IsNullOrWhiteSpace(stepItem.进程文件名),
-                                        stepItem.进程文件名,
-                                        If(stepItem.阶段 = 预设数据_v6.命令行阶段.FFprobe获取时长,
-                                           设置_v6.获取FFprobe进程文件名(),
-                                           设置_v6.获取FFmpeg进程文件名()))
-        process.StartInfo.WorkingDirectory = If(Not String.IsNullOrWhiteSpace(stepItem.工作目录),
-                                                stepItem.工作目录,
-                                                设置_v6.获取有效工作目录())
-        process.StartInfo.Arguments = If(Not stepItem.使用宿主FFmpeg参数包装 OrElse
-                                         stepItem.阶段 = 预设数据_v6.命令行阶段.FFprobe获取时长 OrElse
-                                         设置_v6.实例对象.覆盖参数传递 = "",
-                                         stepItem.命令行,
-                                         设置_v6.实例对象.覆盖参数传递.Replace("<args>", stepItem.命令行))
-        stepItem.实际执行文件名 = process.StartInfo.FileName
-        stepItem.实际执行参数 = process.StartInfo.Arguments
-        process.StartInfo.UseShellExecute = False
-        process.StartInfo.RedirectStandardOutput = True
-        process.StartInfo.RedirectStandardError = True
-        process.StartInfo.StandardOutputEncoding = Encoding.UTF8
-        process.StartInfo.StandardErrorEncoding = Encoding.UTF8
-        process.StartInfo.RedirectStandardInput = True
-        process.StartInfo.StandardInputEncoding = Encoding.UTF8
-        process.StartInfo.CreateNoWindow = True
-        process.EnableRaisingEvents = True
-
-        Dim beforeStart = Ext插件扩展桥接_v2.创建任务管线上下文(Ext插件处理阶段_v2.启动进程之前, Me)
-        beforeStart.ProcessFileName = process.StartInfo.FileName
-        beforeStart.CommandLine = process.StartInfo.Arguments
-        beforeStart.PhaseName = stepItem.显示名称
-        beforeStart.Properties("commandStage") = stepItem.阶段.ToString()
-        beforeStart.Properties("isPluginStep") = If(stepItem.是插件步骤, "true", "false")
-        beforeStart.Properties("pluginId") = stepItem.插件ID
-        beforeStart.Properties("pluginProviderId") = stepItem.插件提供器ID
-        beforeStart.Properties("pluginStepId") = stepItem.插件步骤ID
-        Await Ext插件扩展桥接_v2.执行异步阶段Async(Ext插件处理阶段_v2.启动进程之前, beforeStart, cancellationToken).ConfigureAwait(False)
-        cancellationToken.ThrowIfCancellationRequested()
-        process.StartInfo.FileName = beforeStart.ProcessFileName
-        process.StartInfo.Arguments = beforeStart.CommandLine
-        stepItem.实际执行文件名 = process.StartInfo.FileName
-        stepItem.实际执行参数 = process.StartInfo.Arguments
-
-        AddHandler process.OutputDataReceived, Sub(sender, e) 处理输出(stepItem, e.Data)
-        AddHandler process.ErrorDataReceived, Sub(sender, e) 处理输出(stepItem, e.Data)
-        AddHandler process.Exited, Sub()
-                                       Dim code As Integer = -1
-                                       Try
-                                           code = process.ExitCode
-                                       Catch
-                                       End Try
-                                       tcs.TrySetResult(code)
-                                   End Sub
-        追加日志($"[3FUI] 执行：{process.StartInfo.FileName} {process.StartInfo.Arguments}", 编码任务日志类别_v6.系统, stepItem, False, False)
-        process.Start()
-        编码队列_v6.通知任务更新(Me)
-        process.BeginOutputReadLine()
-        process.BeginErrorReadLine()
-        If 设置_v6.实例对象.指定处理器核心 <> "" Then
-            process.ProcessorAffinity = GetAffinityMask(设置_v6.实例对象.指定处理器核心.Split(","c).Select(Function(s) s.Trim()).Where(Function(s) Integer.TryParse(s, Nothing)).Select(Function(s) Integer.Parse(s)).ToArray())
-        End If
-        Dim exitCode = Await tcs.Task.ConfigureAwait(False)
-        Dim afterExit = Ext插件扩展桥接_v2.创建任务管线上下文(Ext插件处理阶段_v2.进程退出之后, Me)
-        afterExit.ProcessFileName = process.StartInfo.FileName
-        afterExit.CommandLine = process.StartInfo.Arguments
-        afterExit.PhaseName = stepItem.显示名称
-        afterExit.ExitCode = exitCode
-        afterExit.Properties("commandStage") = stepItem.阶段.ToString()
-        afterExit.Properties("isPluginStep") = If(stepItem.是插件步骤, "true", "false")
-        afterExit.Properties("pluginId") = stepItem.插件ID
-        afterExit.Properties("pluginProviderId") = stepItem.插件提供器ID
-        afterExit.Properties("pluginStepId") = stepItem.插件步骤ID
-        Await Ext插件扩展桥接_v2.执行异步阶段Async(Ext插件处理阶段_v2.进程退出之后, afterExit, cancellationToken).ConfigureAwait(False)
-        Return afterExit.ExitCode.GetValueOrDefault(exitCode)
-    End Function
-
-    Private Sub 处理输出(stepItem As 编码步骤_v6, line As String)
-        If line Is Nothing Then Exit Sub
-        stepItem.输出缓存.Add(line)
-        If stepItem.输出缓存.Count > 2000 Then stepItem.输出缓存.RemoveRange(0, stepItem.输出缓存.Count - 1000)
-        If stepItem.解析FFmpeg进度 AndAlso line.Contains("Duration:", StringComparison.OrdinalIgnoreCase) Then
-            Dim detectedDuration = 编码进度_v6.提取媒体总时长(line)
-            If String.IsNullOrWhiteSpace(媒体总时长) AndAlso detectedDuration > TimeSpan.Zero Then
-                媒体总时长 = detectedDuration.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture)
-            End If
-            进度.解析FFmpeg输出(line, 计算当前总时长())
-        End If
-        Dim isProgressLine = stepItem.解析FFmpeg进度 AndAlso 编码队列_v6.是否进度输出(line)
-        If isProgressLine Then
-            进度.解析FFmpeg输出(line, 计算当前总时长())
-        End If
-        Dim isError = 编码队列_v6.是否错误输出(line)
-        Dim category = If(isError, 编码任务日志类别_v6.错误, If(isProgressLine, 编码任务日志类别_v6.进度, 编码任务日志类别_v6.输出))
-        追加日志(line, category, stepItem, isError)
-    End Sub
-
-    Private Function 计算当前总时长() As TimeSpan
-        Dim originalDuration = If(Not String.IsNullOrWhiteSpace(媒体总时长),
-                                  编码进度_v6.转换时间(媒体总时长),
-                                  进度.总时长)
-        If 预设数据 Is Nothing OrElse 预设数据.剪辑区间_方法 = 预设数据_v6.剪辑方法.未知 Then Return originalDuration
-
-        Dim inPointText = If(预设数据.剪辑区间_入点, "").Trim()
-        Dim outPointText = If(预设数据.剪辑区间_出点, "").Trim()
-        If inPointText = "" AndAlso outPointText = "" Then Return originalDuration
-
-        Dim inPoint = 编码进度_v6.转换时间(inPointText)
-        Dim outPoint = 编码进度_v6.转换时间(outPointText)
-        If 预设数据.剪辑区间_方法 = 预设数据_v6.剪辑方法.掐头去尾 Then
-            If originalDuration <= TimeSpan.Zero Then Return originalDuration
-            If outPointText <> "" Then
-                Return TimeSpan.FromSeconds(Math.Max(0, Math.Min(originalDuration.TotalSeconds, outPoint.TotalSeconds) - Math.Min(originalDuration.TotalSeconds, inPoint.TotalSeconds)))
-            ElseIf inPointText <> "" Then
-                Return TimeSpan.FromSeconds(Math.Max(0, originalDuration.TotalSeconds - Math.Min(originalDuration.TotalSeconds, inPoint.TotalSeconds)))
-            End If
-            Return originalDuration
-        End If
-
-        If 预设数据.剪辑区间_方法 = 预设数据_v6.剪辑方法.剔除中间 Then
-            If originalDuration <= TimeSpan.Zero Then Return originalDuration
-            If inPointText <> "" AndAlso outPointText <> "" Then
-                Return TimeSpan.FromSeconds(Math.Max(0, originalDuration.TotalSeconds - Math.Max(0, outPoint.TotalSeconds - inPoint.TotalSeconds)))
-            ElseIf inPointText <> "" Then
-                Return TimeSpan.FromSeconds(Math.Min(originalDuration.TotalSeconds, Math.Max(0, inPoint.TotalSeconds)))
-            ElseIf outPointText <> "" Then
-                Return TimeSpan.FromSeconds(Math.Max(0, originalDuration.TotalSeconds - Math.Max(0, outPoint.TotalSeconds)))
-            End If
-        End If
-
-        If outPointText <> "" Then
-            Return TimeSpan.FromSeconds(Math.Max(0, outPoint.TotalSeconds - inPoint.TotalSeconds))
-        End If
-        If inPointText <> "" AndAlso originalDuration > TimeSpan.Zero Then
-            Return TimeSpan.FromSeconds(Math.Max(0, originalDuration.TotalSeconds - inPoint.TotalSeconds))
-        End If
-        Return originalDuration
-    End Function
-
-    Public Sub 暂停()
-        Try
-            If 状态 = 编码任务状态_v6.正在处理 AndAlso 当前进程 IsNot Nothing AndAlso Not 当前进程.HasExited Then
-                If NtSuspendProcess(当前进程.Handle) = 0 Then
-                    状态 = 编码任务状态_v6.已暂停
-                    任务耗时计时器.Stop()
-                    追加日志("[3FUI] 任务已暂停", 编码任务日志类别_v6.系统, 当前步骤, False, False)
-                    编码队列_v6.通知任务更新(Me)
-                    编码队列_v6.触发插件事件("task.paused", Me)
-                End If
-            End If
-        Catch ex As Exception
-            追加日志("[3FUI] 暂停失败：" & ex.Message, 编码任务日志类别_v6.错误, 当前步骤, True)
-        End Try
-    End Sub
-
-    Public Sub 恢复()
-        Try
-            If 状态 = 编码任务状态_v6.已暂停 AndAlso 当前进程 IsNot Nothing AndAlso Not 当前进程.HasExited Then
-                If NtResumeProcess(当前进程.Handle) = 0 Then
-                    状态 = 编码任务状态_v6.正在处理
-                    任务耗时计时器.Start()
-                    设定系统状态_v6()
-                    追加日志("[3FUI] 任务已恢复", 编码任务日志类别_v6.系统, 当前步骤, False, False)
-                    编码队列_v6.通知任务更新(Me)
-                    编码队列_v6.触发插件事件("task.resumed", Me)
-                End If
-            End If
-        Catch ex As Exception
-            追加日志("[3FUI] 恢复失败：" & ex.Message, 编码任务日志类别_v6.错误, 当前步骤, True)
-        End Try
-    End Sub
-
-    Public Sub 停止()
-        停止并报告是否停止执行()
-    End Sub
-
-    Friend Function 停止并报告是否停止执行() As Boolean
-        Dim stoppedExecution As Boolean = False
-        Dim cancellationSource As Threading.CancellationTokenSource = Nothing
-        Try
-            Dim process As Process = Nothing
-            SyncLock 状态锁
-                If Not 可停止 Then Return False
-                stoppedExecution = 正在执行标记
-                If stoppedExecution Then 当前执行已请求停止 = True
-                手动停止 = True
-                状态 = 编码任务状态_v6.已停止
-                process = 当前进程
-                cancellationSource = 当前执行取消源
-            End SyncLock
-            cancellationSource?.Cancel()
-            If process IsNot Nothing AndAlso Not process.HasExited Then process.Kill(entireProcessTree:=True)
-            任务耗时计时器.Stop()
-            追加日志("[3FUI] 正在停止任务", 编码任务日志类别_v6.系统, 当前步骤, False, False)
-            编码队列_v6.通知任务更新(Me)
-            编码队列_v6.触发插件事件("task.stopped", Me)
-            Return stoppedExecution
-        Catch ex As Exception
-            追加日志("[3FUI] 停止失败：" & ex.Message, 编码任务日志类别_v6.错误, 当前步骤, True)
-            Return stoppedExecution
-        End Try
-    End Function
-
-    Public Sub 重置()
-        使当前执行失效()
-        释放资源()
-        If 输出文件由自动命名生成 Then 输出文件 = ""
-        输出文件由自动命名生成 = False
-        状态 = 编码任务状态_v6.未处理
-        当前步骤索引 = -1
-        手动停止 = False
-        实时输出 = ""
-        清空日志(False)
-        清空插件结果()
-        步骤.Clear()
-        进度 = New 编码进度_v6
-        输入文件大小 = 0
-        媒体总时长 = ""
-        任务耗时计时器.Reset()
-    End Sub
-
-    Public Sub 释放资源()
-        释放进程()
-        清理帧服务器缓存()
-    End Sub
-
-    Private Sub 释放进程()
-        Try
-            If 当前进程 IsNot Nothing Then
-                If Not 当前进程.HasExited Then 当前进程.Kill(entireProcessTree:=True)
-                当前进程.Dispose()
-            End If
-        Catch
-        Finally
-            当前进程 = Nothing
-        End Try
-    End Sub
-
-    Private Sub 生成帧服务器脚本()
-        If 预设数据 Is Nothing Then Exit Sub
-        If 预设数据.视频参数_视频帧服务器_使用AviSynth Then
-            Dim scriptPath = 解析帧服务器模板路径(预设数据.视频参数_视频帧服务器_avs脚本文件)
-            If Not File.Exists(scriptPath) Then Throw New FileNotFoundException("AviSynth 脚本模板文件不存在", scriptPath)
-            Dim content = File.ReadAllText(scriptPath).Replace("<FilePath>", 输入文件)
-            AviSynthCachePath = 预设管理_v6.派生帧服务器脚本路径(输入文件, ".avs", ID)
-            File.WriteAllText(AviSynthCachePath, content, New UTF8Encoding(False))
-        End If
-        If 预设数据.视频参数_视频帧服务器_使用VapourSynth Then
-            Dim scriptPath = 解析帧服务器模板路径(预设数据.视频参数_视频帧服务器_vpy脚本文件)
-            If Not File.Exists(scriptPath) Then Throw New FileNotFoundException("VapourSynth 脚本模板文件不存在", scriptPath)
-            Dim content = File.ReadAllText(scriptPath).Replace("<FilePath>", 输入文件)
-            VapourSynthCachePath = 预设管理_v6.派生帧服务器脚本路径(输入文件, Path.GetExtension(scriptPath), ID)
-            File.WriteAllText(VapourSynthCachePath, content, New UTF8Encoding(False))
-        End If
-    End Sub
-
-    Private Shared Function 解析帧服务器模板路径(pathText As String) As String
-        Dim raw = If(pathText, "").Trim()
-        If raw = "" Then Return raw
-        Try
-            If Path.IsPathRooted(raw) Then Return raw
-            Return Path.GetFullPath(Path.Combine(Application.StartupPath, raw))
-        Catch
-            Return raw
-        End Try
-    End Function
-
-    Private Sub 清理帧服务器缓存()
-        Try
-            If File.Exists(AviSynthCachePath) Then File.Delete(AviSynthCachePath)
-            If File.Exists(VapourSynthCachePath) Then File.Delete(VapourSynthCachePath)
-        Catch
-        End Try
-    End Sub
-
-    Private Sub 完成后处理输出时间()
-        If 预设数据 Is Nothing OrElse String.IsNullOrWhiteSpace(输出文件) Then Exit Sub
-        Try
-            If File.Exists(输出文件) AndAlso File.Exists(输入文件) Then
-                If 预设数据.输出命名_保留创建时间 Then File.SetCreationTime(输出文件, File.GetCreationTime(输入文件))
-                If 预设数据.输出命名_保留修改时间 Then File.SetLastWriteTime(输出文件, File.GetLastWriteTime(输入文件))
-                If 预设数据.输出命名_保留访问时间 Then File.SetLastAccessTime(输出文件, File.GetLastAccessTime(输入文件))
-            End If
-        Catch ex As Exception
-            追加日志("[3FUI] 保留文件时间失败：" & ex.Message, 编码任务日志类别_v6.输出, Nothing, False, False)
-        End Try
-    End Sub
-
-    Private Sub 失败后清理输出()
-        清理已报废MP4输出("失败")
-    End Sub
-
-    Private Sub 手动停止后清理输出()
-        清理已报废MP4输出("手动停止")
-    End Sub
-
-    Private Sub 清理已报废MP4输出(触发原因 As String)
-        If String.IsNullOrWhiteSpace(输出文件) OrElse Not File.Exists(输出文件) Then Exit Sub
-        If Not Path.GetExtension(输出文件).Equals(".mp4", StringComparison.OrdinalIgnoreCase) Then Exit Sub
-        If 输出文件是否等于输入文件() Then Exit Sub
-        Try
-            Select Case 设置_v6.实例对象.任务失败自动删除输出文件
-                Case 0
-                    FileIO.FileSystem.DeleteFile(输出文件, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                    追加日志($"[3FUI] {触发原因}后已将报废 MP4 输出文件删除到回收站", 编码任务日志类别_v6.系统, 当前步骤, False, False)
-                Case 1
-                    FileIO.FileSystem.DeleteFile(输出文件, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.DeletePermanently)
-                    追加日志($"[3FUI] {触发原因}后已永久删除报废 MP4 输出文件", 编码任务日志类别_v6.系统, 当前步骤, False, False)
-            End Select
-        Catch ex As Exception
-            追加日志($"[3FUI] {触发原因}后删除报废 MP4 输出文件失败：" & ex.Message, 编码任务日志类别_v6.错误, 当前步骤, True, False)
-        End Try
-    End Sub
-
-    Private Function 输出文件是否等于输入文件() As Boolean
-        If String.IsNullOrWhiteSpace(输出文件) OrElse String.IsNullOrWhiteSpace(输入文件) Then Return False
-        Try
-            Return Path.GetFullPath(输出文件).Equals(Path.GetFullPath(输入文件), StringComparison.OrdinalIgnoreCase)
-        Catch
-            Return 输出文件.Equals(输入文件, StringComparison.OrdinalIgnoreCase)
-        End Try
-    End Function
-
-    Private Shared Function 提取FFprobe时长(lines As IEnumerable(Of String)) As String
-        For Each line In lines
-            Dim v As Double
-            If Double.TryParse(line.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, v) AndAlso v > 0 Then Return v.ToString("0.###", CultureInfo.InvariantCulture)
-        Next
-        Return ""
-    End Function
-
-    Private Shared Function 获取阶段显示名称(stage As 预设数据_v6.命令行阶段) As String
-        Select Case stage
-            Case 预设数据_v6.命令行阶段.FFprobe获取时长 : Return "ffprobe 获取时长"
-            Case 预设数据_v6.命令行阶段.二次编码第一遍 : Return "二次编码 1/2"
-            Case 预设数据_v6.命令行阶段.二次编码第二遍 : Return "二次编码 2/2"
-            Case Else : Return "编码"
-        End Select
-    End Function
-
-    Private Shared Sub 设定系统状态_v6()
-        Select Case 设置_v6.实例对象.有任务时系统保持状态选项
-            Case 0
-                SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS Or EXECUTION_STATE.ES_SYSTEM_REQUIRED)
-            Case 1
-                SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS Or EXECUTION_STATE.ES_SYSTEM_REQUIRED Or EXECUTION_STATE.ES_DISPLAY_REQUIRED)
-            Case 2
-                SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS)
-        End Select
-    End Sub
-
-    Private Shared Sub 恢复系统状态_v6()
-        SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS)
-    End Sub
-End Class
-
-Public Class 编码步骤_v6
-    Public Property 阶段 As 预设数据_v6.命令行阶段 = 预设数据_v6.命令行阶段.普通单次
-    Public Property 显示名称 As String = ""
-    Public Property 进程文件名 As String = ""
-    Public Property 工作目录 As String = ""
-    Public Property 命令行 As String = ""
-    Public Property 实际执行文件名 As String = ""
-    Public Property 实际执行参数 As String = ""
-    Public Property 滤镜图 As String = ""
-    Public Property 映射参数 As String = ""
-    Public Property 输出滤镜参数 As String = ""
-    Public Property 需要媒体总时长 As Boolean = False
-    Public Property 说明 As String = ""
-    Public Property 是插件步骤 As Boolean = False
-    Public Property 插件ID As String = ""
-    Public Property 插件提供器ID As String = ""
-    Public Property 插件步骤ID As String = ""
-    Public Property 使用宿主FFmpeg参数包装 As Boolean = True
-    Public Property 解析FFmpeg进度 As Boolean = True
-    Public Property 状态 As 编码步骤状态_v6 = 编码步骤状态_v6.未处理
-    Public Property 输出缓存 As New List(Of String)
-End Class
-
-Public Class 编码进度_v6
-    Private Shared ReadOnly DurationPattern As New Regex("Duration:\s*(\d+:\d{2}:\d{2}\.\d{2})", RegexOptions.Compiled)
-    Private Shared ReadOnly SizePattern As New Regex("size=\s*(?<value>\d+)\s*(?<unit>[KMG]iB|kB)", RegexOptions.Compiled Or RegexOptions.IgnoreCase)
-    Private Shared ReadOnly TimePattern As New Regex("time=\s*(?<value>\d+:\d{2}:\d{2}\.\d{2})", RegexOptions.Compiled)
-    Private Shared ReadOnly QPattern As New Regex("q=\s*(?<value>[\d\.\-]+)", RegexOptions.Compiled)
-    Private Shared ReadOnly BitratePattern As New Regex("bitrate=\s*(?<value>[\d\.]+)\s*kbits/s", RegexOptions.Compiled)
-    Private Shared ReadOnly SpeedPattern As New Regex("speed=\s*(?<value>[\d\.eE\+\-]+)\s*x", RegexOptions.Compiled)
-    Private Const 最低有效速度 As Double = 0.01
-
-    Public Property 当前阶段 As String = ""
-    Public Property 总时长 As TimeSpan = TimeSpan.Zero
-    Public Property 当前时间 As TimeSpan = TimeSpan.Zero
-    Public Property 百分比 As Double = 0
-    Public Property 进度文本 As String = ""
-    Public Property 效率文本 As String = ""
-    Public Property 输出大小文本 As String = ""
-    Public Property 输出大小KB As Long = 0
-    Public Property 质量文本 As String = ""
-    Public Property 比特率文本 As String = ""
-    Public Property 时间文本 As String = ""
-
-    Public Sub 解析FFmpeg输出(line As String, preferredTotal As TimeSpan)
-        If String.IsNullOrWhiteSpace(line) Then Exit Sub
-        If 总时长 = TimeSpan.Zero AndAlso preferredTotal > TimeSpan.Zero Then 总时长 = preferredTotal
-        Dim detectedDuration = 提取媒体总时长(line)
-        If 总时长 = TimeSpan.Zero AndAlso detectedDuration > TimeSpan.Zero Then 总时长 = detectedDuration
-        Dim tm = TimePattern.Match(line)
-        If tm.Success Then 当前时间 = 转换时间(tm.Groups("value").Value)
-
-        If 总时长.TotalSeconds > 0 AndAlso 当前时间.TotalSeconds > 0 Then
-            百分比 = Math.Min(Math.Max(当前时间.TotalSeconds / 总时长.TotalSeconds, 0), 1)
-            进度文本 = $"{百分比 * 100:F1}%"
-        Else
-            进度文本 = ""
-        End If
-
-        Dim sm = SizePattern.Match(line)
-        If sm.Success Then
-            输出大小KB = 转换到KB(Long.Parse(sm.Groups("value").Value), sm.Groups("unit").Value)
-        End If
-        更新输出大小文本()
-        Dim qm = QPattern.Match(line)
-        If qm.Success Then 质量文本 = 格式化质量文本(qm.Groups("value").Value)
-        Dim bm = BitratePattern.Match(line)
-        If bm.Success Then 比特率文本 = 格式化比特率文本(bm.Groups("value").Value)
-        Dim sp = SpeedPattern.Match(line)
-        If sp.Success Then
-            Dim speed As Double
-            If Double.TryParse(sp.Groups("value").Value, NumberStyles.Any, CultureInfo.InvariantCulture, speed) Then
-                效率文本 = 格式化效率文本(speed)
-                If 总时长.TotalSeconds > 0 AndAlso 当前时间.TotalSeconds > 0 AndAlso
-                   Not Double.IsNaN(speed) AndAlso Not Double.IsInfinity(speed) AndAlso speed >= 最低有效速度 Then
-                    Dim remain = Math.Max(0, (总时长.TotalSeconds - 当前时间.TotalSeconds) / speed)
-                    ' FFmpeg startup samples can report an extremely small speed (for example 0.00x).
-                    ' Do not expose the resulting multi-year ETA; wait for a usable sample instead.
-                    Dim maximumRemain = Math.Max(TimeSpan.FromDays(30).TotalSeconds, 总时长.TotalSeconds * 100.0R)
-                    If Not Double.IsNaN(remain) AndAlso Not Double.IsInfinity(remain) AndAlso remain <= maximumRemain Then
-                        时间文本 = 格式化秒(remain)
-                    Else
-                        时间文本 = ""
-                    End If
-                Else
-                    时间文本 = ""
-                End If
-            Else
-                时间文本 = ""
-            End If
-        Else
-            时间文本 = ""
-        End If
-    End Sub
-
-    Friend Shared Function 提取媒体总时长(line As String) As TimeSpan
-        If String.IsNullOrWhiteSpace(line) Then Return TimeSpan.Zero
-        Dim match = DurationPattern.Match(line)
-        If Not match.Success Then Return TimeSpan.Zero
-        Return 转换时间(match.Groups(1).Value)
-    End Function
-
-    Private Shared Function 格式化质量文本(value As String) As String
-        Dim q As Double
-        If Not Double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, q) Then Return If(value, "")
-        If q = 0 OrElse q = -1 Then Return ""
-        Return q.ToString("F0", CultureInfo.InvariantCulture)
-    End Function
-
-    Private Shared Function 格式化效率文本(speed As Double) As String
-        If speed * 100 >= 10000 Then Return speed.ToString("F0", CultureInfo.InvariantCulture) & "x"
-        Return $"{speed * 100:F0}%"
-    End Function
-
-    Private Shared Function 格式化比特率文本(value As String) As String
-        Dim bitrate As Double
-        If Not Double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, bitrate) Then Return If(value, "") & " kbps"
-        If bitrate >= 10000 Then Return (bitrate / 1000).ToString("F2", CultureInfo.InvariantCulture) & " Mbps"
-        Return bitrate.ToString("F0", CultureInfo.InvariantCulture) & " kbps"
-    End Function
-
-    Private Sub 更新输出大小文本()
-        If 输出大小KB <= 0 Then
-            输出大小文本 = ""
-            Exit Sub
-        End If
-
-        输出大小文本 = 格式化大小KB(输出大小KB)
-        If 百分比 <= 0 OrElse 百分比 >= 1 Then Exit Sub
-
-        Dim estimatedSizeKB = CLng(输出大小KB / 百分比)
-        输出大小文本 &= " - " & 格式化预估大小KB(estimatedSizeKB)
-    End Sub
-
-    Public Shared Function 转换时间(value As String) As TimeSpan
-        If String.IsNullOrWhiteSpace(value) Then Return TimeSpan.Zero
-
-        ' FFprobe stores durations as plain seconds (for example "3600").
-        ' TimeSpan.TryParse treats a plain integer as days, which can inflate
-        ' the ETA by 24 hours per unit. Parse numeric values as seconds first.
-        Dim seconds As Double
-        If Double.TryParse(value.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, seconds) Then
-            If Double.IsNaN(seconds) OrElse Double.IsInfinity(seconds) OrElse seconds < 0 OrElse seconds > TimeSpan.MaxValue.TotalSeconds Then Return TimeSpan.Zero
-            Return TimeSpan.FromSeconds(seconds)
-        End If
-
-        Dim t As TimeSpan
-        If TimeSpan.TryParse(value.Trim(), CultureInfo.InvariantCulture, t) AndAlso t >= TimeSpan.Zero Then Return t
-        Return TimeSpan.Zero
-    End Function
-
-    Private Shared Function 转换到KB(value As Long, unit As String) As Long
-        Select Case unit.ToLowerInvariant()
-            Case "kb", "kib" : Return value
-            Case "mib" : Return value * 1024
-            Case "gib" : Return value * 1024 * 1024
-            Case Else : Return value
-        End Select
-    End Function
-
-    Public Shared Function 格式化大小KB(value As Long) As String
-        If value >= 1024L * 1024L Then Return $"{value / 1024.0 / 1024.0:F2} GB"
-        If value >= 1024L Then Return $"{value / 1024.0:F0} MB"
-        Return $"{value} KB"
-    End Function
-
-    Private Shared Function 格式化预估大小KB(value As Long) As String
-        If value >= 1024L * 1024L Then Return $"{value / 1024.0 / 1024.0:F1} GB"
-        If value >= 1024L Then Return $"{value / 1024.0:F0} MB"
-        Return $"{value} KB"
-    End Function
-
-    Public Shared Function 格式化秒(value As Double) As String
-        If Double.IsNaN(value) OrElse Double.IsInfinity(value) OrElse value < 0 Then Return ""
-        Dim safeValue = Math.Min(value, TimeSpan.MaxValue.TotalSeconds)
-        Dim h = CLng(Math.Floor(safeValue / 3600.0R))
-        Dim m = CLng(Math.Floor((safeValue - h * 3600.0R) / 60.0R))
-        Dim s = CLng(Math.Floor(safeValue - h * 3600.0R - m * 60.0R))
-        Dim parts As New List(Of String)
-        If h > 0 Then parts.Add($"{h}h")
-        If m > 0 OrElse h > 0 Then parts.Add($"{m}m")
-        parts.Add($"{s}s")
-        Return String.Join("", parts)
-    End Function
 End Class

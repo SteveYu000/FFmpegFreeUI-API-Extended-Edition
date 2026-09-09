@@ -70,10 +70,12 @@ Public Class Form_v6_参数面板_预设管理
                     Dim displayName = Path.GetFileNameWithoutExtension(file)
                     Dim remark = ""
                     Try
-                        Dim data = 预设管理_v6.读取预设文件(file)
-                        If data IsNot Nothing Then
-                            remark = data.预设备注
-                        End If
+                        Using stream = System.IO.File.OpenRead(file)
+                            Using document = JsonDocument.Parse(stream)
+                                Dim note As JsonElement
+                                If document.RootElement.TryGetProperty(NameOf(预设数据_v6.预设备注), note) AndAlso note.ValueKind = JsonValueKind.String Then remark = note.GetString()
+                            End Using
+                        End Using
                     Catch
                         remark = "此文件无法按 v6 预设读取"
                     End Try
@@ -108,6 +110,7 @@ Public Class Form_v6_参数面板_预设管理
 
     Private Function 读取用户预设排序文件名() As List(Of String)
         Dim result As New List(Of String)
+        Dim seen As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
         Dim file = 用户预设排序文件路径()
         If Not System.IO.File.Exists(file) Then Return result
 
@@ -115,7 +118,7 @@ Public Class Form_v6_参数面板_预设管理
             Dim lines = System.IO.File.ReadAllLines(file, System.Text.Encoding.UTF8)
             For i = 0 To lines.Length - 1
                 Dim name = Path.GetFileName(If(lines(i), "").Trim())
-                If name <> "" AndAlso Not result.Any(Function(x) String.Equals(x, name, StringComparison.OrdinalIgnoreCase)) Then result.Add(name)
+                If name <> "" AndAlso seen.Add(name) Then result.Add(name)
             Next
         Catch
         End Try
@@ -131,23 +134,23 @@ Public Class Form_v6_参数面板_预设管理
             Where(Function(x) x <> "").
             Distinct(StringComparer.OrdinalIgnoreCase).
             ToList()
-        System.IO.File.WriteAllLines(Path.Combine(dir, 预设排序文件名), names, System.Text.Encoding.UTF8)
+        Dim target = Path.Combine(dir, 预设排序文件名)
+        Dim content = String.Join(Environment.NewLine, names)
+        If System.IO.File.Exists(target) AndAlso System.IO.File.ReadAllText(target, System.Text.Encoding.UTF8) = content Then Exit Sub
+        原子文件写入_v6.写入文本(target, content)
     End Sub
 
     Private Function 应用用户预设排序(files As List(Of String)) As List(Of String)
         Dim order = 读取用户预设排序文件名()
-        Dim remaining = files.ToList()
+        Dim remaining = files.ToDictionary(Function(x) Path.GetFileName(x), StringComparer.OrdinalIgnoreCase)
         Dim result As New List(Of String)
 
         For Each orderedName In order
-            Dim index = remaining.FindIndex(Function(x) String.Equals(Path.GetFileName(x), orderedName, StringComparison.OrdinalIgnoreCase))
-            If index < 0 Then Continue For
-            result.Add(remaining(index))
-            remaining.RemoveAt(index)
+            Dim file As String = Nothing
+            If remaining.Remove(orderedName, file) Then result.Add(file)
         Next
 
-        result.AddRange(remaining)
-        写入用户预设排序(result)
+        result.AddRange(files.Where(Function(x) remaining.ContainsKey(Path.GetFileName(x))))
         Return result
     End Function
 
@@ -177,13 +180,7 @@ Public Class Form_v6_参数面板_预设管理
         Dim index = order.FindIndex(Function(x) String.Equals(x, oldName, StringComparison.OrdinalIgnoreCase))
         If index >= 0 Then
             order(index) = newName
-            Dim normalized As New List(Of String)
-            For Each orderedName In order
-                If orderedName = "" Then Continue For
-                If normalized.Any(Function(x) String.Equals(x, orderedName, StringComparison.OrdinalIgnoreCase)) Then Continue For
-                normalized.Add(orderedName)
-            Next
-            写入用户预设排序(normalized)
+            写入用户预设排序(order)
         Else
             添加用户预设到排序末尾(newFile)
         End If
