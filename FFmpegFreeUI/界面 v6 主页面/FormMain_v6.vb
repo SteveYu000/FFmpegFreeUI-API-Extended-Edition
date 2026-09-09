@@ -27,31 +27,31 @@ Public Class FormMain_v6
         设置_v6.加载SP自定义起始页顶栏背景图()
         设置_v6.加载SP自定义背景图()
 
-        Me.ModernTabListControl1.Items(1).BoundControl = Form_v6_起始页面
+        Me.ModernTabListControl1.Items(0).BoundControl = Form_v6_起始页面
         绑定选项卡(Form_v6_起始页面.ModernPanel1)
-        Me.ModernTabListControl1.Items(2).BoundControl = Form_v6_编码队列
+        Me.ModernTabListControl1.Items(1).BoundControl = Form_v6_编码队列
         绑定选项卡(Form_v6_编码队列.ModernPanel1)
-        Me.ModernTabListControl1.Items(4).BoundControl = Form_v6_准备文件
+        Me.ModernTabListControl1.Items(3).BoundControl = Form_v6_准备文件
         绑定选项卡(Form_v6_准备文件.ModernPanel1)
-        Me.ModernTabListControl1.Items(5).BoundControl = Form_v6_参数面板
+        Me.ModernTabListControl1.Items(4).BoundControl = Form_v6_参数面板
         绑定选项卡(Form_v6_参数面板.ModernPanel1)
-        Me.ModernTabListControl1.Items(6).BoundControl = Form_v6_Agent
+        Me.ModernTabListControl1.Items(5).BoundControl = Form_v6_Agent
         绑定选项卡(Form_v6_Agent.ModernPanel1)
-        'Me.ModernTabListControl1.Items(7).BoundControl = Form_v6_社区_个人中心
+        'Me.ModernTabListControl1.Items(6).BoundControl = Form_v6_社区_个人中心
         '绑定选项卡(Form_v6_社区_个人中心.ModernPanel1)
-        Me.ModernTabListControl1.Items(9).BoundControl = Form_v6_媒体信息
+        Me.ModernTabListControl1.Items(8).BoundControl = Form_v6_媒体信息
         绑定选项卡(Form_v6_媒体信息.ModernPanel1)
-        Me.ModernTabListControl1.Items(10).BoundControl = Form_v6_调试播放器
+        Me.ModernTabListControl1.Items(9).BoundControl = Form_v6_调试播放器
         绑定选项卡(Form_v6_调试播放器.ModernPanel1)
-        Me.ModernTabListControl1.Items(11).BoundControl = Form_v6_性能监控
+        Me.ModernTabListControl1.Items(10).BoundControl = Form_v6_性能监控
         绑定选项卡(Form_v6_性能监控.ModernPanel1)
-        Me.ModernTabListControl1.Items(12).BoundControl = Form_v6_集成工具
+        Me.ModernTabListControl1.Items(11).BoundControl = Form_v6_集成工具
         绑定选项卡(Form_v6_集成工具.ModernPanel1)
-        Me.ModernTabListControl1.Items(14).BoundControl = Form_v6_设置
+        Me.ModernTabListControl1.Items(13).BoundControl = Form_v6_设置
         绑定选项卡(Form_v6_设置.ModernPanel1)
-        Me.ModernTabListControl1.Items(15).BoundControl = Form_v6_支持者
+        Me.ModernTabListControl1.Items(14).BoundControl = Form_v6_支持者
         绑定选项卡(Form_v6_支持者.ModernPanel1)
-        Me.ModernTabListControl1.Items(17).BoundControl = Form_v6_插件管理
+        Me.ModernTabListControl1.Items(16).BoundControl = Form_v6_插件管理
         绑定选项卡(Form_v6_插件管理.ModernPanel1)
 
         Select Case 设置_v6.实例对象.窗口样式
@@ -85,7 +85,7 @@ Public Class FormMain_v6
                 End Select
         End Select
 
-        Me.ModernTabListControl1.SelectedIndex = 1
+        Me.ModernTabListControl1.SelectedIndex = 0
         Me.ModernTextBox1.Parent = Me.ModernTabListControl1
 
         其他初始化.执行()
@@ -157,19 +157,19 @@ Public Class FormMain_v6
         插件主导航目标已注册 = True
 
         Dim targets As (Id As String, DisplayName As String, Index As Integer)() = {
-            (Ext插件页面目标_v2.主导航_起始页面, "起始页面", 1),
-            (Ext插件页面目标_v2.主导航_编码队列, "编码队列", 2),
-            (Ext插件页面目标_v2.主导航_准备文件, "准备文件", 4),
-            (Ext插件页面目标_v2.主导航_参数面板, "参数面板", 5),
-            (Ext插件页面目标_v2.主导航_Agent, "Agent 智能体", 6),
-            (Ext插件页面目标_v2.主导航_Studios, "3FUI Studios", 7),
-            (Ext插件页面目标_v2.主导航_媒体信息, "ffprobe 媒体信息", 9),
-            (Ext插件页面目标_v2.主导航_调试播放器, "ffplay 调试播放器", 10),
-            (Ext插件页面目标_v2.主导航_性能监控, "性能监控", 11),
-            (Ext插件页面目标_v2.主导航_集成工具, "集成工具", 12),
-            (Ext插件页面目标_v2.主导航_软件设置, "软件设置", 14),
-            (Ext插件页面目标_v2.主导航_支持者, "支持者", 15),
-            (Ext插件页面目标_v2.主导航_插件管理, "插件管理", 17)
+            (Ext插件页面目标_v2.主导航_起始页面, "起始页面", 0),
+            (Ext插件页面目标_v2.主导航_编码队列, "编码队列", 1),
+            (Ext插件页面目标_v2.主导航_准备文件, "准备文件", 3),
+            (Ext插件页面目标_v2.主导航_参数面板, "参数面板", 4),
+            (Ext插件页面目标_v2.主导航_Agent, "Agent 智能体", 5),
+            (Ext插件页面目标_v2.主导航_Studios, "3FUI Studios", 6),
+            (Ext插件页面目标_v2.主导航_媒体信息, "ffprobe 媒体信息", 8),
+            (Ext插件页面目标_v2.主导航_调试播放器, "ffplay 调试播放器", 9),
+            (Ext插件页面目标_v2.主导航_性能监控, "性能监控", 10),
+            (Ext插件页面目标_v2.主导航_集成工具, "集成工具", 11),
+            (Ext插件页面目标_v2.主导航_软件设置, "软件设置", 13),
+            (Ext插件页面目标_v2.主导航_支持者, "支持者", 14),
+            (Ext插件页面目标_v2.主导航_插件管理, "插件管理", 16)
         }
         For Each target In targets
             Ext插件扩展桥接_v2.注册插件页面目标(
