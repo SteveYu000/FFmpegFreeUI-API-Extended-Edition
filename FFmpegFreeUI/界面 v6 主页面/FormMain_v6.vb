@@ -246,7 +246,6 @@ Public Class FormMain_v6
             Form_v6_性能监控.停止()
         End If
 
-        If selectedControl Is Form_v6_插件管理 Then Form_v6_插件管理.提交切页首帧()
     End Sub
 
     <CodeAnalysis.SuppressMessage("Performance", "CA1861:不要将常量数组作为参数", Justification:="<挂起>")>

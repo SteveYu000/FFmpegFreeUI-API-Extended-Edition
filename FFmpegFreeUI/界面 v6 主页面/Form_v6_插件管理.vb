@@ -177,15 +177,6 @@ Public Class Form_v6_插件管理
         调整列宽()
     End Sub
 
-    Friend Sub 提交切页首帧()
-        If Not Visible OrElse IsDisposed OrElse 是设计器宿主() Then Return
-        更新页面布局()
-        ' 页面切换是明确的同步视觉边界。LakeUI 5 要求父 surface 先于子 surface 提交；
-        ' 由主导航完成 BoundControl 切换后，再一次性按外到内提交，避免已显示但尚未
-        ' 提交的独立 HWND 短暂呈现黑色。
-        OuterToInnerRefreshScheduler.RequestFull(ModernPanel1, invalidateChildren:=True, immediate:=True)
-    End Sub
-
     Private Sub 插件列表变化(sender As Object, e As EventArgs)
         If 忽略管理器通知 OrElse IsDisposed Then Exit Sub
         If InvokeRequired Then
