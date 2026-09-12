@@ -24,13 +24,10 @@
     <ProjectReference Include="..\FFmpegFreeUI.Ext.PluginSdk\FFmpegFreeUI.Ext.PluginSdk.csproj" />
   </ItemGroup>
 
-  <!-- LakeUI 5 由主程序以文件引用方式接入，不会像旧 NuGet 包那样把编译资产
-       传递给引用主程序的项目；PluginHost 中包含导航页宿主实现，因此也必须显式
-       引用完全相同的 LakeUI 程序集。该引用只修复构建依赖，不改变 Ext SDK ABI。 -->
+  <!-- PluginHost 中包含导航页宿主实现，因此显式引用与主程序相同的 LakeUI 包版本。
+       该引用只提供构建与运行依赖，不改变 Ext SDK ABI。 -->
   <ItemGroup>
-    <Reference Include="LakeUI">
-      <HintPath>..\..\LakeUI\LakeUI\bin\Debug\net10.0-windows10.0.17763.0\LakeUI.dll</HintPath>
-    </Reference>
+    <PackageReference Include="LakeUI" Version="5.11.0" />
   </ItemGroup>
 
   <!-- Ext PluginHost 随宿主发行但保持休眠；SDK 仍按用户是否已安装来更新。 -->
