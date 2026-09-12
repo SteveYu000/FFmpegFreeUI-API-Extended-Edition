@@ -49,7 +49,7 @@ Ext Plugin API v2 是可选组件。只有程序根目录同时存在 `FFmpegFre
 
 SDK 已发布到 [NuGet.org](https://www.nuget.org/packages/FFmpegFreeUI.Ext.PluginSdk)，独立插件推荐直接使用 `PackageReference`；源码引用和 DLL + XML 文档引用继续用于 SDK 联调与离线开发。`ExtDeployFFmpegFreeUIPlugin` MSBuild 目标可用一条命令完成插件还原、编译与依赖部署，具体配置见开发指南第 2、3、17 节。
 
-从源码构建主程序只需正常克隆仓库并执行 `dotnet restore`。主程序通过 NuGet 使用 `LakeUI 3.31.0`，无需再初始化 LakeUI 源码子模块。
+从源码构建主程序只需正常克隆仓库并执行 `dotnet restore`。
 
 ---
 
