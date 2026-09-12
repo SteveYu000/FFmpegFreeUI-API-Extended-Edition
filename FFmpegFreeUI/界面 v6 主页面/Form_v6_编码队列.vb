@@ -405,6 +405,29 @@ Public Class Form_v6_编码队列
         End If
     End Sub
 
+    Private Sub UltraDetailListView1_AfterLabelEdit(sender As Object, e As UltraDetailListView.LabelEditEventArgs) Handles UltraDetailListView1.AfterLabelEdit
+        If e.ColumnIndex <> 0 Then
+            e.CancelEdit = True
+            Exit Sub
+        End If
+
+        Dim id = TryCast(e.Item?.Tag, String)
+        If String.IsNullOrWhiteSpace(id) Then
+            e.CancelEdit = True
+            Exit Sub
+        End If
+
+        Dim task = 编码队列_v6.根据ID获取任务(id)
+        If task Is Nothing Then
+            e.CancelEdit = True
+            Exit Sub
+        End If
+
+        ' Keep the edited label in the task model so a later queue reorder refresh
+        ' does not replace it with the input file name.
+        task.任务名称 = If(e.Label, "")
+    End Sub
+
     Private Sub UltraDetailListView1_DragEnter(sender As Object, e As DragEventArgs) Handles UltraDetailListView1.DragEnter
         e.Effect = If(e.Data.GetDataPresent(DataFormats.FileDrop), DragDropEffects.Copy, DragDropEffects.None)
     End Sub
