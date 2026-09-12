@@ -127,7 +127,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel6.BorderSize = 0
         Panel6.Controls.Add(MB_烧录字幕)
         Panel6.Dock = DockStyle.Top
-        Panel6.Location = New Point(20, 592)
+        Panel6.Location = New Point(20, 572)
         Panel6.Name = "Panel6"
         Panel6.Padding = New Padding(0, 10, 0, 0)
         Panel6.Size = New Size(729, 42)
@@ -154,11 +154,11 @@ Partial Class Form_v6_参数面板_画面帧
         HCL_画面内容标题.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_画面内容标题.Dock = DockStyle.Top
         HCL_画面内容标题.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_画面内容标题.Location = New Point(20, 544)
+        HCL_画面内容标题.Location = New Point(20, 529)
         HCL_画面内容标题.Margin = New Padding(2)
         HCL_画面内容标题.Name = "HCL_画面内容标题"
-        HCL_画面内容标题.Padding = New Padding(0, 20, 0, 5)
-        HCL_画面内容标题.Size = New Size(729, 48)
+        HCL_画面内容标题.Padding = New Padding(0, 20, 0, 0)
+        HCL_画面内容标题.Size = New Size(729, 43)
         HCL_画面内容标题.TabIndex = 13
         HCL_画面内容标题.Text = "<span style=""font-size:13; color:Silver"">内容</span>   专业需求请用剪辑和特效软件"
         ' 
@@ -173,7 +173,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel8.Controls.Add(JustEmptyControl11)
         Panel8.Controls.Add(MB_扫描方式)
         Panel8.Dock = DockStyle.Top
-        Panel8.Location = New Point(20, 502)
+        Panel8.Location = New Point(20, 487)
         Panel8.Name = "Panel8"
         Panel8.Padding = New Padding(0, 10, 0, 0)
         Panel8.Size = New Size(729, 42)
@@ -251,7 +251,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel7.Controls.Add(JustEmptyControl9)
         Panel7.Controls.Add(MB_传统降噪)
         Panel7.Dock = DockStyle.Top
-        Panel7.Location = New Point(20, 460)
+        Panel7.Location = New Point(20, 445)
         Panel7.Name = "Panel7"
         Panel7.Padding = New Padding(0, 10, 0, 0)
         Panel7.Size = New Size(729, 42)
@@ -327,7 +327,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel5.Controls.Add(JustEmptyControl5)
         Panel5.Controls.Add(MB_动态模糊)
         Panel5.Dock = DockStyle.Top
-        Panel5.Location = New Point(20, 418)
+        Panel5.Location = New Point(20, 403)
         Panel5.Name = "Panel5"
         Panel5.Padding = New Padding(0, 10, 0, 0)
         Panel5.Size = New Size(729, 42)
@@ -377,11 +377,11 @@ Partial Class Form_v6_参数面板_画面帧
         HCL_画面增强标题.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_画面增强标题.Dock = DockStyle.Top
         HCL_画面增强标题.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_画面增强标题.Location = New Point(20, 370)
+        HCL_画面增强标题.Location = New Point(20, 360)
         HCL_画面增强标题.Margin = New Padding(2)
         HCL_画面增强标题.Name = "HCL_画面增强标题"
-        HCL_画面增强标题.Padding = New Padding(0, 20, 0, 5)
-        HCL_画面增强标题.Size = New Size(729, 48)
+        HCL_画面增强标题.Padding = New Padding(0, 20, 0, 0)
+        HCL_画面增强标题.Size = New Size(729, 43)
         HCL_画面增强标题.TabIndex = 11
         HCL_画面增强标题.Text = "<span style=""font-size:13; color:Silver"">增强</span>   专业需求请考虑行业软件或 AI 软件"
         '
@@ -394,7 +394,7 @@ Partial Class Form_v6_参数面板_画面帧
         ModernPanel2.Controls.Add(JustEmptyControl4)
         ModernPanel2.Controls.Add(MB_简易插帧)
         ModernPanel2.Dock = DockStyle.Top
-        ModernPanel2.Location = New Point(20, 328)
+        ModernPanel2.Location = New Point(20, 318)
         ModernPanel2.Name = "ModernPanel2"
         ModernPanel2.Padding = New Padding(0, 10, 0, 0)
         ModernPanel2.Size = New Size(729, 42)
@@ -449,7 +449,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel3.Controls.Add(JustEmptyControl13)
         Panel3.Controls.Add(MCB_直接指定帧率)
         Panel3.Dock = DockStyle.Top
-        Panel3.Location = New Point(20, 286)
+        Panel3.Location = New Point(20, 276)
         Panel3.Name = "Panel3"
         Panel3.Padding = New Padding(0, 10, 0, 0)
         Panel3.Size = New Size(729, 42)
@@ -563,11 +563,11 @@ Partial Class Form_v6_参数面板_画面帧
         HCL_帧率设置标题.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_帧率设置标题.Dock = DockStyle.Top
         HCL_帧率设置标题.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_帧率设置标题.Location = New Point(20, 238)
+        HCL_帧率设置标题.Location = New Point(20, 233)
         HCL_帧率设置标题.Margin = New Padding(2)
         HCL_帧率设置标题.Name = "HCL_帧率设置标题"
-        HCL_帧率设置标题.Padding = New Padding(0, 20, 0, 5)
-        HCL_帧率设置标题.Size = New Size(729, 48)
+        HCL_帧率设置标题.Padding = New Padding(0, 20, 0, 0)
+        HCL_帧率设置标题.Size = New Size(729, 43)
         HCL_帧率设置标题.TabIndex = 9
         HCL_帧率设置标题.Text = "<span style=""font-size:13; color:Silver"">帧率</span>   收藏内容切勿抽帧！"
         ' 
@@ -581,7 +581,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel4.Controls.Add(JustEmptyControl1)
         Panel4.Controls.Add(MB_画面裁剪交互)
         Panel4.Dock = DockStyle.Top
-        Panel4.Location = New Point(20, 196)
+        Panel4.Location = New Point(20, 191)
         Panel4.Name = "Panel4"
         Panel4.Padding = New Padding(0, 10, 0, 0)
         Panel4.Size = New Size(729, 42)
@@ -651,7 +651,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel11.BorderSize = 0
         Panel11.Controls.Add(JustEmptyControl12)
         Panel11.Dock = DockStyle.Top
-        Panel11.Location = New Point(20, 185)
+        Panel11.Location = New Point(20, 180)
         Panel11.Name = "Panel11"
         Panel11.Padding = New Padding(0, 10, 0, 0)
         Panel11.Size = New Size(729, 11)
@@ -677,7 +677,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel1.Controls.Add(JustEmptyControl2)
         Panel1.Controls.Add(MCB_宽度缩放)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 143)
+        Panel1.Location = New Point(20, 138)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 0)
         Panel1.Size = New Size(729, 42)
@@ -812,7 +812,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel9.Controls.Add(HCL_缩放滤镜说明)
         Panel9.Controls.Add(MCB_指定缩放滤镜)
         Panel9.Dock = DockStyle.Top
-        Panel9.Location = New Point(20, 101)
+        Panel9.Location = New Point(20, 96)
         Panel9.Name = "Panel9"
         Panel9.Padding = New Padding(0, 10, 0, 0)
         Panel9.Size = New Size(729, 42)
@@ -873,7 +873,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel10.BorderSize = 0
         Panel10.Controls.Add(JustEmptyControl7)
         Panel10.Dock = DockStyle.Top
-        Panel10.Location = New Point(20, 90)
+        Panel10.Location = New Point(20, 85)
         Panel10.Name = "Panel10"
         Panel10.Padding = New Padding(0, 10, 0, 0)
         Panel10.Size = New Size(729, 11)
@@ -896,7 +896,7 @@ Partial Class Form_v6_参数面板_画面帧
         Panel2.Controls.Add(HCL_直接指定分辨率说明)
         Panel2.Controls.Add(MCB_直接指定分辨率)
         Panel2.Dock = DockStyle.Top
-        Panel2.Location = New Point(20, 48)
+        Panel2.Location = New Point(20, 43)
         Panel2.Name = "Panel2"
         Panel2.Padding = New Padding(0, 10, 0, 0)
         Panel2.Size = New Size(729, 42)
@@ -962,8 +962,7 @@ Partial Class Form_v6_参数面板_画面帧
         HCL_分辨率设置标题.Location = New Point(20, 20)
         HCL_分辨率设置标题.Margin = New Padding(2)
         HCL_分辨率设置标题.Name = "HCL_分辨率设置标题"
-        HCL_分辨率设置标题.Padding = New Padding(0, 0, 0, 5)
-        HCL_分辨率设置标题.Size = New Size(729, 28)
+        HCL_分辨率设置标题.Size = New Size(729, 23)
         HCL_分辨率设置标题.TabIndex = 4
         HCL_分辨率设置标题.Text = "<span style=""font-size:13; color:Silver"">分辨率</span>   推荐使用在滤镜中处理的单独缩放"
         ' 

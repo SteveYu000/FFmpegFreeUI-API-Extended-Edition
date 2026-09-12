@@ -18,153 +18,85 @@ Partial Class Form_v6_参数面板_烧录字幕
     Private components As System.ComponentModel.IContainer
 
     '注意: 以下过程是 Windows 窗体设计器所必需的
-    '可以使用 Windows 窗体设计器修改它。  
+    '可以使用 Windows 窗体设计器修改它。
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         ModernPanel1 = New LakeUI.ModernPanel()
-        ModernPanel1.BackColor = Color.Transparent
-        ModernPanel1.BackColor1 = Color.Transparent
         Panel16 = New LakeUI.ModernPanel()
-        Panel16.BackColor = Color.Transparent
-        Panel16.BackColor1 = Color.Transparent
-        Panel16.BorderSize = 0
         MTB_自己写整个滤镜 = New LakeUI.ModernTextBox()
         HCL_自己写滤镜取代所有设置 = New LakeUI.HtmlColorLabel()
         MTB_补充样式 = New LakeUI.ModernTextBox()
         HCL_补充样式 = New LakeUI.HtmlColorLabel()
         Panel3 = New LakeUI.ModernPanel()
-        Panel3.BackColor = Color.Transparent
-        Panel3.BackColor1 = Color.Transparent
-        Panel3.BorderSize = 0
         Panel22 = New LakeUI.ModernPanel()
-        Panel22.BackColor = Color.Transparent
-        Panel22.BackColor1 = Color.Transparent
-        Panel22.BorderSize = 0
         MTB_行距 = New LakeUI.ModernTextBox()
         HCL_行距 = New LakeUI.HtmlColorLabel()
         Panel23 = New LakeUI.ModernPanel()
-        Panel23.BackColor = Color.Transparent
-        Panel23.BackColor1 = Color.Transparent
-        Panel23.BorderSize = 0
         MTB_字距 = New LakeUI.ModernTextBox()
         HCL_字距 = New LakeUI.HtmlColorLabel()
         HCL_文字距离 = New LakeUI.HtmlColorLabel()
         Panel21 = New LakeUI.ModernPanel()
-        Panel21.BackColor = Color.Transparent
-        Panel21.BackColor1 = Color.Transparent
-        Panel21.BorderSize = 0
         MTB_右边距 = New LakeUI.ModernTextBox()
         HCL_右边距 = New LakeUI.HtmlColorLabel()
         Panel20 = New LakeUI.ModernPanel()
-        Panel20.BackColor = Color.Transparent
-        Panel20.BackColor1 = Color.Transparent
-        Panel20.BorderSize = 0
         MTB_左边距 = New LakeUI.ModernTextBox()
         HCL_左边距 = New LakeUI.HtmlColorLabel()
         Panel19 = New LakeUI.ModernPanel()
-        Panel19.BackColor = Color.Transparent
-        Panel19.BackColor1 = Color.Transparent
-        Panel19.BorderSize = 0
         MTB_垂直边距 = New LakeUI.ModernTextBox()
         HCL_垂直边距 = New LakeUI.HtmlColorLabel()
         Panel18 = New LakeUI.ModernPanel()
-        Panel18.BackColor = Color.Transparent
-        Panel18.BackColor1 = Color.Transparent
-        Panel18.BorderSize = 0
         MCB_对齐方位 = New LakeUI.ModernComboBox()
         HCL_对齐方位 = New LakeUI.HtmlColorLabel()
         Panel2 = New LakeUI.ModernPanel()
-        Panel2.BackColor = Color.Transparent
-        Panel2.BackColor1 = Color.Transparent
-        Panel2.BorderSize = 0
         Panel17 = New LakeUI.ModernPanel()
-        Panel17.BackColor = Color.Transparent
-        Panel17.BackColor1 = Color.Transparent
-        Panel17.BorderSize = 0
         MCB_字体文件夹路径 = New LakeUI.ModernComboBox()
         HCL_字体文件夹 = New LakeUI.HtmlColorLabel()
         Panel15 = New LakeUI.ModernPanel()
-        Panel15.BackColor = Color.Transparent
-        Panel15.BackColor1 = Color.Transparent
-        Panel15.BorderSize = 0
         MB_清楚背景颜色 = New LakeUI.ModernButton()
         JustEmptyControl11 = New LakeUI.JustEmptyControl()
         MB_设置背景颜色 = New LakeUI.ModernButton()
         Panel14 = New LakeUI.ModernPanel()
-        Panel14.BackColor = Color.Transparent
-        Panel14.BackColor1 = Color.Transparent
-        Panel14.BorderSize = 0
         MB_清除描边颜色 = New LakeUI.ModernButton()
         JustEmptyControl10 = New LakeUI.JustEmptyControl()
         MB_设置描边颜色 = New LakeUI.ModernButton()
         Panel13 = New LakeUI.ModernPanel()
-        Panel13.BackColor = Color.Transparent
-        Panel13.BackColor1 = Color.Transparent
-        Panel13.BorderSize = 0
         MB_清除次要颜色 = New LakeUI.ModernButton()
         JustEmptyControl9 = New LakeUI.JustEmptyControl()
         MB_设置次要颜色 = New LakeUI.ModernButton()
         Panel12 = New LakeUI.ModernPanel()
-        Panel12.BackColor = Color.Transparent
-        Panel12.BackColor1 = Color.Transparent
-        Panel12.BorderSize = 0
         MB_清除主要颜色 = New LakeUI.ModernButton()
         JustEmptyControl8 = New LakeUI.JustEmptyControl()
         MB_设置主要颜色 = New LakeUI.ModernButton()
         HCL_文字颜色 = New LakeUI.HtmlColorLabel()
         Panel10 = New LakeUI.ModernPanel()
-        Panel10.BackColor = Color.Transparent
-        Panel10.BackColor1 = Color.Transparent
-        Panel10.BorderSize = 0
         MCB_边框类型 = New LakeUI.ModernComboBox()
         JustEmptyControl6 = New LakeUI.JustEmptyControl()
         MTB_描边宽度 = New LakeUI.ModernTextBox()
         JustEmptyControl5 = New LakeUI.JustEmptyControl()
         MTB_阴影距离 = New LakeUI.ModernTextBox()
         Panel11 = New LakeUI.ModernPanel()
-        Panel11.BackColor = Color.Transparent
-        Panel11.BackColor1 = Color.Transparent
-        Panel11.BorderSize = 0
         HCL_边框类型 = New LakeUI.HtmlColorLabel()
         HCL_描边宽度 = New LakeUI.HtmlColorLabel()
         JustEmptyControl7 = New LakeUI.JustEmptyControl()
         HCL_阴影距离 = New LakeUI.HtmlColorLabel()
         Panel9 = New LakeUI.ModernPanel()
-        Panel9.BackColor = Color.Transparent
-        Panel9.BackColor1 = Color.Transparent
-        Panel9.BorderSize = 0
         MB_清除基本样式 = New LakeUI.ModernButton()
         JustEmptyControl4 = New LakeUI.JustEmptyControl()
         MB_设置基本样式 = New LakeUI.ModernButton()
         HCL_字体样式 = New LakeUI.HtmlColorLabel()
         Panel1 = New LakeUI.ModernPanel()
-        Panel1.BackColor = Color.Transparent
-        Panel1.BackColor1 = Color.Transparent
-        Panel1.BorderSize = 0
         Panel8 = New LakeUI.ModernPanel()
-        Panel8.BackColor = Color.Transparent
-        Panel8.BackColor1 = Color.Transparent
-        Panel8.BorderSize = 0
         MTB_内嵌的流索引 = New LakeUI.ModernTextBox()
         HCL_流索引 = New LakeUI.HtmlColorLabel()
         HCL_内嵌的流配置 = New LakeUI.HtmlColorLabel()
         Panel7 = New LakeUI.ModernPanel()
-        Panel7.BackColor = Color.Transparent
-        Panel7.BackColor1 = Color.Transparent
-        Panel7.BorderSize = 0
         MCB_字幕文件路径 = New LakeUI.ModernComboBox()
         HCL_字幕文件路径 = New LakeUI.HtmlColorLabel()
         Panel6 = New LakeUI.ModernPanel()
-        Panel6.BackColor = Color.Transparent
-        Panel6.BackColor1 = Color.Transparent
-        Panel6.BorderSize = 0
         MTB_字幕文件多余字符 = New LakeUI.ModernTextBox()
         HCL_字幕文件名多余字符 = New LakeUI.HtmlColorLabel()
         Panel5 = New LakeUI.ModernPanel()
-        Panel5.BackColor = Color.Transparent
-        Panel5.BackColor1 = Color.Transparent
-        Panel5.BorderSize = 0
         MCB_后缀优先级3 = New LakeUI.ModernComboBox()
         JustEmptyControl3 = New LakeUI.JustEmptyControl()
         MCB_后缀优先级2 = New LakeUI.ModernComboBox()
@@ -173,9 +105,6 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_后缀优先级 = New LakeUI.HtmlColorLabel()
         HCL_外部来源配置 = New LakeUI.HtmlColorLabel()
         Panel4 = New LakeUI.ModernPanel()
-        Panel4.BackColor = Color.Transparent
-        Panel4.BackColor1 = Color.Transparent
-        Panel4.BorderSize = 0
         MCB_字幕来源 = New LakeUI.ModernComboBox()
         JustEmptyControl1 = New LakeUI.JustEmptyControl()
         MCB_滤镜选择 = New LakeUI.ModernComboBox()
@@ -209,6 +138,8 @@ Partial Class Form_v6_参数面板_烧录字幕
         '
         ' ModernPanel1
         '
+        ModernPanel1.BackColor = Color.Transparent
+        ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
         ModernPanel1.Controls.Add(Panel16)
         ModernPanel1.Controls.Add(Panel3)
@@ -219,12 +150,14 @@ Partial Class Form_v6_参数面板_烧录字幕
         ModernPanel1.Location = New Point(0, 0)
         ModernPanel1.Name = "ModernPanel1"
         ModernPanel1.Padding = New Padding(20)
-        ModernPanel1.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.None
         ModernPanel1.Size = New Size(1184, 611)
         ModernPanel1.TabIndex = 0
         '
         ' Panel16
         '
+        Panel16.BackColor = Color.Transparent
+        Panel16.BackColor1 = Color.Transparent
+        Panel16.BorderSize = 0
         Panel16.Controls.Add(MTB_自己写整个滤镜)
         Panel16.Controls.Add(HCL_自己写滤镜取代所有设置)
         Panel16.Controls.Add(MTB_补充样式)
@@ -245,13 +178,13 @@ Partial Class Form_v6_参数面板_烧录字幕
         MTB_自己写整个滤镜.CaretColor = Color.FromArgb(CByte(220), CByte(220), CByte(220))
         MTB_自己写整个滤镜.Dock = DockStyle.Fill
         MTB_自己写整个滤镜.LineHeight = 20
-        MTB_自己写整个滤镜.Location = New Point(20, 301)
+        MTB_自己写整个滤镜.Location = New Point(20, 297)
         MTB_自己写整个滤镜.Margin = New Padding(2)
         MTB_自己写整个滤镜.MultiLine = True
         MTB_自己写整个滤镜.Name = "MTB_自己写整个滤镜"
         MTB_自己写整个滤镜.Padding = New Padding(10, 6, 10, 6)
         MTB_自己写整个滤镜.SelectionColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        MTB_自己写整个滤镜.Size = New Size(304, 246)
+        MTB_自己写整个滤镜.Size = New Size(304, 250)
         MTB_自己写整个滤镜.TabIndex = 31
         MTB_自己写整个滤镜.WaterText = "一旦写了这个，本页所有设置除了总开关之外全部失效，以这里的为准，这就像是自定义参数里完全自己写模式一样"
         MTB_自己写整个滤镜.WaterTextForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
@@ -262,11 +195,11 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_自己写滤镜取代所有设置.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_自己写滤镜取代所有设置.Dock = DockStyle.Top
         HCL_自己写滤镜取代所有设置.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_自己写滤镜取代所有设置.Location = New Point(20, 246)
+        HCL_自己写滤镜取代所有设置.Location = New Point(20, 244)
         HCL_自己写滤镜取代所有设置.Margin = New Padding(2)
         HCL_自己写滤镜取代所有设置.Name = "HCL_自己写滤镜取代所有设置"
         HCL_自己写滤镜取代所有设置.Padding = New Padding(0, 20, 0, 10)
-        HCL_自己写滤镜取代所有设置.Size = New Size(304, 55)
+        HCL_自己写滤镜取代所有设置.Size = New Size(304, 53)
         HCL_自己写滤镜取代所有设置.TabIndex = 30
         HCL_自己写滤镜取代所有设置.Text = "<span style=""font-size:13; color:Silver"">自己写滤镜取代所有设置</span>"
         '
@@ -279,7 +212,7 @@ Partial Class Form_v6_参数面板_烧录字幕
         MTB_补充样式.CaretColor = Color.FromArgb(CByte(220), CByte(220), CByte(220))
         MTB_补充样式.Dock = DockStyle.Top
         MTB_补充样式.LineHeight = 20
-        MTB_补充样式.Location = New Point(20, 55)
+        MTB_补充样式.Location = New Point(20, 53)
         MTB_补充样式.Margin = New Padding(2)
         MTB_补充样式.MultiLine = True
         MTB_补充样式.Name = "MTB_补充样式"
@@ -299,12 +232,15 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_补充样式.Margin = New Padding(2)
         HCL_补充样式.Name = "HCL_补充样式"
         HCL_补充样式.Padding = New Padding(0, 20, 0, 10)
-        HCL_补充样式.Size = New Size(304, 55)
+        HCL_补充样式.Size = New Size(304, 53)
         HCL_补充样式.TabIndex = 28
         HCL_补充样式.Text = "<span style=""font-size:13; color:Silver"">补充样式 (force_style)</span>"
         '
         ' Panel3
         '
+        Panel3.BackColor = Color.Transparent
+        Panel3.BackColor1 = Color.Transparent
+        Panel3.BorderSize = 0
         Panel3.Controls.Add(Panel22)
         Panel3.Controls.Add(HCL_行距)
         Panel3.Controls.Add(Panel23)
@@ -327,9 +263,12 @@ Partial Class Form_v6_参数面板_烧录字幕
         '
         ' Panel22
         '
+        Panel22.BackColor = Color.Transparent
+        Panel22.BackColor1 = Color.Transparent
+        Panel22.BorderSize = 0
         Panel22.Controls.Add(MTB_行距)
         Panel22.Dock = DockStyle.Top
-        Panel22.Location = New Point(20, 455)
+        Panel22.Location = New Point(20, 431)
         Panel22.Name = "Panel22"
         Panel22.Padding = New Padding(0, 10, 0, 0)
         Panel22.Size = New Size(130, 42)
@@ -358,19 +297,22 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_行距.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_行距.Dock = DockStyle.Top
         HCL_行距.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_行距.Location = New Point(20, 424)
+        HCL_行距.Location = New Point(20, 404)
         HCL_行距.Margin = New Padding(2)
         HCL_行距.Name = "HCL_行距"
         HCL_行距.Padding = New Padding(0, 10, 0, 0)
-        HCL_行距.Size = New Size(130, 31)
+        HCL_行距.Size = New Size(130, 27)
         HCL_行距.TabIndex = 52
         HCL_行距.Text = "行距"
         '
         ' Panel23
         '
+        Panel23.BackColor = Color.Transparent
+        Panel23.BackColor1 = Color.Transparent
+        Panel23.BorderSize = 0
         Panel23.Controls.Add(MTB_字距)
         Panel23.Dock = DockStyle.Top
-        Panel23.Location = New Point(20, 382)
+        Panel23.Location = New Point(20, 362)
         Panel23.Name = "Panel23"
         Panel23.Padding = New Padding(0, 10, 0, 0)
         Panel23.Size = New Size(130, 42)
@@ -399,11 +341,11 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_字距.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_字距.Dock = DockStyle.Top
         HCL_字距.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_字距.Location = New Point(20, 351)
+        HCL_字距.Location = New Point(20, 335)
         HCL_字距.Margin = New Padding(2)
         HCL_字距.Name = "HCL_字距"
         HCL_字距.Padding = New Padding(0, 10, 0, 0)
-        HCL_字距.Size = New Size(130, 31)
+        HCL_字距.Size = New Size(130, 27)
         HCL_字距.TabIndex = 50
         HCL_字距.Text = "字距"
         '
@@ -413,19 +355,22 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_文字距离.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_文字距离.Dock = DockStyle.Top
         HCL_文字距离.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_文字距离.Location = New Point(20, 306)
+        HCL_文字距离.Location = New Point(20, 292)
         HCL_文字距离.Margin = New Padding(2)
         HCL_文字距离.Name = "HCL_文字距离"
         HCL_文字距离.Padding = New Padding(0, 20, 0, 0)
-        HCL_文字距离.Size = New Size(130, 45)
+        HCL_文字距离.Size = New Size(130, 43)
         HCL_文字距离.TabIndex = 49
         HCL_文字距离.Text = "<span style=""font-size:13; color:Silver"">文字距离</span>"
         '
         ' Panel21
         '
+        Panel21.BackColor = Color.Transparent
+        Panel21.BackColor1 = Color.Transparent
+        Panel21.BorderSize = 0
         Panel21.Controls.Add(MTB_右边距)
         Panel21.Dock = DockStyle.Top
-        Panel21.Location = New Point(20, 264)
+        Panel21.Location = New Point(20, 250)
         Panel21.Name = "Panel21"
         Panel21.Padding = New Padding(0, 10, 0, 0)
         Panel21.Size = New Size(130, 42)
@@ -454,19 +399,22 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_右边距.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_右边距.Dock = DockStyle.Top
         HCL_右边距.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_右边距.Location = New Point(20, 233)
+        HCL_右边距.Location = New Point(20, 223)
         HCL_右边距.Margin = New Padding(2)
         HCL_右边距.Name = "HCL_右边距"
         HCL_右边距.Padding = New Padding(0, 10, 0, 0)
-        HCL_右边距.Size = New Size(130, 31)
+        HCL_右边距.Size = New Size(130, 27)
         HCL_右边距.TabIndex = 47
         HCL_右边距.Text = "右边距"
         '
         ' Panel20
         '
+        Panel20.BackColor = Color.Transparent
+        Panel20.BackColor1 = Color.Transparent
+        Panel20.BorderSize = 0
         Panel20.Controls.Add(MTB_左边距)
         Panel20.Dock = DockStyle.Top
-        Panel20.Location = New Point(20, 191)
+        Panel20.Location = New Point(20, 181)
         Panel20.Name = "Panel20"
         Panel20.Padding = New Padding(0, 10, 0, 0)
         Panel20.Size = New Size(130, 42)
@@ -495,19 +443,22 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_左边距.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_左边距.Dock = DockStyle.Top
         HCL_左边距.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_左边距.Location = New Point(20, 160)
+        HCL_左边距.Location = New Point(20, 154)
         HCL_左边距.Margin = New Padding(2)
         HCL_左边距.Name = "HCL_左边距"
         HCL_左边距.Padding = New Padding(0, 10, 0, 0)
-        HCL_左边距.Size = New Size(130, 31)
+        HCL_左边距.Size = New Size(130, 27)
         HCL_左边距.TabIndex = 45
         HCL_左边距.Text = "左边距"
         '
         ' Panel19
         '
+        Panel19.BackColor = Color.Transparent
+        Panel19.BackColor1 = Color.Transparent
+        Panel19.BorderSize = 0
         Panel19.Controls.Add(MTB_垂直边距)
         Panel19.Dock = DockStyle.Top
-        Panel19.Location = New Point(20, 118)
+        Panel19.Location = New Point(20, 112)
         Panel19.Name = "Panel19"
         Panel19.Padding = New Padding(0, 10, 0, 0)
         Panel19.Size = New Size(130, 42)
@@ -536,19 +487,22 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_垂直边距.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_垂直边距.Dock = DockStyle.Top
         HCL_垂直边距.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_垂直边距.Location = New Point(20, 87)
+        HCL_垂直边距.Location = New Point(20, 85)
         HCL_垂直边距.Margin = New Padding(2)
         HCL_垂直边距.Name = "HCL_垂直边距"
         HCL_垂直边距.Padding = New Padding(0, 10, 0, 0)
-        HCL_垂直边距.Size = New Size(130, 31)
+        HCL_垂直边距.Size = New Size(130, 27)
         HCL_垂直边距.TabIndex = 43
         HCL_垂直边距.Text = "垂直边距"
         '
         ' Panel18
         '
+        Panel18.BackColor = Color.Transparent
+        Panel18.BackColor1 = Color.Transparent
+        Panel18.BorderSize = 0
         Panel18.Controls.Add(MCB_对齐方位)
         Panel18.Dock = DockStyle.Top
-        Panel18.Location = New Point(20, 45)
+        Panel18.Location = New Point(20, 43)
         Panel18.Name = "Panel18"
         Panel18.Padding = New Padding(0, 10, 0, 0)
         Panel18.Size = New Size(130, 42)
@@ -601,12 +555,15 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_对齐方位.Margin = New Padding(2)
         HCL_对齐方位.Name = "HCL_对齐方位"
         HCL_对齐方位.Padding = New Padding(0, 20, 0, 0)
-        HCL_对齐方位.Size = New Size(130, 45)
+        HCL_对齐方位.Size = New Size(130, 43)
         HCL_对齐方位.TabIndex = 27
         HCL_对齐方位.Text = "<span style=""font-size:13; color:Silver"">对齐方位</span>"
         '
         ' Panel2
         '
+        Panel2.BackColor = Color.Transparent
+        Panel2.BackColor1 = Color.Transparent
+        Panel2.BorderSize = 0
         Panel2.Controls.Add(Panel17)
         Panel2.Controls.Add(HCL_字体文件夹)
         Panel2.Controls.Add(Panel15)
@@ -627,9 +584,12 @@ Partial Class Form_v6_参数面板_烧录字幕
         '
         ' Panel17
         '
+        Panel17.BackColor = Color.Transparent
+        Panel17.BackColor1 = Color.Transparent
+        Panel17.BorderSize = 0
         Panel17.Controls.Add(MCB_字体文件夹路径)
         Panel17.Dock = DockStyle.Top
-        Panel17.Location = New Point(20, 468)
+        Panel17.Location = New Point(20, 460)
         Panel17.Name = "Panel17"
         Panel17.Padding = New Padding(0, 10, 0, 0)
         Panel17.Size = New Size(330, 42)
@@ -669,22 +629,25 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_字体文件夹.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_字体文件夹.Dock = DockStyle.Top
         HCL_字体文件夹.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_字体文件夹.Location = New Point(20, 423)
+        HCL_字体文件夹.Location = New Point(20, 417)
         HCL_字体文件夹.Margin = New Padding(2)
         HCL_字体文件夹.Name = "HCL_字体文件夹"
         HCL_字体文件夹.Padding = New Padding(0, 20, 0, 0)
-        HCL_字体文件夹.Size = New Size(330, 45)
+        HCL_字体文件夹.Size = New Size(330, 43)
         HCL_字体文件夹.TabIndex = 52
         HCL_字体文件夹.Text = "<span style=""font-size:13; color:Silver"">字体文件夹</span>"
         HCL_字体文件夹.ToolTipText = "要正确渲染 ass 中所使用的非常用字体，除了将字体文件安装到系统外，还可以手动指定文件夹"
         '
         ' Panel15
         '
+        Panel15.BackColor = Color.Transparent
+        Panel15.BackColor1 = Color.Transparent
+        Panel15.BorderSize = 0
         Panel15.Controls.Add(MB_清楚背景颜色)
         Panel15.Controls.Add(JustEmptyControl11)
         Panel15.Controls.Add(MB_设置背景颜色)
         Panel15.Dock = DockStyle.Top
-        Panel15.Location = New Point(20, 368)
+        Panel15.Location = New Point(20, 362)
         Panel15.Name = "Panel15"
         Panel15.Padding = New Padding(0, 10, 0, 0)
         Panel15.Size = New Size(330, 55)
@@ -730,11 +693,14 @@ Partial Class Form_v6_参数面板_烧录字幕
         '
         ' Panel14
         '
+        Panel14.BackColor = Color.Transparent
+        Panel14.BackColor1 = Color.Transparent
+        Panel14.BorderSize = 0
         Panel14.Controls.Add(MB_清除描边颜色)
         Panel14.Controls.Add(JustEmptyControl10)
         Panel14.Controls.Add(MB_设置描边颜色)
         Panel14.Dock = DockStyle.Top
-        Panel14.Location = New Point(20, 313)
+        Panel14.Location = New Point(20, 307)
         Panel14.Name = "Panel14"
         Panel14.Padding = New Padding(0, 10, 0, 0)
         Panel14.Size = New Size(330, 55)
@@ -780,11 +746,14 @@ Partial Class Form_v6_参数面板_烧录字幕
         '
         ' Panel13
         '
+        Panel13.BackColor = Color.Transparent
+        Panel13.BackColor1 = Color.Transparent
+        Panel13.BorderSize = 0
         Panel13.Controls.Add(MB_清除次要颜色)
         Panel13.Controls.Add(JustEmptyControl9)
         Panel13.Controls.Add(MB_设置次要颜色)
         Panel13.Dock = DockStyle.Top
-        Panel13.Location = New Point(20, 258)
+        Panel13.Location = New Point(20, 252)
         Panel13.Name = "Panel13"
         Panel13.Padding = New Padding(0, 10, 0, 0)
         Panel13.Size = New Size(330, 55)
@@ -830,11 +799,14 @@ Partial Class Form_v6_参数面板_烧录字幕
         '
         ' Panel12
         '
+        Panel12.BackColor = Color.Transparent
+        Panel12.BackColor1 = Color.Transparent
+        Panel12.BorderSize = 0
         Panel12.Controls.Add(MB_清除主要颜色)
         Panel12.Controls.Add(JustEmptyControl8)
         Panel12.Controls.Add(MB_设置主要颜色)
         Panel12.Dock = DockStyle.Top
-        Panel12.Location = New Point(20, 203)
+        Panel12.Location = New Point(20, 197)
         Panel12.Name = "Panel12"
         Panel12.Padding = New Padding(0, 10, 0, 0)
         Panel12.Size = New Size(330, 55)
@@ -884,23 +856,26 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_文字颜色.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_文字颜色.Dock = DockStyle.Top
         HCL_文字颜色.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_文字颜色.Location = New Point(20, 172)
+        HCL_文字颜色.Location = New Point(20, 170)
         HCL_文字颜色.Margin = New Padding(2)
         HCL_文字颜色.Name = "HCL_文字颜色"
         HCL_文字颜色.Padding = New Padding(0, 10, 0, 0)
-        HCL_文字颜色.Size = New Size(330, 31)
+        HCL_文字颜色.Size = New Size(330, 27)
         HCL_文字颜色.TabIndex = 47
         HCL_文字颜色.Text = "文字颜色"
         '
         ' Panel10
         '
+        Panel10.BackColor = Color.Transparent
+        Panel10.BackColor1 = Color.Transparent
+        Panel10.BorderSize = 0
         Panel10.Controls.Add(MCB_边框类型)
         Panel10.Controls.Add(JustEmptyControl6)
         Panel10.Controls.Add(MTB_描边宽度)
         Panel10.Controls.Add(JustEmptyControl5)
         Panel10.Controls.Add(MTB_阴影距离)
         Panel10.Dock = DockStyle.Top
-        Panel10.Location = New Point(20, 130)
+        Panel10.Location = New Point(20, 128)
         Panel10.Name = "Panel10"
         Panel10.Padding = New Padding(0, 10, 0, 0)
         Panel10.Size = New Size(330, 42)
@@ -988,12 +963,15 @@ Partial Class Form_v6_参数面板_烧录字幕
         '
         ' Panel11
         '
+        Panel11.BackColor = Color.Transparent
+        Panel11.BackColor1 = Color.Transparent
+        Panel11.BorderSize = 0
         Panel11.Controls.Add(HCL_边框类型)
         Panel11.Controls.Add(HCL_描边宽度)
         Panel11.Controls.Add(JustEmptyControl7)
         Panel11.Controls.Add(HCL_阴影距离)
         Panel11.Dock = DockStyle.Top
-        Panel11.Location = New Point(20, 100)
+        Panel11.Location = New Point(20, 98)
         Panel11.Name = "Panel11"
         Panel11.Size = New Size(330, 30)
         Panel11.TabIndex = 45
@@ -1047,11 +1025,14 @@ Partial Class Form_v6_参数面板_烧录字幕
         '
         ' Panel9
         '
+        Panel9.BackColor = Color.Transparent
+        Panel9.BackColor1 = Color.Transparent
+        Panel9.BorderSize = 0
         Panel9.Controls.Add(MB_清除基本样式)
         Panel9.Controls.Add(JustEmptyControl4)
         Panel9.Controls.Add(MB_设置基本样式)
         Panel9.Dock = DockStyle.Top
-        Panel9.Location = New Point(20, 45)
+        Panel9.Location = New Point(20, 43)
         Panel9.Name = "Panel9"
         Panel9.Padding = New Padding(0, 10, 0, 0)
         Panel9.Size = New Size(330, 55)
@@ -1105,12 +1086,15 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_字体样式.Margin = New Padding(2)
         HCL_字体样式.Name = "HCL_字体样式"
         HCL_字体样式.Padding = New Padding(0, 20, 0, 0)
-        HCL_字体样式.Size = New Size(330, 45)
+        HCL_字体样式.Size = New Size(330, 43)
         HCL_字体样式.TabIndex = 26
         HCL_字体样式.Text = "<span style=""font-size:13; color:Silver"">字体样式</span>"
         '
         ' Panel1
         '
+        Panel1.BackColor = Color.Transparent
+        Panel1.BackColor1 = Color.Transparent
+        Panel1.BorderSize = 0
         Panel1.Controls.Add(Panel8)
         Panel1.Controls.Add(HCL_流索引)
         Panel1.Controls.Add(HCL_内嵌的流配置)
@@ -1131,9 +1115,12 @@ Partial Class Form_v6_参数面板_烧录字幕
         '
         ' Panel8
         '
+        Panel8.BackColor = Color.Transparent
+        Panel8.BackColor1 = Color.Transparent
+        Panel8.BorderSize = 0
         Panel8.Controls.Add(MTB_内嵌的流索引)
         Panel8.Dock = DockStyle.Top
-        Panel8.Location = New Point(0, 427)
+        Panel8.Location = New Point(0, 405)
         Panel8.Name = "Panel8"
         Panel8.Padding = New Padding(0, 10, 0, 0)
         Panel8.Size = New Size(320, 42)
@@ -1162,11 +1149,11 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_流索引.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_流索引.Dock = DockStyle.Top
         HCL_流索引.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_流索引.Location = New Point(0, 396)
+        HCL_流索引.Location = New Point(0, 378)
         HCL_流索引.Margin = New Padding(2)
         HCL_流索引.Name = "HCL_流索引"
         HCL_流索引.Padding = New Padding(0, 10, 0, 0)
-        HCL_流索引.Size = New Size(320, 31)
+        HCL_流索引.Size = New Size(320, 27)
         HCL_流索引.TabIndex = 41
         HCL_流索引.Text = "流索引"
         '
@@ -1176,19 +1163,22 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_内嵌的流配置.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_内嵌的流配置.Dock = DockStyle.Top
         HCL_内嵌的流配置.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_内嵌的流配置.Location = New Point(0, 351)
+        HCL_内嵌的流配置.Location = New Point(0, 335)
         HCL_内嵌的流配置.Margin = New Padding(2)
         HCL_内嵌的流配置.Name = "HCL_内嵌的流配置"
         HCL_内嵌的流配置.Padding = New Padding(0, 20, 0, 0)
-        HCL_内嵌的流配置.Size = New Size(320, 45)
+        HCL_内嵌的流配置.Size = New Size(320, 43)
         HCL_内嵌的流配置.TabIndex = 40
         HCL_内嵌的流配置.Text = "<span style=""font-size:13; color:Silver"">内嵌的流配置</span>"
         '
         ' Panel7
         '
+        Panel7.BackColor = Color.Transparent
+        Panel7.BackColor1 = Color.Transparent
+        Panel7.BorderSize = 0
         Panel7.Controls.Add(MCB_字幕文件路径)
         Panel7.Dock = DockStyle.Top
-        Panel7.Location = New Point(0, 309)
+        Panel7.Location = New Point(0, 293)
         Panel7.Name = "Panel7"
         Panel7.Padding = New Padding(0, 10, 0, 0)
         Panel7.Size = New Size(320, 42)
@@ -1228,20 +1218,24 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_字幕文件路径.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_字幕文件路径.Dock = DockStyle.Top
         HCL_字幕文件路径.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_字幕文件路径.Location = New Point(0, 278)
+        HCL_字幕文件路径.InfoIconSizeRatio = 0.9F
+        HCL_字幕文件路径.Location = New Point(0, 266)
         HCL_字幕文件路径.Margin = New Padding(2)
         HCL_字幕文件路径.Name = "HCL_字幕文件路径"
         HCL_字幕文件路径.Padding = New Padding(0, 10, 0, 0)
-        HCL_字幕文件路径.Size = New Size(320, 31)
+        HCL_字幕文件路径.Size = New Size(320, 27)
         HCL_字幕文件路径.TabIndex = 38
         HCL_字幕文件路径.Text = "字幕文件路径（不填是同目录）"
         HCL_字幕文件路径.ToolTipText = "字幕文件在其他地方吗？可在此指定文件夹"
         '
         ' Panel6
         '
+        Panel6.BackColor = Color.Transparent
+        Panel6.BackColor1 = Color.Transparent
+        Panel6.BorderSize = 0
         Panel6.Controls.Add(MTB_字幕文件多余字符)
         Panel6.Dock = DockStyle.Top
-        Panel6.Location = New Point(0, 236)
+        Panel6.Location = New Point(0, 224)
         Panel6.Name = "Panel6"
         Panel6.Padding = New Padding(0, 10, 0, 0)
         Panel6.Size = New Size(320, 42)
@@ -1270,24 +1264,28 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_字幕文件名多余字符.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_字幕文件名多余字符.Dock = DockStyle.Top
         HCL_字幕文件名多余字符.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_字幕文件名多余字符.Location = New Point(0, 205)
+        HCL_字幕文件名多余字符.InfoIconSizeRatio = 0.9F
+        HCL_字幕文件名多余字符.Location = New Point(0, 197)
         HCL_字幕文件名多余字符.Margin = New Padding(2)
         HCL_字幕文件名多余字符.Name = "HCL_字幕文件名多余字符"
         HCL_字幕文件名多余字符.Padding = New Padding(0, 10, 0, 0)
-        HCL_字幕文件名多余字符.Size = New Size(320, 31)
+        HCL_字幕文件名多余字符.Size = New Size(320, 27)
         HCL_字幕文件名多余字符.TabIndex = 36
         HCL_字幕文件名多余字符.Text = "字幕文件名多余字符"
         HCL_字幕文件名多余字符.ToolTipText = "字幕文件名不与视频同名？可在此指定多余字符 (不含后缀)"
         '
         ' Panel5
         '
+        Panel5.BackColor = Color.Transparent
+        Panel5.BackColor1 = Color.Transparent
+        Panel5.BorderSize = 0
         Panel5.Controls.Add(MCB_后缀优先级3)
         Panel5.Controls.Add(JustEmptyControl3)
         Panel5.Controls.Add(MCB_后缀优先级2)
         Panel5.Controls.Add(JustEmptyControl2)
         Panel5.Controls.Add(MCB_后缀优先级1)
         Panel5.Dock = DockStyle.Top
-        Panel5.Location = New Point(0, 163)
+        Panel5.Location = New Point(0, 155)
         Panel5.Name = "Panel5"
         Panel5.Padding = New Padding(0, 10, 0, 0)
         Panel5.Size = New Size(320, 42)
@@ -1408,11 +1406,11 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_后缀优先级.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_后缀优先级.Dock = DockStyle.Top
         HCL_后缀优先级.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_后缀优先级.Location = New Point(0, 132)
+        HCL_后缀优先级.Location = New Point(0, 128)
         HCL_后缀优先级.Margin = New Padding(2)
         HCL_后缀优先级.Name = "HCL_后缀优先级"
         HCL_后缀优先级.Padding = New Padding(0, 10, 0, 0)
-        HCL_后缀优先级.Size = New Size(320, 31)
+        HCL_后缀优先级.Size = New Size(320, 27)
         HCL_后缀优先级.TabIndex = 34
         HCL_后缀优先级.Text = "后缀优先级（优先 -> 然后 -> 最后）"
         '
@@ -1422,21 +1420,24 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_外部来源配置.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_外部来源配置.Dock = DockStyle.Top
         HCL_外部来源配置.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_外部来源配置.Location = New Point(0, 87)
+        HCL_外部来源配置.Location = New Point(0, 85)
         HCL_外部来源配置.Margin = New Padding(2)
         HCL_外部来源配置.Name = "HCL_外部来源配置"
         HCL_外部来源配置.Padding = New Padding(0, 20, 0, 0)
-        HCL_外部来源配置.Size = New Size(320, 45)
+        HCL_外部来源配置.Size = New Size(320, 43)
         HCL_外部来源配置.TabIndex = 33
         HCL_外部来源配置.Text = "<span style=""font-size:13; color:Silver"">外部来源配置</span>"
         '
         ' Panel4
         '
+        Panel4.BackColor = Color.Transparent
+        Panel4.BackColor1 = Color.Transparent
+        Panel4.BorderSize = 0
         Panel4.Controls.Add(MCB_字幕来源)
         Panel4.Controls.Add(JustEmptyControl1)
         Panel4.Controls.Add(MCB_滤镜选择)
         Panel4.Dock = DockStyle.Top
-        Panel4.Location = New Point(0, 45)
+        Panel4.Location = New Point(0, 43)
         Panel4.Name = "Panel4"
         Panel4.Padding = New Padding(0, 10, 0, 0)
         Panel4.Size = New Size(320, 42)
@@ -1520,7 +1521,7 @@ Partial Class Form_v6_参数面板_烧录字幕
         HCL_滤镜和来源.Margin = New Padding(2)
         HCL_滤镜和来源.Name = "HCL_滤镜和来源"
         HCL_滤镜和来源.Padding = New Padding(0, 20, 0, 0)
-        HCL_滤镜和来源.Size = New Size(320, 45)
+        HCL_滤镜和来源.Size = New Size(320, 43)
         HCL_滤镜和来源.TabIndex = 25
         HCL_滤镜和来源.Text = "<span style=""font-size:13; color:Silver"">滤镜和来源</span>"
         HCL_滤镜和来源.ToolTipText = "建议使用默认 subtitles。ass 滤镜几乎只支持 ass 格式，而且几乎无法复写样式。"

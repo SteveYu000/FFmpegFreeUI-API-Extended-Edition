@@ -75,7 +75,7 @@ Partial Class Form_v6_参数面板_剪辑区间
         Panel1.BorderSize = 0
         Panel1.Controls.Add(MCB_向前解码秒数)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 292)
+        Panel1.Location = New Point(20, 287)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 0)
         Panel1.Size = New Size(725, 42)
@@ -126,10 +126,10 @@ Partial Class Form_v6_参数面板_剪辑区间
         HCL_向前解码.Location = New Point(20, 244)
         HCL_向前解码.Margin = New Padding(2)
         HCL_向前解码.Name = "HCL_向前解码"
-        HCL_向前解码.Padding = New Padding(0, 20, 0, 5)
-        HCL_向前解码.Size = New Size(725, 48)
+        HCL_向前解码.Padding = New Padding(0, 20, 0, 0)
+        HCL_向前解码.Size = New Size(725, 43)
         HCL_向前解码.TabIndex = 13
-        HCL_向前解码.Text = "<span style=""font-size:13; color:Silver"">向前解码</span>   <span style=""font-size:10pt; color:Gray"">仅限快速响应的精简，其他模式无效</span>"
+        HCL_向前解码.Text = "<span style=""font-size:13; color:Silver"">向前解码</span>   仅限快速响应的精简，其他模式无效"
         '
         ' Panel3
         '

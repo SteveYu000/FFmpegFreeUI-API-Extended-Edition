@@ -44,8 +44,7 @@ Partial Class Form_v6_参数面板_章节
         HCL_章节说明.Location = New Point(20, 20)
         HCL_章节说明.Margin = New Padding(2)
         HCL_章节说明.Name = "HCL_章节说明"
-        HCL_章节说明.Padding = New Padding(0, 0, 0, 5)
-        HCL_章节说明.Size = New Size(743, 28)
+        HCL_章节说明.Size = New Size(743, 23)
         HCL_章节说明.TabIndex = 11
         HCL_章节说明.Text = "<span style=""font-size:13; color:Silver"">章节</span>   <span style=""font-size:10pt; color:Gray"">向输出文件中写入自定义章节，请自行编辑并准备好符合标准的章节文本文档</span>"
         '
@@ -60,7 +59,7 @@ Partial Class Form_v6_参数面板_章节
         Panel1.Controls.Add(JustEmptyControl2)
         Panel1.Controls.Add(MB_教程)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 48)
+        Panel1.Location = New Point(20, 43)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 10)
         Panel1.Size = New Size(743, 52)
@@ -169,10 +168,10 @@ Partial Class Form_v6_参数面板_章节
         MDV_章节教程.ForeColor = Color.Silver
         MDV_章节教程.HorizontalRuleColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
         MDV_章节教程.HorizontalRuleThickness = 2
-        MDV_章节教程.Location = New Point(20, 100)
+        MDV_章节教程.Location = New Point(20, 95)
         MDV_章节教程.Name = "MDV_章节教程"
         MDV_章节教程.Padding = New Padding(20)
-        MDV_章节教程.Size = New Size(743, 509)
+        MDV_章节教程.Size = New Size(743, 514)
         MDV_章节教程.TabIndex = 13
         MDV_章节教程.Visible = False
         '

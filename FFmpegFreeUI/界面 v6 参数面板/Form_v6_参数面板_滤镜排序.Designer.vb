@@ -182,7 +182,7 @@ Partial Class Form_v6_参数面板_滤镜排序
         HCL_滤镜排序说明.Padding = New Padding(0, 0, 0, 5)
         HCL_滤镜排序说明.Size = New Size(755, 28)
         HCL_滤镜排序说明.TabIndex = 10
-        HCL_滤镜排序说明.Text = "<span style=""font-size:13; color:Silver"">滤镜排序和自定义</span>   如果需要一行里写多个滤镜，使用英文逗号隔开即可"
+        HCL_滤镜排序说明.Text = "<span style=""font-size:13; color:Silver"">滤镜排序和自定义</span>   添加后双击内容来编辑；如果要一行里写多个滤镜，使用英文逗号隔开即可"
         ' 
         ' Form_v6_参数面板_滤镜排序
         ' 

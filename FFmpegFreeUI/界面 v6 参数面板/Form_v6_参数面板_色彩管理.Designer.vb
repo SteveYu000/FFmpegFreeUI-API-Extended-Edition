@@ -18,109 +18,68 @@ Partial Class Form_v6_参数面板_色彩管理
     Private components As System.ComponentModel.IContainer
 
     '注意: 以下过程是 Windows 窗体设计器所必需的
-    '可以使用 Windows 窗体设计器修改它。  
+    '可以使用 Windows 窗体设计器修改它。
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim TrackLabel13 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel14 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel15 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel16 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel17 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel18 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel19 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel20 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel21 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel22 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel23 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
-        Dim TrackLabel24 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel1 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel2 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel3 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel4 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel5 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel6 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel7 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel8 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel9 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel10 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel11 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
+        Dim TrackLabel12 As LakeUI.ExcellentTrackBar.TrackLabel = New LakeUI.ExcellentTrackBar.TrackLabel()
         ModernPanel1 = New LakeUI.ModernPanel()
-        ModernPanel1.BackColor = Color.Transparent
-        ModernPanel1.BackColor1 = Color.Transparent
         Panel9 = New LakeUI.ModernPanel()
-        Panel9.BackColor = Color.Transparent
-        Panel9.BackColor1 = Color.Transparent
-        Panel9.BorderSize = 0
         Panel13 = New LakeUI.ModernPanel()
-        Panel13.BackColor = Color.Transparent
-        Panel13.BackColor1 = Color.Transparent
-        Panel13.BorderSize = 0
         ETB_伽马 = New LakeUI.ExcellentTrackBar()
+        MCK_启用伽马调整 = New LakeUI.ModernCheckBox()
         JustEmptyControl5 = New LakeUI.JustEmptyControl()
         Panel12 = New LakeUI.ModernPanel()
-        Panel12.BackColor = Color.Transparent
-        Panel12.BackColor1 = Color.Transparent
-        Panel12.BorderSize = 0
         ETB_饱和度 = New LakeUI.ExcellentTrackBar()
+        MCK_启用饱和度调整 = New LakeUI.ModernCheckBox()
         JustEmptyControl3 = New LakeUI.JustEmptyControl()
         Panel11 = New LakeUI.ModernPanel()
-        Panel11.BackColor = Color.Transparent
-        Panel11.BackColor1 = Color.Transparent
-        Panel11.BorderSize = 0
         ETB_对比度 = New LakeUI.ExcellentTrackBar()
+        MCK_启用对比度调整 = New LakeUI.ModernCheckBox()
         JustEmptyControl2 = New LakeUI.JustEmptyControl()
         Panel10 = New LakeUI.ModernPanel()
-        Panel10.BackColor = Color.Transparent
-        Panel10.BackColor1 = Color.Transparent
-        Panel10.BorderSize = 0
         ETB_亮度 = New LakeUI.ExcellentTrackBar()
+        MCK_启用亮度调整 = New LakeUI.ModernCheckBox()
         HCL_简易调色 = New LakeUI.HtmlColorLabel()
         Panel8 = New LakeUI.ModernPanel()
-        Panel8.BackColor = Color.Transparent
-        Panel8.BackColor1 = Color.Transparent
-        Panel8.BorderSize = 0
         HCL_操作方式 = New LakeUI.HtmlColorLabel()
         MCB_色彩管理_色彩空间操作方式 = New LakeUI.ModernComboBox()
         Panel7 = New LakeUI.ModernPanel()
-        Panel7.BackColor = Color.Transparent
-        Panel7.BackColor1 = Color.Transparent
-        Panel7.BorderSize = 0
         HCL_色调映射算法 = New LakeUI.HtmlColorLabel()
         MCB_色彩管理_色调映射算法 = New LakeUI.ModernComboBox()
         Panel6 = New LakeUI.ModernPanel()
-        Panel6.BackColor = Color.Transparent
-        Panel6.BackColor1 = Color.Transparent
-        Panel6.BorderSize = 0
         HCL_色彩范围 = New LakeUI.HtmlColorLabel()
         MCB_色彩管理_色彩范围 = New LakeUI.ModernComboBox()
         Panel5 = New LakeUI.ModernPanel()
-        Panel5.BackColor = Color.Transparent
-        Panel5.BackColor1 = Color.Transparent
-        Panel5.BorderSize = 0
         HCL_传输特性 = New LakeUI.HtmlColorLabel()
         MCB_色彩管理_传输特性 = New LakeUI.ModernComboBox()
         Panel4 = New LakeUI.ModernPanel()
-        Panel4.BackColor = Color.Transparent
-        Panel4.BackColor1 = Color.Transparent
-        Panel4.BorderSize = 0
         HCL_色域 = New LakeUI.HtmlColorLabel()
         MCB_色彩管理_色域 = New LakeUI.ModernComboBox()
         Panel3 = New LakeUI.ModernPanel()
-        Panel3.BackColor = Color.Transparent
-        Panel3.BackColor1 = Color.Transparent
-        Panel3.BorderSize = 0
         HCL_矩阵系数 = New LakeUI.HtmlColorLabel()
         MCB_色彩管理_矩阵系数 = New LakeUI.ModernComboBox()
         Panel1 = New LakeUI.ModernPanel()
-        Panel1.BackColor = Color.Transparent
-        Panel1.BackColor1 = Color.Transparent
-        Panel1.BorderSize = 0
         HCL_选择滤镜 = New LakeUI.HtmlColorLabel()
         MCB_色彩管理_选择滤镜 = New LakeUI.ModernComboBox()
         HCL_色彩空间 = New LakeUI.HtmlColorLabel()
         Panel2 = New LakeUI.ModernPanel()
-        Panel2.BackColor = Color.Transparent
-        Panel2.BackColor1 = Color.Transparent
-        Panel2.BorderSize = 0
         HCL_预先转换 = New LakeUI.HtmlColorLabel()
         MCB_像素格式预先转换 = New LakeUI.ModernComboBox()
         HCL_最终输出 = New LakeUI.HtmlColorLabel()
         MCB_像素格式 = New LakeUI.ModernComboBox()
         HCL_像素格式 = New LakeUI.HtmlColorLabel()
-        MCK_启用亮度调整 = New LakeUI.ModernCheckBox()
-        MCK_启用对比度调整 = New LakeUI.ModernCheckBox()
-        MCK_启用饱和度调整 = New LakeUI.ModernCheckBox()
-        MCK_启用伽马调整 = New LakeUI.ModernCheckBox()
         ModernPanel1.SuspendLayout()
         Panel9.SuspendLayout()
         Panel13.SuspendLayout()
@@ -139,6 +98,8 @@ Partial Class Form_v6_参数面板_色彩管理
         '
         ' ModernPanel1
         '
+        ModernPanel1.BackColor = Color.Transparent
+        ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
         ModernPanel1.Controls.Add(Panel9)
         ModernPanel1.Controls.Add(HCL_简易调色)
@@ -162,6 +123,9 @@ Partial Class Form_v6_参数面板_色彩管理
         '
         ' Panel9
         '
+        Panel9.BackColor = Color.Transparent
+        Panel9.BackColor1 = Color.Transparent
+        Panel9.BorderSize = 0
         Panel9.Controls.Add(Panel13)
         Panel9.Controls.Add(JustEmptyControl5)
         Panel9.Controls.Add(Panel12)
@@ -170,19 +134,22 @@ Partial Class Form_v6_参数面板_色彩管理
         Panel9.Controls.Add(JustEmptyControl2)
         Panel9.Controls.Add(Panel10)
         Panel9.Dock = DockStyle.Fill
-        Panel9.Location = New Point(20, 476)
+        Panel9.Location = New Point(20, 475)
         Panel9.Name = "Panel9"
-        Panel9.Size = New Size(802, 199)
+        Panel9.Size = New Size(802, 200)
         Panel9.TabIndex = 18
         '
         ' Panel13
         '
+        Panel13.BackColor = Color.Transparent
+        Panel13.BackColor1 = Color.Transparent
+        Panel13.BorderSize = 0
         Panel13.Controls.Add(ETB_伽马)
         Panel13.Controls.Add(MCK_启用伽马调整)
         Panel13.Dock = DockStyle.Left
         Panel13.Location = New Point(465, 0)
         Panel13.Name = "Panel13"
-        Panel13.Size = New Size(150, 199)
+        Panel13.Size = New Size(150, 200)
         Panel13.TabIndex = 7
         '
         ' ETB_伽马
@@ -192,17 +159,17 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_伽马.LabelColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         ETB_伽马.LabelLineColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         ETB_伽马.LabelLineLength = 20
-        TrackLabel13.Position = 10R
-        TrackLabel13.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
-        TrackLabel13.Text = "最亮"
-        TrackLabel14.Position = 1R
-        TrackLabel14.Text = "原点"
-        TrackLabel15.Position = 0.10000000149011612R
-        TrackLabel15.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
-        TrackLabel15.Text = "最暗"
-        ETB_伽马.Labels.Add(TrackLabel13)
-        ETB_伽马.Labels.Add(TrackLabel14)
-        ETB_伽马.Labels.Add(TrackLabel15)
+        TrackLabel1.Position = 10R
+        TrackLabel1.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
+        TrackLabel1.Text = "最亮"
+        TrackLabel2.Position = 1R
+        TrackLabel2.Text = "原点"
+        TrackLabel3.Position = 0.10000000149011612R
+        TrackLabel3.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
+        TrackLabel3.Text = "最暗"
+        ETB_伽马.Labels.Add(TrackLabel1)
+        ETB_伽马.Labels.Add(TrackLabel2)
+        ETB_伽马.Labels.Add(TrackLabel3)
         ETB_伽马.LargeChange = 0.1R
         ETB_伽马.Location = New Point(0, 0)
         ETB_伽马.Margin = New Padding(2, 2, 2, 2)
@@ -211,7 +178,7 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_伽马.Name = "ETB_伽马"
         ETB_伽马.Orientation = LakeUI.ExcellentTrackBar.TrackOrientationEnum.Vertical
         ETB_伽马.Padding = New Padding(0, 10, 0, 10)
-        ETB_伽马.Size = New Size(150, 157)
+        ETB_伽马.Size = New Size(150, 158)
         ETB_伽马.SmallChange = 0.1R
         ETB_伽马.TabIndex = 1
         ETB_伽马.ThumbBorderWidth = 0
@@ -224,22 +191,46 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_伽马.TrackFillColor = Color.Transparent
         ETB_伽马.Value = 1R
         '
+        ' MCK_启用伽马调整
+        '
+        MCK_启用伽马调整.AutoSize = True
+        MCK_启用伽马调整.BackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCK_启用伽马调整.BoxBorderRadius = 5
+        MCK_启用伽马调整.BoxBorderSize = 0
+        MCK_启用伽马调整.BoxCheckedBackColor = Color.MediumPurple
+        MCK_启用伽马调整.BoxInnerPadding = 6
+        MCK_启用伽马调整.BoxSize = 22
+        MCK_启用伽马调整.BoxTextSpacing = 10
+        MCK_启用伽马调整.BoxUncheckedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCK_启用伽马调整.Checked = True
+        MCK_启用伽马调整.ClickAnywhere = True
+        MCK_启用伽马调整.Dock = DockStyle.Bottom
+        MCK_启用伽马调整.Location = New Point(0, 158)
+        MCK_启用伽马调整.Name = "MCK_启用伽马调整"
+        MCK_启用伽马调整.Padding = New Padding(10)
+        MCK_启用伽马调整.Size = New Size(150, 42)
+        MCK_启用伽马调整.TabIndex = 15
+        MCK_启用伽马调整.Text = "伽马"
+        '
         ' JustEmptyControl5
         '
         JustEmptyControl5.Dock = DockStyle.Left
         JustEmptyControl5.Location = New Point(460, 0)
         JustEmptyControl5.Name = "JustEmptyControl5"
-        JustEmptyControl5.Size = New Size(5, 199)
+        JustEmptyControl5.Size = New Size(5, 200)
         JustEmptyControl5.TabIndex = 6
         '
         ' Panel12
         '
+        Panel12.BackColor = Color.Transparent
+        Panel12.BackColor1 = Color.Transparent
+        Panel12.BorderSize = 0
         Panel12.Controls.Add(ETB_饱和度)
         Panel12.Controls.Add(MCK_启用饱和度调整)
         Panel12.Dock = DockStyle.Left
         Panel12.Location = New Point(310, 0)
         Panel12.Name = "Panel12"
-        Panel12.Size = New Size(150, 199)
+        Panel12.Size = New Size(150, 200)
         Panel12.TabIndex = 5
         '
         ' ETB_饱和度
@@ -249,16 +240,16 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_饱和度.LabelColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         ETB_饱和度.LabelLineColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         ETB_饱和度.LabelLineLength = 20
-        TrackLabel16.Position = 3R
-        TrackLabel16.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
-        TrackLabel16.Text = "最高"
-        TrackLabel17.Position = 1R
-        TrackLabel17.Text = "原点"
-        TrackLabel18.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
-        TrackLabel18.Text = "最低"
-        ETB_饱和度.Labels.Add(TrackLabel16)
-        ETB_饱和度.Labels.Add(TrackLabel17)
-        ETB_饱和度.Labels.Add(TrackLabel18)
+        TrackLabel4.Position = 3R
+        TrackLabel4.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
+        TrackLabel4.Text = "最高"
+        TrackLabel5.Position = 1R
+        TrackLabel5.Text = "原点"
+        TrackLabel6.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
+        TrackLabel6.Text = "最低"
+        ETB_饱和度.Labels.Add(TrackLabel4)
+        ETB_饱和度.Labels.Add(TrackLabel5)
+        ETB_饱和度.Labels.Add(TrackLabel6)
         ETB_饱和度.LargeChange = 0.1R
         ETB_饱和度.Location = New Point(0, 0)
         ETB_饱和度.Margin = New Padding(2, 2, 2, 2)
@@ -266,7 +257,7 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_饱和度.Name = "ETB_饱和度"
         ETB_饱和度.Orientation = LakeUI.ExcellentTrackBar.TrackOrientationEnum.Vertical
         ETB_饱和度.Padding = New Padding(0, 10, 0, 10)
-        ETB_饱和度.Size = New Size(150, 157)
+        ETB_饱和度.Size = New Size(150, 158)
         ETB_饱和度.SmallChange = 0.1R
         ETB_饱和度.TabIndex = 1
         ETB_饱和度.ThumbBorderWidth = 0
@@ -279,22 +270,46 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_饱和度.TrackFillColor = Color.Transparent
         ETB_饱和度.Value = 1R
         '
+        ' MCK_启用饱和度调整
+        '
+        MCK_启用饱和度调整.AutoSize = True
+        MCK_启用饱和度调整.BackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCK_启用饱和度调整.BoxBorderRadius = 5
+        MCK_启用饱和度调整.BoxBorderSize = 0
+        MCK_启用饱和度调整.BoxCheckedBackColor = Color.CornflowerBlue
+        MCK_启用饱和度调整.BoxInnerPadding = 6
+        MCK_启用饱和度调整.BoxSize = 22
+        MCK_启用饱和度调整.BoxTextSpacing = 10
+        MCK_启用饱和度调整.BoxUncheckedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCK_启用饱和度调整.Checked = True
+        MCK_启用饱和度调整.ClickAnywhere = True
+        MCK_启用饱和度调整.Dock = DockStyle.Bottom
+        MCK_启用饱和度调整.Location = New Point(0, 158)
+        MCK_启用饱和度调整.Name = "MCK_启用饱和度调整"
+        MCK_启用饱和度调整.Padding = New Padding(10)
+        MCK_启用饱和度调整.Size = New Size(150, 42)
+        MCK_启用饱和度调整.TabIndex = 15
+        MCK_启用饱和度调整.Text = "饱和度"
+        '
         ' JustEmptyControl3
         '
         JustEmptyControl3.Dock = DockStyle.Left
         JustEmptyControl3.Location = New Point(305, 0)
         JustEmptyControl3.Name = "JustEmptyControl3"
-        JustEmptyControl3.Size = New Size(5, 199)
+        JustEmptyControl3.Size = New Size(5, 200)
         JustEmptyControl3.TabIndex = 4
         '
         ' Panel11
         '
+        Panel11.BackColor = Color.Transparent
+        Panel11.BackColor1 = Color.Transparent
+        Panel11.BorderSize = 0
         Panel11.Controls.Add(ETB_对比度)
         Panel11.Controls.Add(MCK_启用对比度调整)
         Panel11.Dock = DockStyle.Left
         Panel11.Location = New Point(155, 0)
         Panel11.Name = "Panel11"
-        Panel11.Size = New Size(150, 199)
+        Panel11.Size = New Size(150, 200)
         Panel11.TabIndex = 3
         '
         ' ETB_对比度
@@ -304,16 +319,16 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_对比度.LabelColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         ETB_对比度.LabelLineColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         ETB_对比度.LabelLineLength = 20
-        TrackLabel19.Position = 2R
-        TrackLabel19.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
-        TrackLabel19.Text = "最高"
-        TrackLabel20.Position = 1R
-        TrackLabel20.Text = "原点"
-        TrackLabel21.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
-        TrackLabel21.Text = "最低"
-        ETB_对比度.Labels.Add(TrackLabel19)
-        ETB_对比度.Labels.Add(TrackLabel20)
-        ETB_对比度.Labels.Add(TrackLabel21)
+        TrackLabel7.Position = 2R
+        TrackLabel7.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
+        TrackLabel7.Text = "最高"
+        TrackLabel8.Position = 1R
+        TrackLabel8.Text = "原点"
+        TrackLabel9.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
+        TrackLabel9.Text = "最低"
+        ETB_对比度.Labels.Add(TrackLabel7)
+        ETB_对比度.Labels.Add(TrackLabel8)
+        ETB_对比度.Labels.Add(TrackLabel9)
         ETB_对比度.LargeChange = 0.1R
         ETB_对比度.Location = New Point(0, 0)
         ETB_对比度.Margin = New Padding(2, 2, 2, 2)
@@ -321,7 +336,7 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_对比度.Name = "ETB_对比度"
         ETB_对比度.Orientation = LakeUI.ExcellentTrackBar.TrackOrientationEnum.Vertical
         ETB_对比度.Padding = New Padding(0, 10, 0, 10)
-        ETB_对比度.Size = New Size(150, 157)
+        ETB_对比度.Size = New Size(150, 158)
         ETB_对比度.SmallChange = 0.1R
         ETB_对比度.TabIndex = 1
         ETB_对比度.ThumbBorderWidth = 0
@@ -334,22 +349,46 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_对比度.TrackFillColor = Color.Transparent
         ETB_对比度.Value = 1R
         '
+        ' MCK_启用对比度调整
+        '
+        MCK_启用对比度调整.AutoSize = True
+        MCK_启用对比度调整.BackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCK_启用对比度调整.BoxBorderRadius = 5
+        MCK_启用对比度调整.BoxBorderSize = 0
+        MCK_启用对比度调整.BoxCheckedBackColor = Color.OliveDrab
+        MCK_启用对比度调整.BoxInnerPadding = 6
+        MCK_启用对比度调整.BoxSize = 22
+        MCK_启用对比度调整.BoxTextSpacing = 10
+        MCK_启用对比度调整.BoxUncheckedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCK_启用对比度调整.Checked = True
+        MCK_启用对比度调整.ClickAnywhere = True
+        MCK_启用对比度调整.Dock = DockStyle.Bottom
+        MCK_启用对比度调整.Location = New Point(0, 158)
+        MCK_启用对比度调整.Name = "MCK_启用对比度调整"
+        MCK_启用对比度调整.Padding = New Padding(10)
+        MCK_启用对比度调整.Size = New Size(150, 42)
+        MCK_启用对比度调整.TabIndex = 15
+        MCK_启用对比度调整.Text = "对比度"
+        '
         ' JustEmptyControl2
         '
         JustEmptyControl2.Dock = DockStyle.Left
         JustEmptyControl2.Location = New Point(150, 0)
         JustEmptyControl2.Name = "JustEmptyControl2"
-        JustEmptyControl2.Size = New Size(5, 199)
+        JustEmptyControl2.Size = New Size(5, 200)
         JustEmptyControl2.TabIndex = 2
         '
         ' Panel10
         '
+        Panel10.BackColor = Color.Transparent
+        Panel10.BackColor1 = Color.Transparent
+        Panel10.BorderSize = 0
         Panel10.Controls.Add(ETB_亮度)
         Panel10.Controls.Add(MCK_启用亮度调整)
         Panel10.Dock = DockStyle.Left
         Panel10.Location = New Point(0, 0)
         Panel10.Name = "Panel10"
-        Panel10.Size = New Size(150, 199)
+        Panel10.Size = New Size(150, 200)
         Panel10.TabIndex = 0
         '
         ' ETB_亮度
@@ -359,16 +398,16 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_亮度.LabelColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         ETB_亮度.LabelLineColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         ETB_亮度.LabelLineLength = 20
-        TrackLabel22.Position = 1R
-        TrackLabel22.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
-        TrackLabel22.Text = "最亮"
-        TrackLabel23.Text = "原点"
-        TrackLabel24.Position = -1R
-        TrackLabel24.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
-        TrackLabel24.Text = "最暗"
-        ETB_亮度.Labels.Add(TrackLabel22)
-        ETB_亮度.Labels.Add(TrackLabel23)
-        ETB_亮度.Labels.Add(TrackLabel24)
+        TrackLabel10.Position = 1R
+        TrackLabel10.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
+        TrackLabel10.Text = "最亮"
+        TrackLabel11.Text = "原点"
+        TrackLabel12.Position = -1R
+        TrackLabel12.Side = LakeUI.ExcellentTrackBar.LabelSideEnum.TopOrLeft
+        TrackLabel12.Text = "最暗"
+        ETB_亮度.Labels.Add(TrackLabel10)
+        ETB_亮度.Labels.Add(TrackLabel11)
+        ETB_亮度.Labels.Add(TrackLabel12)
         ETB_亮度.LargeChange = 0.1R
         ETB_亮度.Location = New Point(0, 0)
         ETB_亮度.Margin = New Padding(2, 2, 2, 2)
@@ -377,7 +416,7 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_亮度.Name = "ETB_亮度"
         ETB_亮度.Orientation = LakeUI.ExcellentTrackBar.TrackOrientationEnum.Vertical
         ETB_亮度.Padding = New Padding(0, 10, 0, 10)
-        ETB_亮度.Size = New Size(150, 157)
+        ETB_亮度.Size = New Size(150, 158)
         ETB_亮度.SmallChange = 0.1R
         ETB_亮度.TabIndex = 1
         ETB_亮度.ThumbBorderWidth = 0
@@ -389,26 +428,50 @@ Partial Class Form_v6_参数面板_色彩管理
         ETB_亮度.TrackColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         ETB_亮度.TrackFillColor = Color.Transparent
         '
+        ' MCK_启用亮度调整
+        '
+        MCK_启用亮度调整.AutoSize = True
+        MCK_启用亮度调整.BackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCK_启用亮度调整.BoxBorderRadius = 5
+        MCK_启用亮度调整.BoxBorderSize = 0
+        MCK_启用亮度调整.BoxCheckedBackColor = Color.IndianRed
+        MCK_启用亮度调整.BoxInnerPadding = 6
+        MCK_启用亮度调整.BoxSize = 22
+        MCK_启用亮度调整.BoxTextSpacing = 10
+        MCK_启用亮度调整.BoxUncheckedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCK_启用亮度调整.Checked = True
+        MCK_启用亮度调整.ClickAnywhere = True
+        MCK_启用亮度调整.Dock = DockStyle.Bottom
+        MCK_启用亮度调整.Location = New Point(0, 158)
+        MCK_启用亮度调整.Name = "MCK_启用亮度调整"
+        MCK_启用亮度调整.Padding = New Padding(10)
+        MCK_启用亮度调整.Size = New Size(150, 42)
+        MCK_启用亮度调整.TabIndex = 15
+        MCK_启用亮度调整.Text = "亮度"
+        '
         ' HCL_简易调色
         '
         HCL_简易调色.AutoSize = True
         HCL_简易调色.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_简易调色.Dock = DockStyle.Top
         HCL_简易调色.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_简易调色.Location = New Point(20, 426)
+        HCL_简易调色.Location = New Point(20, 422)
         HCL_简易调色.Margin = New Padding(2)
         HCL_简易调色.Name = "HCL_简易调色"
-        HCL_简易调色.Padding = New Padding(0, 20, 0, 5)
-        HCL_简易调色.Size = New Size(802, 50)
+        HCL_简易调色.Padding = New Padding(0, 20, 0, 10)
+        HCL_简易调色.Size = New Size(802, 53)
         HCL_简易调色.TabIndex = 17
         HCL_简易调色.Text = "<span style=""font-size:13; color:Silver"">简易调色</span>   高级调色去用达芬奇，勾选才会使用"
         '
         ' Panel8
         '
+        Panel8.BackColor = Color.Transparent
+        Panel8.BackColor1 = Color.Transparent
+        Panel8.BorderSize = 0
         Panel8.Controls.Add(HCL_操作方式)
         Panel8.Controls.Add(MCB_色彩管理_色彩空间操作方式)
         Panel8.Dock = DockStyle.Top
-        Panel8.Location = New Point(20, 384)
+        Panel8.Location = New Point(20, 380)
         Panel8.Name = "Panel8"
         Panel8.Padding = New Padding(0, 10, 0, 0)
         Panel8.Size = New Size(802, 42)
@@ -462,10 +525,13 @@ Partial Class Form_v6_参数面板_色彩管理
         '
         ' Panel7
         '
+        Panel7.BackColor = Color.Transparent
+        Panel7.BackColor1 = Color.Transparent
+        Panel7.BorderSize = 0
         Panel7.Controls.Add(HCL_色调映射算法)
         Panel7.Controls.Add(MCB_色彩管理_色调映射算法)
         Panel7.Dock = DockStyle.Top
-        Panel7.Location = New Point(20, 342)
+        Panel7.Location = New Point(20, 338)
         Panel7.Name = "Panel7"
         Panel7.Padding = New Padding(0, 10, 0, 0)
         Panel7.Size = New Size(802, 42)
@@ -528,10 +594,13 @@ Partial Class Form_v6_参数面板_色彩管理
         '
         ' Panel6
         '
+        Panel6.BackColor = Color.Transparent
+        Panel6.BackColor1 = Color.Transparent
+        Panel6.BorderSize = 0
         Panel6.Controls.Add(HCL_色彩范围)
         Panel6.Controls.Add(MCB_色彩管理_色彩范围)
         Panel6.Dock = DockStyle.Top
-        Panel6.Location = New Point(20, 300)
+        Panel6.Location = New Point(20, 296)
         Panel6.Name = "Panel6"
         Panel6.Padding = New Padding(0, 10, 0, 0)
         Panel6.Size = New Size(802, 42)
@@ -584,10 +653,13 @@ Partial Class Form_v6_参数面板_色彩管理
         '
         ' Panel5
         '
+        Panel5.BackColor = Color.Transparent
+        Panel5.BackColor1 = Color.Transparent
+        Panel5.BorderSize = 0
         Panel5.Controls.Add(HCL_传输特性)
         Panel5.Controls.Add(MCB_色彩管理_传输特性)
         Panel5.Dock = DockStyle.Top
-        Panel5.Location = New Point(20, 258)
+        Panel5.Location = New Point(20, 254)
         Panel5.Name = "Panel5"
         Panel5.Padding = New Padding(0, 10, 0, 0)
         Panel5.Size = New Size(802, 42)
@@ -656,10 +728,13 @@ Partial Class Form_v6_参数面板_色彩管理
         '
         ' Panel4
         '
+        Panel4.BackColor = Color.Transparent
+        Panel4.BackColor1 = Color.Transparent
+        Panel4.BorderSize = 0
         Panel4.Controls.Add(HCL_色域)
         Panel4.Controls.Add(MCB_色彩管理_色域)
         Panel4.Dock = DockStyle.Top
-        Panel4.Location = New Point(20, 216)
+        Panel4.Location = New Point(20, 212)
         Panel4.Name = "Panel4"
         Panel4.Padding = New Padding(0, 10, 0, 0)
         Panel4.Size = New Size(802, 42)
@@ -723,10 +798,13 @@ Partial Class Form_v6_参数面板_色彩管理
         '
         ' Panel3
         '
+        Panel3.BackColor = Color.Transparent
+        Panel3.BackColor1 = Color.Transparent
+        Panel3.BorderSize = 0
         Panel3.Controls.Add(HCL_矩阵系数)
         Panel3.Controls.Add(MCB_色彩管理_矩阵系数)
         Panel3.Dock = DockStyle.Top
-        Panel3.Location = New Point(20, 174)
+        Panel3.Location = New Point(20, 170)
         Panel3.Name = "Panel3"
         Panel3.Padding = New Padding(0, 10, 0, 0)
         Panel3.Size = New Size(802, 42)
@@ -790,10 +868,13 @@ Partial Class Form_v6_参数面板_色彩管理
         '
         ' Panel1
         '
+        Panel1.BackColor = Color.Transparent
+        Panel1.BackColor1 = Color.Transparent
+        Panel1.BorderSize = 0
         Panel1.Controls.Add(HCL_选择滤镜)
         Panel1.Controls.Add(MCB_色彩管理_选择滤镜)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 132)
+        Panel1.Location = New Point(20, 128)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 0)
         Panel1.Size = New Size(802, 42)
@@ -850,22 +931,25 @@ Partial Class Form_v6_参数面板_色彩管理
         HCL_色彩空间.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_色彩空间.Dock = DockStyle.Top
         HCL_色彩空间.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_色彩空间.Location = New Point(20, 87)
+        HCL_色彩空间.Location = New Point(20, 85)
         HCL_色彩空间.Margin = New Padding(2)
         HCL_色彩空间.Name = "HCL_色彩空间"
         HCL_色彩空间.Padding = New Padding(0, 20, 0, 0)
-        HCL_色彩空间.Size = New Size(802, 45)
+        HCL_色彩空间.Size = New Size(802, 43)
         HCL_色彩空间.TabIndex = 8
         HCL_色彩空间.Text = "<span style=""font-size:13; color:Silver"">色彩空间</span>   在此处转换色彩空间；先选用哪个滤镜，再配置，最后选方式"
         '
         ' Panel2
         '
+        Panel2.BackColor = Color.Transparent
+        Panel2.BackColor1 = Color.Transparent
+        Panel2.BorderSize = 0
         Panel2.Controls.Add(HCL_预先转换)
         Panel2.Controls.Add(MCB_像素格式预先转换)
         Panel2.Controls.Add(HCL_最终输出)
         Panel2.Controls.Add(MCB_像素格式)
         Panel2.Dock = DockStyle.Top
-        Panel2.Location = New Point(20, 45)
+        Panel2.Location = New Point(20, 43)
         Panel2.Name = "Panel2"
         Panel2.Padding = New Padding(0, 10, 0, 0)
         Panel2.Size = New Size(802, 42)
@@ -972,93 +1056,9 @@ Partial Class Form_v6_参数面板_色彩管理
         HCL_像素格式.Location = New Point(20, 20)
         HCL_像素格式.Margin = New Padding(2)
         HCL_像素格式.Name = "HCL_像素格式"
-        HCL_像素格式.Size = New Size(802, 25)
+        HCL_像素格式.Size = New Size(802, 23)
         HCL_像素格式.TabIndex = 6
         HCL_像素格式.Text = "<span style=""font-size:13; color:Silver"">像素格式</span>   指定像素如何存储，下拉选项跟随选择的具体编码器"
-        '
-        ' MCK_启用亮度调整
-        '
-        MCK_启用亮度调整.AutoSize = True
-        MCK_启用亮度调整.BackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        MCK_启用亮度调整.BoxBorderRadius = 5
-        MCK_启用亮度调整.BoxBorderSize = 0
-        MCK_启用亮度调整.BoxCheckedBackColor = Color.IndianRed
-        MCK_启用亮度调整.BoxInnerPadding = 6
-        MCK_启用亮度调整.BoxSize = 22
-        MCK_启用亮度调整.BoxTextSpacing = 10
-        MCK_启用亮度调整.BoxUncheckedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        MCK_启用亮度调整.Checked = True
-        MCK_启用亮度调整.ClickAnywhere = True
-        MCK_启用亮度调整.Dock = DockStyle.Bottom
-        MCK_启用亮度调整.Location = New Point(0, 157)
-        MCK_启用亮度调整.Name = "MCK_启用亮度调整"
-        MCK_启用亮度调整.Padding = New Padding(10)
-        MCK_启用亮度调整.Size = New Size(150, 42)
-        MCK_启用亮度调整.TabIndex = 15
-        MCK_启用亮度调整.Text = "亮度"
-        '
-        ' MCK_启用对比度调整
-        '
-        MCK_启用对比度调整.AutoSize = True
-        MCK_启用对比度调整.BackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        MCK_启用对比度调整.BoxBorderRadius = 5
-        MCK_启用对比度调整.BoxBorderSize = 0
-        MCK_启用对比度调整.BoxCheckedBackColor = Color.OliveDrab
-        MCK_启用对比度调整.BoxInnerPadding = 6
-        MCK_启用对比度调整.BoxSize = 22
-        MCK_启用对比度调整.BoxTextSpacing = 10
-        MCK_启用对比度调整.BoxUncheckedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        MCK_启用对比度调整.Checked = True
-        MCK_启用对比度调整.ClickAnywhere = True
-        MCK_启用对比度调整.Dock = DockStyle.Bottom
-        MCK_启用对比度调整.Location = New Point(0, 157)
-        MCK_启用对比度调整.Name = "MCK_启用对比度调整"
-        MCK_启用对比度调整.Padding = New Padding(10)
-        MCK_启用对比度调整.Size = New Size(150, 42)
-        MCK_启用对比度调整.TabIndex = 15
-        MCK_启用对比度调整.Text = "对比度"
-        '
-        ' MCK_启用饱和度调整
-        '
-        MCK_启用饱和度调整.AutoSize = True
-        MCK_启用饱和度调整.BackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        MCK_启用饱和度调整.BoxBorderRadius = 5
-        MCK_启用饱和度调整.BoxBorderSize = 0
-        MCK_启用饱和度调整.BoxCheckedBackColor = Color.CornflowerBlue
-        MCK_启用饱和度调整.BoxInnerPadding = 6
-        MCK_启用饱和度调整.BoxSize = 22
-        MCK_启用饱和度调整.BoxTextSpacing = 10
-        MCK_启用饱和度调整.BoxUncheckedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        MCK_启用饱和度调整.Checked = True
-        MCK_启用饱和度调整.ClickAnywhere = True
-        MCK_启用饱和度调整.Dock = DockStyle.Bottom
-        MCK_启用饱和度调整.Location = New Point(0, 157)
-        MCK_启用饱和度调整.Name = "MCK_启用饱和度调整"
-        MCK_启用饱和度调整.Padding = New Padding(10)
-        MCK_启用饱和度调整.Size = New Size(150, 42)
-        MCK_启用饱和度调整.TabIndex = 15
-        MCK_启用饱和度调整.Text = "饱和度"
-        '
-        ' MCK_启用伽马调整
-        '
-        MCK_启用伽马调整.AutoSize = True
-        MCK_启用伽马调整.BackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        MCK_启用伽马调整.BoxBorderRadius = 5
-        MCK_启用伽马调整.BoxBorderSize = 0
-        MCK_启用伽马调整.BoxCheckedBackColor = Color.MediumPurple
-        MCK_启用伽马调整.BoxInnerPadding = 6
-        MCK_启用伽马调整.BoxSize = 22
-        MCK_启用伽马调整.BoxTextSpacing = 10
-        MCK_启用伽马调整.BoxUncheckedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        MCK_启用伽马调整.Checked = True
-        MCK_启用伽马调整.ClickAnywhere = True
-        MCK_启用伽马调整.Dock = DockStyle.Bottom
-        MCK_启用伽马调整.Location = New Point(0, 157)
-        MCK_启用伽马调整.Name = "MCK_启用伽马调整"
-        MCK_启用伽马调整.Padding = New Padding(10)
-        MCK_启用伽马调整.Size = New Size(150, 42)
-        MCK_启用伽马调整.TabIndex = 15
-        MCK_启用伽马调整.Text = "伽马"
         '
         ' Form_v6_参数面板_色彩管理
         '

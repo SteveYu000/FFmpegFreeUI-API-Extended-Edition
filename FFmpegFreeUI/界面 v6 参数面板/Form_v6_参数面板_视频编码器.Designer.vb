@@ -18,55 +18,32 @@ Partial Class Form_v6_参数面板_视频编码器
     Private components As System.ComponentModel.IContainer
 
     '注意: 以下过程是 Windows 窗体设计器所必需的
-    '可以使用 Windows 窗体设计器修改它。  
+    '可以使用 Windows 窗体设计器修改它。
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form_v6_参数面板_视频编码器))
         ModernPanel1 = New LakeUI.ModernPanel()
-        ModernPanel1.BackColor = Color.Transparent
-        ModernPanel1.BackColor1 = Color.Transparent
         Panel6 = New LakeUI.ModernPanel()
-        Panel6.BackColor = Color.Transparent
-        Panel6.BackColor1 = Color.Transparent
-        Panel6.BorderSize = 0
         HCL_GPU编号说明 = New LakeUI.HtmlColorLabel()
         MTB_编码线程数 = New LakeUI.ModernTextBox()
         Panel5 = New LakeUI.ModernPanel()
-        Panel5.BackColor = Color.Transparent
-        Panel5.BackColor1 = Color.Transparent
-        Panel5.BorderSize = 0
         HCL_编码线程数说明 = New LakeUI.HtmlColorLabel()
         MTB_GPU编号 = New LakeUI.ModernTextBox()
         HCL_性能选项 = New LakeUI.HtmlColorLabel()
         Panel4 = New LakeUI.ModernPanel()
-        Panel4.BackColor = Color.Transparent
-        Panel4.BackColor1 = Color.Transparent
-        Panel4.BorderSize = 0
         MCB_场景优化 = New LakeUI.ModernComboBox()
         HCL_场景优化 = New LakeUI.HtmlColorLabel()
         Panel3 = New LakeUI.ModernPanel()
-        Panel3.BackColor = Color.Transparent
-        Panel3.BackColor1 = Color.Transparent
-        Panel3.BorderSize = 0
         MCB_配置文件 = New LakeUI.ModernComboBox()
         HCL_配置文件 = New LakeUI.HtmlColorLabel()
         Panel1 = New LakeUI.ModernPanel()
-        Panel1.BackColor = Color.Transparent
-        Panel1.BackColor1 = Color.Transparent
-        Panel1.BorderSize = 0
         MCB_编码预设 = New LakeUI.ModernComboBox()
         HCL_编码预设 = New LakeUI.HtmlColorLabel()
         Panel7 = New LakeUI.ModernPanel()
-        Panel7.BackColor = Color.Transparent
-        Panel7.BackColor1 = Color.Transparent
-        Panel7.BorderSize = 0
         HCL_图片编码器质量值 = New LakeUI.HtmlColorLabel()
         MTB_图片编码器质量值 = New LakeUI.ModernTextBox()
         Panel2 = New LakeUI.ModernPanel()
-        Panel2.BackColor = Color.Transparent
-        Panel2.BackColor1 = Color.Transparent
-        Panel2.BorderSize = 0
         MCB_具体编码器 = New LakeUI.ModernComboBox()
         JustEmptyControl2 = New LakeUI.JustEmptyControl()
         MCB_视频编码器分类 = New LakeUI.ModernComboBox()
@@ -86,6 +63,8 @@ Partial Class Form_v6_参数面板_视频编码器
         '
         ' ModernPanel1
         '
+        ModernPanel1.BackColor = Color.Transparent
+        ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
         ModernPanel1.Controls.Add(Panel6)
         ModernPanel1.Controls.Add(Panel5)
@@ -110,10 +89,13 @@ Partial Class Form_v6_参数面板_视频编码器
         '
         ' Panel6
         '
+        Panel6.BackColor = Color.Transparent
+        Panel6.BackColor1 = Color.Transparent
+        Panel6.BorderSize = 0
         Panel6.Controls.Add(HCL_GPU编号说明)
         Panel6.Controls.Add(MTB_编码线程数)
         Panel6.Dock = DockStyle.Top
-        Panel6.Location = New Point(20, 528)
+        Panel6.Location = New Point(20, 489)
         Panel6.Name = "Panel6"
         Panel6.Padding = New Padding(0, 10, 0, 0)
         Panel6.Size = New Size(664, 42)
@@ -153,10 +135,13 @@ Partial Class Form_v6_参数面板_视频编码器
         '
         ' Panel5
         '
+        Panel5.BackColor = Color.Transparent
+        Panel5.BackColor1 = Color.Transparent
+        Panel5.BorderSize = 0
         Panel5.Controls.Add(HCL_编码线程数说明)
         Panel5.Controls.Add(MTB_GPU编号)
         Panel5.Dock = DockStyle.Top
-        Panel5.Location = New Point(20, 486)
+        Panel5.Location = New Point(20, 447)
         Panel5.Name = "Panel5"
         Panel5.Padding = New Padding(0, 10, 0, 0)
         Panel5.Size = New Size(664, 42)
@@ -200,19 +185,22 @@ Partial Class Form_v6_参数面板_视频编码器
         HCL_性能选项.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_性能选项.Dock = DockStyle.Top
         HCL_性能选项.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_性能选项.Location = New Point(20, 436)
+        HCL_性能选项.Location = New Point(20, 404)
         HCL_性能选项.Margin = New Padding(2)
         HCL_性能选项.Name = "HCL_性能选项"
-        HCL_性能选项.Padding = New Padding(0, 20, 0, 5)
-        HCL_性能选项.Size = New Size(664, 50)
+        HCL_性能选项.Padding = New Padding(0, 20, 0, 0)
+        HCL_性能选项.Size = New Size(664, 43)
         HCL_性能选项.TabIndex = 10
         HCL_性能选项.Text = "<span style=""font-size:13; color:Silver"">性能选项</span>   通常不需要考虑，也不一定起作用"
         '
         ' Panel4
         '
+        Panel4.BackColor = Color.Transparent
+        Panel4.BackColor1 = Color.Transparent
+        Panel4.BorderSize = 0
         Panel4.Controls.Add(MCB_场景优化)
         Panel4.Dock = DockStyle.Top
-        Panel4.Location = New Point(20, 394)
+        Panel4.Location = New Point(20, 362)
         Panel4.Name = "Panel4"
         Panel4.Padding = New Padding(0, 10, 0, 0)
         Panel4.Size = New Size(664, 42)
@@ -251,19 +239,22 @@ Partial Class Form_v6_参数面板_视频编码器
         HCL_场景优化.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_场景优化.Dock = DockStyle.Top
         HCL_场景优化.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_场景优化.Location = New Point(20, 344)
+        HCL_场景优化.Location = New Point(20, 319)
         HCL_场景优化.Margin = New Padding(2)
         HCL_场景优化.Name = "HCL_场景优化"
-        HCL_场景优化.Padding = New Padding(0, 20, 0, 5)
-        HCL_场景优化.Size = New Size(664, 50)
+        HCL_场景优化.Padding = New Padding(0, 20, 0, 0)
+        HCL_场景优化.Size = New Size(664, 43)
         HCL_场景优化.TabIndex = 8
         HCL_场景优化.Text = "<span style=""font-size:13; color:Silver"">场景优化</span>   对特定需求的专项优化，例如 CPU 编码的颗粒保留或是 GPU 编码的特调模式"
         '
         ' Panel3
         '
+        Panel3.BackColor = Color.Transparent
+        Panel3.BackColor1 = Color.Transparent
+        Panel3.BorderSize = 0
         Panel3.Controls.Add(MCB_配置文件)
         Panel3.Dock = DockStyle.Top
-        Panel3.Location = New Point(20, 302)
+        Panel3.Location = New Point(20, 277)
         Panel3.Name = "Panel3"
         Panel3.Padding = New Padding(0, 10, 0, 0)
         Panel3.Size = New Size(664, 42)
@@ -302,19 +293,22 @@ Partial Class Form_v6_参数面板_视频编码器
         HCL_配置文件.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_配置文件.Dock = DockStyle.Top
         HCL_配置文件.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_配置文件.Location = New Point(20, 252)
+        HCL_配置文件.Location = New Point(20, 234)
         HCL_配置文件.Margin = New Padding(2)
         HCL_配置文件.Name = "HCL_配置文件"
-        HCL_配置文件.Padding = New Padding(0, 20, 0, 5)
-        HCL_配置文件.Size = New Size(664, 50)
+        HCL_配置文件.Padding = New Padding(0, 20, 0, 0)
+        HCL_配置文件.Size = New Size(664, 43)
         HCL_配置文件.TabIndex = 6
         HCL_配置文件.Text = "<span style=""font-size:13; color:Silver"">配置文件</span>   控制要支持怎样的技术规格和功能，一般不用指定"
         '
         ' Panel1
         '
+        Panel1.BackColor = Color.Transparent
+        Panel1.BackColor1 = Color.Transparent
+        Panel1.BorderSize = 0
         Panel1.Controls.Add(MCB_编码预设)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 210)
+        Panel1.Location = New Point(20, 192)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 0)
         Panel1.Size = New Size(664, 42)
@@ -353,20 +347,23 @@ Partial Class Form_v6_参数面板_视频编码器
         HCL_编码预设.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_编码预设.Dock = DockStyle.Top
         HCL_编码预设.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_编码预设.Location = New Point(20, 160)
+        HCL_编码预设.Location = New Point(20, 149)
         HCL_编码预设.Margin = New Padding(2)
         HCL_编码预设.Name = "HCL_编码预设"
-        HCL_编码预设.Padding = New Padding(0, 20, 0, 5)
-        HCL_编码预设.Size = New Size(664, 50)
+        HCL_编码预设.Padding = New Padding(0, 20, 0, 0)
+        HCL_编码预设.Size = New Size(664, 43)
         HCL_编码预设.TabIndex = 4
         HCL_编码预设.Text = "<span style=""font-size:13; color:Silver"">编码预设</span>   如何平衡压缩度和速度，往上越慢，往下越快"
         '
         ' Panel7
         '
+        Panel7.BackColor = Color.Transparent
+        Panel7.BackColor1 = Color.Transparent
+        Panel7.BorderSize = 0
         Panel7.Controls.Add(HCL_图片编码器质量值)
         Panel7.Controls.Add(MTB_图片编码器质量值)
         Panel7.Dock = DockStyle.Top
-        Panel7.Location = New Point(20, 118)
+        Panel7.Location = New Point(20, 107)
         Panel7.Name = "Panel7"
         Panel7.Padding = New Padding(0, 10, 0, 0)
         Panel7.Size = New Size(664, 42)
@@ -406,13 +403,16 @@ Partial Class Form_v6_参数面板_视频编码器
         '
         ' Panel2
         '
+        Panel2.BackColor = Color.Transparent
+        Panel2.BackColor1 = Color.Transparent
+        Panel2.BorderSize = 0
         Panel2.Controls.Add(MCB_具体编码器)
         Panel2.Controls.Add(JustEmptyControl2)
         Panel2.Controls.Add(MCB_视频编码器分类)
         Panel2.Controls.Add(JustEmptyControl1)
         Panel2.Controls.Add(MCB_视频编码器类型)
         Panel2.Dock = DockStyle.Top
-        Panel2.Location = New Point(20, 76)
+        Panel2.Location = New Point(20, 65)
         Panel2.Name = "Panel2"
         Panel2.Padding = New Padding(0, 10, 0, 0)
         Panel2.Size = New Size(664, 42)
@@ -529,11 +529,10 @@ Partial Class Form_v6_参数面板_视频编码器
         HCL_视频编码器.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_视频编码器.Dock = DockStyle.Top
         HCL_视频编码器.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_视频编码器.Location = New Point(20, 50)
+        HCL_视频编码器.Location = New Point(20, 48)
         HCL_视频编码器.Margin = New Padding(2)
         HCL_视频编码器.Name = "HCL_视频编码器"
-        HCL_视频编码器.Padding = New Padding(0, 0, 0, 5)
-        HCL_视频编码器.Size = New Size(664, 26)
+        HCL_视频编码器.Size = New Size(664, 17)
         HCL_视频编码器.TabIndex = 13
         HCL_视频编码器.Text = resources.GetString("HCL_视频编码器.Text")
         '
@@ -547,7 +546,7 @@ Partial Class Form_v6_参数面板_视频编码器
         HCL_视频编码器2.Margin = New Padding(2)
         HCL_视频编码器2.Name = "HCL_视频编码器2"
         HCL_视频编码器2.Padding = New Padding(0, 0, 0, 5)
-        HCL_视频编码器2.Size = New Size(664, 30)
+        HCL_视频编码器2.Size = New Size(664, 28)
         HCL_视频编码器2.TabIndex = 1
         HCL_视频编码器2.Text = "<span style=""font-size:13; color:Silver"">视频编码器</span>   依次选择类别，再选具体；可编辑设置文件添加自定义"
         '

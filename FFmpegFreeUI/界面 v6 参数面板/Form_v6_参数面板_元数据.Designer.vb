@@ -18,20 +18,15 @@ Partial Class Form_v6_参数面板_元数据
     Private components As System.ComponentModel.IContainer
 
     '注意: 以下过程是 Windows 窗体设计器所必需的
-    '可以使用 Windows 窗体设计器修改它。  
+    '可以使用 Windows 窗体设计器修改它。
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim ListColumn1 As LakeUI.UltraDetailListView.ListColumn = New LakeUI.UltraDetailListView.ListColumn()
         Dim ListColumn2 As LakeUI.UltraDetailListView.ListColumn = New LakeUI.UltraDetailListView.ListColumn()
         ModernPanel1 = New LakeUI.ModernPanel()
-        ModernPanel1.BackColor = Color.Transparent
-        ModernPanel1.BackColor1 = Color.Transparent
         UDLV_元数据列表 = New LakeUI.UltraDetailListView()
         Panel1 = New LakeUI.ModernPanel()
-        Panel1.BackColor = Color.Transparent
-        Panel1.BackColor1 = Color.Transparent
-        Panel1.BorderSize = 0
         MB_导入元数据 = New LakeUI.ModernButton()
         JustEmptyControl4 = New LakeUI.JustEmptyControl()
         MB_导出元数据 = New LakeUI.ModernButton()
@@ -48,6 +43,8 @@ Partial Class Form_v6_参数面板_元数据
         '
         ' ModernPanel1
         '
+        ModernPanel1.BackColor = Color.Transparent
+        ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
         ModernPanel1.Controls.Add(UDLV_元数据列表)
         ModernPanel1.Controls.Add(Panel1)
@@ -82,16 +79,19 @@ Partial Class Form_v6_参数面板_元数据
         UDLV_元数据列表.HeaderHeight = 40
         UDLV_元数据列表.ItemPadding = New Padding(10, 6, 10, 6)
         UDLV_元数据列表.ItemSelectedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        UDLV_元数据列表.Location = New Point(20, 102)
+        UDLV_元数据列表.Location = New Point(20, 95)
         UDLV_元数据列表.Margin = New Padding(2, 2, 2, 2)
         UDLV_元数据列表.Name = "UDLV_元数据列表"
-        UDLV_元数据列表.SelectionRectFillColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
         UDLV_元数据列表.SelectionRectBorderColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
-        UDLV_元数据列表.Size = New Size(824, 521)
+        UDLV_元数据列表.SelectionRectFillColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        UDLV_元数据列表.Size = New Size(824, 528)
         UDLV_元数据列表.TabIndex = 1
         '
         ' Panel1
         '
+        Panel1.BackColor = Color.Transparent
+        Panel1.BackColor1 = Color.Transparent
+        Panel1.BorderSize = 0
         Panel1.Controls.Add(MB_导入元数据)
         Panel1.Controls.Add(JustEmptyControl4)
         Panel1.Controls.Add(MB_导出元数据)
@@ -102,7 +102,7 @@ Partial Class Form_v6_参数面板_元数据
         Panel1.Controls.Add(JustEmptyControl1)
         Panel1.Controls.Add(MCB_添加元数据预制项)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 50)
+        Panel1.Location = New Point(20, 43)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 10)
         Panel1.Size = New Size(824, 52)
@@ -250,10 +250,9 @@ Partial Class Form_v6_参数面板_元数据
         HCL_元数据说明.Location = New Point(20, 20)
         HCL_元数据说明.Margin = New Padding(2)
         HCL_元数据说明.Name = "HCL_元数据说明"
-        HCL_元数据说明.Padding = New Padding(0, 0, 0, 5)
-        HCL_元数据说明.Size = New Size(824, 30)
+        HCL_元数据说明.Size = New Size(824, 23)
         HCL_元数据说明.TabIndex = 10
-        HCL_元数据说明.Text = "<span style=""font-size:13; color:Silver"">元数据</span>   向输出文件中写入自定义元数据，流的元数据请写自定义参数<br><span style=""font-size:10pt; color:Gray"">值支持通配字符串，例如 &lt;InputFileNameWithOutExtension&gt;、&lt;OutputFile&gt;</span>"
+        HCL_元数据说明.Text = "<span style=""font-size:13; color:Silver"">元数据</span>   向输出文件中写入自定义元数据，流的元数据请写自定义参数；值支持通配字符串"
         '
         ' Form_v6_参数面板_元数据
         '

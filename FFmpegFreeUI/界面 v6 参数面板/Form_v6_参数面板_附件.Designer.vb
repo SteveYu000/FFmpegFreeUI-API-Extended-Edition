@@ -18,20 +18,15 @@ Partial Class Form_v6_参数面板_附件
     Private components As System.ComponentModel.IContainer
 
     '注意: 以下过程是 Windows 窗体设计器所必需的
-    '可以使用 Windows 窗体设计器修改它。  
+    '可以使用 Windows 窗体设计器修改它。
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim ListColumn1 As LakeUI.UltraDetailListView.ListColumn = New LakeUI.UltraDetailListView.ListColumn()
         Dim ListColumn2 As LakeUI.UltraDetailListView.ListColumn = New LakeUI.UltraDetailListView.ListColumn()
         ModernPanel1 = New LakeUI.ModernPanel()
-        ModernPanel1.BackColor = Color.Transparent
-        ModernPanel1.BackColor1 = Color.Transparent
         UDLV_附件列表 = New LakeUI.UltraDetailListView()
         Panel1 = New LakeUI.ModernPanel()
-        Panel1.BackColor = Color.Transparent
-        Panel1.BackColor1 = Color.Transparent
-        Panel1.BorderSize = 0
         MB_导入附件 = New LakeUI.ModernButton()
         JustEmptyControl4 = New LakeUI.JustEmptyControl()
         MB_导出附件 = New LakeUI.ModernButton()
@@ -48,6 +43,8 @@ Partial Class Form_v6_参数面板_附件
         '
         ' ModernPanel1
         '
+        ModernPanel1.BackColor = Color.Transparent
+        ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
         ModernPanel1.Controls.Add(UDLV_附件列表)
         ModernPanel1.Controls.Add(Panel1)
@@ -82,16 +79,19 @@ Partial Class Form_v6_参数面板_附件
         UDLV_附件列表.HeaderHeight = 40
         UDLV_附件列表.ItemPadding = New Padding(10, 6, 10, 6)
         UDLV_附件列表.ItemSelectedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        UDLV_附件列表.Location = New Point(20, 102)
+        UDLV_附件列表.Location = New Point(20, 95)
         UDLV_附件列表.Margin = New Padding(2, 2, 2, 2)
         UDLV_附件列表.Name = "UDLV_附件列表"
         UDLV_附件列表.SelectionRectBorderColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
         UDLV_附件列表.SelectionRectFillColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        UDLV_附件列表.Size = New Size(727, 448)
+        UDLV_附件列表.Size = New Size(727, 455)
         UDLV_附件列表.TabIndex = 1
         '
         ' Panel1
         '
+        Panel1.BackColor = Color.Transparent
+        Panel1.BackColor1 = Color.Transparent
+        Panel1.BorderSize = 0
         Panel1.Controls.Add(MB_导入附件)
         Panel1.Controls.Add(JustEmptyControl4)
         Panel1.Controls.Add(MB_导出附件)
@@ -102,7 +102,7 @@ Partial Class Form_v6_参数面板_附件
         Panel1.Controls.Add(JustEmptyControl1)
         Panel1.Controls.Add(MCB_添加附件)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 50)
+        Panel1.Location = New Point(20, 43)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 10)
         Panel1.Size = New Size(727, 52)
@@ -215,24 +215,24 @@ Partial Class Form_v6_参数面板_附件
         MCB_添加附件.DropDownSelectedColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
         MCB_添加附件.DropDownSelectedForeColor = Color.White
         MCB_添加附件.HoverBackColor1 = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
-        MCB_添加附件.Margin = New Padding(2, 2, 2, 2)
-        MCB_添加附件.Padding = New Padding(10, 0, 10, 0)
-        MCB_添加附件.SelectionColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
-        MCB_添加附件.ToolTipGap = -1
-        MCB_添加附件.ToolTipMaxWidth = 350
-        MCB_添加附件.ToolTipPadding = New Padding(15)
-        MCB_添加附件.WaterTextForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         MCB_添加附件.Items.Add("添加图片")
         MCB_添加附件.Items.Add("添加 MP4 封面图")
         MCB_添加附件.Items.Add("添加 MKV 封面图")
         MCB_添加附件.Items.Add("添加字体文件")
         MCB_添加附件.Items.Add("添加文本文档")
         MCB_添加附件.Location = New Point(0, 10)
+        MCB_添加附件.Margin = New Padding(2, 2, 2, 2)
         MCB_添加附件.MaxDropDownItems = 15
         MCB_添加附件.Name = "MCB_添加附件"
+        MCB_添加附件.Padding = New Padding(10, 0, 10, 0)
+        MCB_添加附件.SelectionColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
         MCB_添加附件.Size = New Size(200, 32)
         MCB_添加附件.TabIndex = 10
+        MCB_添加附件.ToolTipGap = -1
+        MCB_添加附件.ToolTipMaxWidth = 350
+        MCB_添加附件.ToolTipPadding = New Padding(15)
         MCB_添加附件.WaterText = "添加附件"
+        MCB_添加附件.WaterTextForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
         '
         ' HCL_附件说明
         '
@@ -243,8 +243,7 @@ Partial Class Form_v6_参数面板_附件
         HCL_附件说明.Location = New Point(20, 20)
         HCL_附件说明.Margin = New Padding(2)
         HCL_附件说明.Name = "HCL_附件说明"
-        HCL_附件说明.Padding = New Padding(0, 0, 0, 5)
-        HCL_附件说明.Size = New Size(727, 30)
+        HCL_附件说明.Size = New Size(727, 23)
         HCL_附件说明.TabIndex = 10
         HCL_附件说明.Text = "<span style=""font-size:13; color:Silver"">附件</span>   向输出文件中塞入附件，例如图片、字体、文本文档，甚至是封面图"
         '
