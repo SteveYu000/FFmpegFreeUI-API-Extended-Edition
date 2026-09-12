@@ -51,6 +51,14 @@ SDK 已发布到 [NuGet.org](https://www.nuget.org/packages/FFmpegFreeUI.Ext.Plu
 
 从源码构建主程序只需正常克隆仓库并执行 `dotnet restore`。
 
+### 许可证说明
+
+本项目基于采用 MIT 许可证的上游 FFmpegFreeUI 开发。上游提供的付费个性化（SP）功能由原作者提供和销售，本项目不参与其销售、收款或收益分配。
+
+本项目继续使用 LakeUI，并已取得 LakeUI 赞助许可证，许可证编号 `SLA-260316-STWHFX2O`。
+
+除另有说明的第三方组件外，本项目代码按照 MIT 许可证发布；LakeUI 及其他第三方组件分别适用其各自许可证或单独授权条款。
+
 ---
 
 # 以下是上游仓库原内容
@@ -181,7 +189,7 @@ v6 开发者官方宣传视频：https://www.bilibili.com/video/BV1rT7E6wEK4<br>
 
 | 引用程序集                                                   | 许可证         | 作用                       |
 | ------------------------------------------------------------ | -------------- | -------------------------- |
-| [LakeUI](https://github.com/Lake1059/LakeUI)                 | MIT            | v6 界面主框架              |
+| [LakeUI](https://github.com/Lake1059/LakeUI)                 | GPL-3.0-only            | v6 界面主框架              |
 | [WindowsAPICodePack](https://github.com/contre/Windows-API-Code-Pack-1.1) | 微软软件许可证 | 提供更舒适的文件夹选择对话框 |
 | [LibreHardwareMonitorLib](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) | MPL-2.0        | 性能监控                   |
 
