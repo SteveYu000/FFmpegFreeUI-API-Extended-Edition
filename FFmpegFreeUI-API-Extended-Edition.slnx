@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="FFmpegFreeUI/FFmpegFreeUI.vbproj" />
+    <Project Path="FFmpegFreeUI.Ext.PluginHost/FFmpegFreeUI.Ext.PluginHost.vbproj" />
+    <Project Path="FFmpegFreeUI.Ext.PluginSdk/FFmpegFreeUI.Ext.PluginSdk.csproj" />
+  </Folder>
+  <Folder Name="/Samples/">
+    <Project Path="Samples/FFmpegFreeUI.Ext.PluginApi.Sample/FFmpegFreeUI.Ext.PluginApi.Sample.csproj" />
+    <Project Path="Samples/FFmpegFreeUI.Ext.PluginApi.VbVmafSample/FFmpegFreeUI.Ext.PluginApi.VbVmafSample.vbproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="tests/FFmpegFreeUI.RegressionTests/FFmpegFreeUI.RegressionTests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.md" />
+  </Folder>
+</Solution>
