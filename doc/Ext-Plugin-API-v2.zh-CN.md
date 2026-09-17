@@ -214,7 +214,7 @@ dotnet restore .\FFmpegFreeUI-API-Extended-Edition.sln
 dotnet build .\FFmpegFreeUI-API-Extended-Edition.sln -c Debug --no-restore
 ```
 
-当前主程序通过 NuGet 使用 **LakeUI 5.11.0**，执行 `dotnet restore` 时会自动还原 LakeUI 及其依赖，不再需要同级 LakeUI 源码仓库或本地 `HintPath`。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需显式引用 LakeUI。
+当前主程序通过 NuGet 使用 **LakeUI 5.101.0**，执行 `dotnet restore` 时会自动还原 LakeUI 及其依赖，不再需要同级 LakeUI 源码仓库或本地 `HintPath`。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需显式引用 LakeUI。
 
 ### 2.2 SDK 引用与编辑器提示
 
@@ -930,7 +930,7 @@ if (host.PageEntries.AvailableTargets.Any(x =>
 
 若插件页面要自动获得 FFmpegFreeUI 的个性化背景和“超容器背景映射”，页面底板必须是 **LakeUI 的 `ModernPanel`**，控件名称必须精确为 `ModernPanel1`，并设为 `DockStyle.Fill`。普通 WinForms 页面不需要依赖 LakeUI，也能正常显示，只是不会自动获得这项背景映射。
 
-本仓库已验证的旧插件使用 NuGet `LakeUI 3.23.0` 编译既有公共控件，而实际宿主运行的是 LakeUI 5.11.0。引用必须限制为编译用途，插件发布目录中只能放插件自己的程序集，不能携带旧版 `LakeUI.dll`：
+本仓库已验证的旧插件使用 NuGet `LakeUI 3.23.0` 编译既有公共控件，而实际宿主运行的是 LakeUI 5.101.0。引用必须限制为编译用途，插件发布目录中只能放插件自己的程序集，不能携带旧版 `LakeUI.dll`：
 
 ```xml
 <PackageReference Include="LakeUI"
