@@ -2,7 +2,7 @@
 
 仓库标识：`FFmpegFreeUI-API-Extended-Edition`
 
-当前版本：`v6.2.22-ext.1+v2.5`（官方基线 `v6.2.22`、扩展修订 `ext.1`、Ext API `v2.5`）
+当前版本：`v6.2.23-ext.1+v2.5`（官方基线 `v6.2.23`、扩展修订 `ext.1`、Ext API `v2.5`）
 
 版本规则：`v{官方版本号}-ext.{扩展修订号}+v{Ext API 主版本.次版本}`。
 
