@@ -15,7 +15,9 @@
     <File Path=".editorconfig" />
     <File Path=".gitattributes" />
     <File Path=".gitignore" />
+    <File Path="AGENTS.md" />
     <File Path="LICENSE.txt" />
+    <File Path="PROJECT_STATE.md" />
     <File Path="README.md" />
   </Folder>
 </Solution>
