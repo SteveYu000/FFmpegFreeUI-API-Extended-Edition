@@ -2,17 +2,17 @@
 
 > 这是供后续开发和交接使用的事实快照，不是第二份指令文件。工作规则以 `AGENTS.md` 为准；源码、项目文件和 Git 与本文件冲突时，以核实后的真实状态为准并更新本文件。不要在这里记录密钥或完整日志。
 
-最后更新：2026-09-21
+最后更新：2026-09-22
 
 ## 当前基线
 
 | 项目 | 当前值 |
 | --- | --- |
 | 主分支 | `main` |
-| 最近合入的上游版本 | `6.2.25` |
-| 上游提交 | `0719c49`（tag `6.2.25`） |
-| 最近上游合并提交 | `8059c24`（`Merge upstream 6.2.25`） |
-| 产品版本 | `v6.2.25-ext.1+v2.5` |
+| 最近合入的上游版本 | `6.2.26` |
+| 上游提交 | `103979f`（tag `6.2.26`） |
+| 最近上游合并提交 | `327d6f2`（`Merge upstream 6.2.26`） |
+| 产品版本 | `v6.2.26-ext.1+v2.5` |
 | Ext API / NuGet 版本 | `v2.5` / `2.5.0` |
 | Ext SDK AssemblyVersion | `2.0.0.0`（兼容既有 2.x 插件） |
 | 目标框架 | `.NET 10` / `net10.0-windows10.0.17763.0` |
@@ -21,13 +21,14 @@
 
 ## 最近验证基线
 
-基线提交：`8059c24`
+基线提交：`327d6f2`
 
 - Release 解决方案构建：0 错误、0 警告。
-- `FFmpegFreeUI.RegressionTests`：352 项检查通过。
+- `FFmpegFreeUI.RegressionTests`：374 项检查通过。
 - 旧插件兼容样例 `E:\DesktopPlus\Works\Code\3fui_plugin_ab-av1\FFmpegFreeUI.AbAv1.vbproj`：构建通过。
 - `git diff --check`：通过。
-- 上述记录不能替代后续改动的重新验证。涉及界面或 LakeUI 的改动仍需使用实际构建的 FFmpegFreeUI 做视觉回归；本状态不声称基线提交之后的 UI 改动已自动验证。
+- 本轮无法执行实际 FFmpegFreeUI 视觉回归：当前 Computer Use 环境未启用原生 Windows 应用接口，`launch_app` 不可用。Agent 页面呈现仍需在可用的桌面环境中人工或自动验证。
+- 上述记录不能替代后续改动的重新验证。涉及界面或 LakeUI 的改动仍需使用实际构建的 FFmpegFreeUI 做视觉回归。
 
 ## 稳定设计决定
 
