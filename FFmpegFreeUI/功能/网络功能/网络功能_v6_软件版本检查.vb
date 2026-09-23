@@ -23,7 +23,6 @@ Friend NotInheritable Class 网络功能_v6_软件版本检查
 
     Friend Const GitHub仓库拥有者 As String = "SteveYu000"
     Friend Const GitHub仓库名称 As String = "FFmpegFreeUI-API-Extended-Edition"
-    Friend Const GitHub仓库地址 As String = "https://github.com/" & GitHub仓库拥有者 & "/" & GitHub仓库名称
     Private Shared ReadOnly 版本检查任务锁 As New Object()
     Private Shared 当前版本检查任务 As Task(Of 版本检查结果)
 
@@ -125,21 +124,13 @@ Friend NotInheritable Class 网络功能_v6_软件版本检查
     Private Shared Sub 显示发现新版本提示(检查结果 As 版本检查结果)
         Dim 选择结果 As Integer = LakeUI.ExOverlayMsgBox(
             FormMain_v6,
-            $"检测到新版本 {检查结果.最新版本号}。{vbCrLf}{vbCrLf}当前版本：{检查结果.当前版本号}{vbCrLf}是否打开项目 Release 页面进行升级？",
-            {"前往升级", "暂不升级"},
+            $"检测到新版本 {检查结果.最新版本号}。{vbCrLf}{vbCrLf}当前版本：{检查结果.当前版本号}{vbCrLf}是否下载并安装？",
+            {"立即更新", "暂不升级"},
             "发现新版本",
             MsgBoxStyle.Question,
             0)
 
-        If 选择结果 = 0 Then 打开发行版页面(检查结果.最新版本号)
-    End Sub
-
-    Private Shared Sub 打开发行版页面(云端版本号 As String)
-        Dim 地址 As String = $"{GitHub仓库地址}/releases/tag/{Uri.EscapeDataString(云端版本号)}"
-        Process.Start(New ProcessStartInfo With {
-            .FileName = 地址,
-            .UseShellExecute = True
-        })
+        If 选择结果 = 0 Then 网络功能_v6_自动更新.开始下载(检查结果.最新版本号)
     End Sub
 
 End Class

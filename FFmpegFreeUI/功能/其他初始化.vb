@@ -138,22 +138,27 @@ Partial Public Class FormMain_v6
             BeginInvoke(Sub() Close())
             Return
         End If
-        If 重启请求待执行 AndAlso Not 重启助手已启动 Then
+        If 退出时清除所有任务 AndAlso 编码队列_v6.获取进行中任务数量() > 0 Then 编码队列_v6.停止所有进行中任务()
+        端口监听_v6.停止客户端()
+        设置_v6.退出时保存设置()
+        If Form_v6_调试播放器.ffplayHandle <> IntPtr.Zero Then Form_v6_调试播放器.停止()
+        网络功能_v6_自动更新.退出时取消下载()
+        If Not 重启助手已启动 AndAlso (重启请求待执行 OrElse 网络功能_v6_自动更新.有待安装更新) Then
             Try
-                启动重启助手()
+                If 网络功能_v6_自动更新.有待安装更新 Then
+                    网络功能_v6_自动更新.启动已准备的更新助手(重启请求待执行)
+                Else
+                    启动重启助手()
+                End If
                 重启助手已启动 = True
                 重启请求待执行 = False
             Catch 异常 As Exception
                 重启请求待执行 = False
                 事件参数.Cancel = True
-                ExOverlayMsgBox(Me, "无法启动重启助手：" & 异常.Message, MsgBoxStyle.Critical, "重启失败")
+                ExOverlayMsgBox(Me, "无法启动退出助手：" & 异常.Message, MsgBoxStyle.Critical, "退出失败")
                 Return
             End Try
         End If
-        If 退出时清除所有任务 AndAlso 编码队列_v6.获取进行中任务数量() > 0 Then 编码队列_v6.停止所有进行中任务()
-        端口监听_v6.停止客户端()
-        设置_v6.退出时保存设置()
-        If Form_v6_调试播放器.ffplayHandle <> IntPtr.Zero Then Form_v6_调试播放器.停止()
     End Function
 
     <CodeAnalysis.SuppressMessage("Performance", "CA1861:不要将常量数组作为参数", Justification:="<挂起>")>

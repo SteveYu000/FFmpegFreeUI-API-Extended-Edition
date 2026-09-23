@@ -13,6 +13,7 @@ Public Class Form_v6_起始页面
     End Sub
 
     Friend Sub 显示正在检查更新()
+        If 网络功能_v6_自动更新.应保持卡片状态 Then Return
         MB_检查更新.Enabled = False
         MB_检查更新.Text = "正在检查更新"
         MB_检查更新.SubText = "正在连接 GitHub…"
@@ -20,6 +21,7 @@ Public Class Form_v6_起始页面
     End Sub
 
     Friend Sub 显示版本检查结果(检查结果 As 网络功能_v6_软件版本检查.版本检查结果)
+        If 网络功能_v6_自动更新.应保持卡片状态 Then Return
         If 检查结果 Is Nothing OrElse Not 检查结果.检查成功 Then
             MB_检查更新.Text = "检查更新"
             MB_检查更新.SubText = "检查失败，点击重试"
@@ -41,7 +43,20 @@ Public Class Form_v6_起始页面
         MB_检查更新.Enabled = True
     End Sub
 
+    Friend Sub 显示更新下载状态(标题 As String, 副标题 As String, 颜色 As Color, 可点击 As Boolean)
+        If IsDisposed OrElse Disposing Then Return
+        MB_检查更新.Text = 标题
+        MB_检查更新.SubText = 副标题
+        MB_检查更新.SubTextForeColor = 颜色
+        MB_检查更新.Enabled = 可点击
+    End Sub
+
     Private Async Sub MB_检查更新_Click(sender As Object, e As EventArgs) Handles MB_检查更新.Click
+        If 网络功能_v6_自动更新.有待安装更新 Then
+            ExOverlayMsgBox(FormMain_v6, "更新文件已经下载完成，关闭程序时会自动安装。", MsgBoxStyle.Information, "等待安装更新")
+            Return
+        End If
+        If 网络功能_v6_自动更新.正在下载 Then Return
         显示正在检查更新()
 
         Try
@@ -77,7 +92,7 @@ Public Class Form_v6_起始页面
     End Sub
 
     Private Sub MB_GitHub_Click(sender As Object, e As EventArgs) Handles MB_GitHub.Click
-        Process.Start(New ProcessStartInfo With {.FileName = "https://github.com/Lake1059/FFmpegFreeUI", .UseShellExecute = True})
+        Process.Start(New ProcessStartInfo With {.FileName = "https://github.com/SteveYu000/FFmpegFreeUI-API-Extended-Edition", .UseShellExecute = True})
     End Sub
 
     Private Sub MB_官网_Click(sender As Object, e As EventArgs) Handles MB_官网.Click

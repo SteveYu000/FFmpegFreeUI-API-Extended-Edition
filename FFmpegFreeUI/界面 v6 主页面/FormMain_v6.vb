@@ -43,6 +43,7 @@ Public Class FormMain_v6
         Application.DoEvents()
         启动参数响应_v6.处理首次启动参数()
 
+        网络功能_v6_自动更新.检查上次更新结果()
         网络功能.启动时检查新版本()
         网络功能.获取新闻列表()
 
@@ -203,6 +204,10 @@ Public Class FormMain_v6
             $"$p = Get-Process -Id {Environment.ProcessId} -ErrorAction SilentlyContinue; " &
             "if ($null -ne $p) { $p.WaitForExit() }; " &
             $"Start-Process -FilePath {转换为PowerShell字符串(executablePath)} -WorkingDirectory {转换为PowerShell字符串(System.Windows.Forms.Application.StartupPath)}"
+        启动隐藏PowerShell助手(command)
+    End Sub
+
+    Friend Shared Sub 启动隐藏PowerShell助手(command As String)
         Dim encodedCommand = Convert.ToBase64String(Encoding.Unicode.GetBytes(command))
         Dim powershellPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "WindowsPowerShell\v1.0\powershell.exe")
         If Not File.Exists(powershellPath) Then powershellPath = "powershell.exe"
@@ -221,7 +226,7 @@ Public Class FormMain_v6
         startInfo.ArgumentList.Add("-EncodedCommand")
         startInfo.ArgumentList.Add(encodedCommand)
         Dim helper = Process.Start(startInfo)
-        If helper Is Nothing Then Throw New InvalidOperationException("重启助手进程未能启动")
+        If helper Is Nothing Then Throw New InvalidOperationException("后台助手进程未能启动")
         helper.Dispose()
     End Sub
 

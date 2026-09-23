@@ -532,7 +532,7 @@ Partial Class Form_v6_起始页面
         MB_GitHub.Size = New Size(260, 30)
         MB_GitHub.SubTextForeColor = Color.DarkGray
         MB_GitHub.TabIndex = 5
-        MB_GitHub.Text = "3FUI GitHub 仓库"
+        MB_GitHub.Text = "3FUI Ext GitHub 仓库"
         MB_GitHub.TextAlign = LakeUI.ModernButton.TextAlignEnum.Left
         ' 
         ' MB_AI提示

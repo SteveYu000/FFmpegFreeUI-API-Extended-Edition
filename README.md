@@ -2,7 +2,7 @@
 
 仓库标识：`FFmpegFreeUI-API-Extended-Edition`
 
-当前版本：`v6.2.25-ext.1+v2.5`（官方基线 `v6.2.25`、扩展修订 `ext.1`、Ext API `v2.5`）
+当前版本：`v6.2.28-ext.2+v2.5`（官方基线 `v6.2.28`、扩展修订 `ext.2`、Ext API `v2.5`）
 
 版本规则：`v{官方版本号}-ext.{扩展修订号}+v{Ext API 主版本.次版本}`。
 
@@ -50,6 +50,10 @@ Ext Plugin API v2 是可选组件。只有程序根目录同时存在 `FFmpegFre
 SDK 已发布到 [NuGet.org](https://www.nuget.org/packages/FFmpegFreeUI.Ext.PluginSdk)，独立插件推荐直接使用 `PackageReference`；源码引用和 DLL + XML 文档引用继续用于 SDK 联调与离线开发。`ExtDeployFFmpegFreeUIPlugin` MSBuild 目标可用一条命令完成插件还原、编译与依赖部署，具体配置见开发指南第 2、3、17 节。
 
 从源码构建主程序只需正常克隆仓库并执行 `dotnet restore`。
+
+### 程序更新
+
+起始页的版本卡片会检查本项目的 GitHub Release。发现新版本后，点击“立即更新”可在后台下载主程序和配套的 Ext PluginHost、Ext PluginSdk DLL；卡片显示下载进度。程序仅接受同一 Release 中完整的三个文件，核对 GitHub 提供的 SHA-256、主程序版本与架构以及 DLL 的 Ext API 版本。全部准备好后，正常关闭程序会由后台助手等待进程退出，再替换文件；替换失败会尝试恢复原文件，并在下次启动时报告结果。插件、配置、预设及用户自行放置的 FFmpeg 文件不会被替换。
 
 ### 许可证说明
 

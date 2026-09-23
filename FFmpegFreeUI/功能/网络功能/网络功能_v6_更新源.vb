@@ -3,7 +3,7 @@ Imports System.Threading
 Friend NotInheritable Class 网络功能_v6_更新源
 
     ' 仅保留上游内部类型的源码兼容性。Extended Edition 的实际更新入口是
-    ' 网络功能_v6_软件版本检查，只检查本项目 Release 并由用户确认是否前往升级。
+    ' 网络功能_v6_软件版本检查与网络功能_v6_自动更新负责实际更新流程。
 
     Friend Const 默认本体下载线程数 As Integer = 1
     Friend Const GitHub本体下载线程数 As Integer = 10

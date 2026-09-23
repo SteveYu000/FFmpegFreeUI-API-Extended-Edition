@@ -70,6 +70,8 @@ internal static partial class Program
             TestQueueView();
             Console.WriteLine("PASS: queue multi-selection");
             SynchronizationContext.SetSynchronizationContext(null);
+            await TestAutomaticUpdate(directory);
+            Console.WriteLine("PASS: release assets, updater replacement and rollback");
             await TestProcessLifecycle();
             Console.WriteLine("PASS: process output drainage and cancellation");
             await TestScheduler(directory);
