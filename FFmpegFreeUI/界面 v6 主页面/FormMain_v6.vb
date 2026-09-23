@@ -19,77 +19,17 @@ Public Class FormMain_v6
         UI同步上下文 = Threading.SynchronizationContext.Current
         设置_v6.启动时读取SP解锁器()
         设置_v6.启动时加载设置()
-        界面主题_v6.初始化()
-        界面主题_v6.应用窗口圆角设置()
+        设置_v6.初始化界面外观()
         网络功能.启动时后台获取SPAgent端点()
 
         设置_v6.加载SP自定义图标()
         设置_v6.加载SP自定义起始页顶栏背景图()
         设置_v6.加载SP自定义背景图()
 
-        Me.ModernTabListControl1.Items(0).BoundControl = Form_v6_起始页面
-        绑定选项卡(Form_v6_起始页面.ModernPanel1)
-        Me.ModernTabListControl1.Items(1).BoundControl = Form_v6_编码队列
-        绑定选项卡(Form_v6_编码队列.ModernPanel1)
-        Me.ModernTabListControl1.Items(3).BoundControl = Form_v6_准备文件
-        绑定选项卡(Form_v6_准备文件.ModernPanel1)
-        Me.ModernTabListControl1.Items(4).BoundControl = Form_v6_参数面板
-        绑定选项卡(Form_v6_参数面板.ModernPanel1)
-        Me.ModernTabListControl1.Items(5).BoundControl = Form_v6_Agent
-        绑定选项卡(Form_v6_Agent.ModernPanel1)
-        'Me.ModernTabListControl1.Items(6).BoundControl = Form_v6_社区_个人中心
-        '绑定选项卡(Form_v6_社区_个人中心.ModernPanel1)
-        Me.ModernTabListControl1.Items(8).BoundControl = Form_v6_媒体信息
-        绑定选项卡(Form_v6_媒体信息.ModernPanel1)
-        Me.ModernTabListControl1.Items(9).BoundControl = Form_v6_调试播放器
-        绑定选项卡(Form_v6_调试播放器.ModernPanel1)
-        Me.ModernTabListControl1.Items(10).BoundControl = Form_v6_性能监控
-        绑定选项卡(Form_v6_性能监控.ModernPanel1)
-        Me.ModernTabListControl1.Items(11).BoundControl = Form_v6_集成工具
-        绑定选项卡(Form_v6_集成工具.ModernPanel1)
-        Me.ModernTabListControl1.Items(13).BoundControl = Form_v6_设置
-        绑定选项卡(Form_v6_设置.ModernPanel1)
-        Me.ModernTabListControl1.Items(14).BoundControl = Form_v6_支持者
-        绑定选项卡(Form_v6_支持者.ModernPanel1)
-        Me.ModernTabListControl1.Items(16).BoundControl = Form_v6_插件管理
-        绑定选项卡(Form_v6_插件管理.ModernPanel1)
-
-        Select Case 设置_v6.实例对象.窗口样式
-            Case 1
-                DwmWindowStyle.SetDarkMode(Me.Handle, True)
-            Case 2
-                Me.ThisIsYourWindow1.Attach(Me)
-                If Not SP_UnLock Then Exit Select
-                Select Case 设置_v6.实例对象.SP_毛玻璃模式
-                    Case > 0
-                        ModernTabListControl1.TabStripBackColor = Color.Transparent
-                        ModernTabListControl1.ContentBackColor = Color.Transparent
-                        Form_v6_参数面板.ModernTabListControl1.TabStripBackColor = Color.Transparent
-                        Form_v6_参数面板.ModernTabListControl1.ContentBackColor = Color.Transparent
-                        Form_v6_集成工具.ModernTabListControl1.TabStripBackColor = Color.Transparent
-                        Form_v6_集成工具.ModernTabListControl1.ContentBackColor = Color.Transparent
-                        Form_v6_设置.ModernTabListControl1.TabStripBackColor = Color.Transparent
-                        Form_v6_设置.ModernTabListControl1.ContentBackColor = Color.Transparent
-                        Form_v6_参数面板.私有界面_自定义参数.ModernTabControl1.TabStripBackColor = Color.Transparent
-                        Form_v6_参数面板.私有界面_自定义参数.ModernTabControl1.ContentBackColor = Color.Transparent
-                        Form_v6_参数面板.私有界面_附加内容.ModernTabControl1.TabStripBackColor = Color.Transparent
-                        Form_v6_参数面板.私有界面_附加内容.ModernTabControl1.ContentBackColor = Color.Transparent
-
-                        Form_v6_起始页面.ModernPanel1.Padding = New Padding(10 * DeviceDpi / 96, 10 * DeviceDpi / 96, Form_v6_起始页面.ModernPanel1.Padding.Right, Form_v6_起始页面.ModernPanel1.Padding.Bottom)
-                        Form_v6_准备文件.ModernPanel1.Padding = New Padding(10 * DeviceDpi / 96, 10 * DeviceDpi / 96, Form_v6_准备文件.ModernPanel1.Padding.Right, Form_v6_准备文件.ModernPanel1.Padding.Bottom)
-
-                        Form_v6_社区_个人中心.ModernPanel1.Padding = New Padding(10 * DeviceDpi / 96, 10 * DeviceDpi / 96, Form_v6_社区_个人中心.ModernPanel1.Padding.Right, Form_v6_社区_个人中心.ModernPanel1.Padding.Bottom)
-
-                        Form_v6_媒体信息.ModernPanel1.Padding = New Padding(10 * DeviceDpi / 96, 10 * DeviceDpi / 96, Form_v6_媒体信息.ModernPanel1.Padding.Right, Form_v6_媒体信息.ModernPanel1.Padding.Bottom)
-                        Form_v6_调试播放器.ModernPanel1.Padding = New Padding(10 * DeviceDpi / 96, 10 * DeviceDpi / 96, Form_v6_调试播放器.ModernPanel1.Padding.Right, Form_v6_调试播放器.ModernPanel1.Padding.Bottom)
-                End Select
-        End Select
-
-        Me.ModernTabListControl1.SelectedIndex = 0
-        Me.ModernTextBox1.Parent = Me.ModernTabListControl1
-
-        其他初始化.执行()
-
+        绑定主页面选项卡()
+        应用窗口样式()
+        ModernTabListControl1.SelectedIndex = 0
+        ModernTextBox1.Parent = ModernTabListControl1
         确保注册插件主导航目标()
         Form_v6_参数面板.确保注册插件参数面板目录()
         Form_v6_编码队列.确保注册插件工具栏目标()
