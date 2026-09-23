@@ -2,7 +2,7 @@
 
 仓库标识：`FFmpegFreeUI-API-Extended-Edition`
 
-当前版本：`v6.2.28-ext.2+v2.5`（官方基线 `v6.2.28`、扩展修订 `ext.2`、Ext API `v2.5`）
+当前版本：`v6.2.28-ext.3+v2.5`（官方基线 `v6.2.28`、扩展修订 `ext.3`、Ext API `v2.5`）
 
 版本规则：`v{官方版本号}-ext.{扩展修订号}+v{Ext API 主版本.次版本}`。
 
@@ -54,6 +54,8 @@ SDK 已发布到 [NuGet.org](https://www.nuget.org/packages/FFmpegFreeUI.Ext.Plu
 ### 程序更新
 
 起始页的版本卡片会检查本项目的 GitHub Release。发现新版本后，点击“立即更新”可在后台下载主程序和配套的 Ext PluginHost、Ext PluginSdk DLL；卡片显示下载进度。程序仅接受同一 Release 中完整的三个文件，核对 GitHub 提供的 SHA-256、主程序版本与架构以及 DLL 的 Ext API 版本。全部准备好后，正常关闭程序会由后台助手等待进程退出，再替换文件；替换失败会尝试恢复原文件，并在下次启动时报告结果。插件、配置、预设及用户自行放置的 FFmpeg 文件不会被替换。
+
+首次通过程序更新或插件变更重启宿主时，程序会说明后台使用 Windows PowerShell 退出助手；两种流程共用同一条已提示记录，确认后不再重复提示。
 
 ### 许可证说明
 

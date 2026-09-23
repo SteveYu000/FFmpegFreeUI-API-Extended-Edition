@@ -138,12 +138,18 @@ Partial Public Class FormMain_v6
             BeginInvoke(Sub() Close())
             Return
         End If
+        Dim 需要启动退出助手 = Not 重启助手已启动 AndAlso (重启请求待执行 OrElse 网络功能_v6_自动更新.有待安装更新)
+        If 需要启动退出助手 AndAlso Not 确认首次使用PowerShell退出助手() Then
+            重启请求待执行 = False
+            退出确认已完成 = False
+            事件参数.Cancel = True
+            Return
+        End If
         If 退出时清除所有任务 AndAlso 编码队列_v6.获取进行中任务数量() > 0 Then 编码队列_v6.停止所有进行中任务()
         端口监听_v6.停止客户端()
-        设置_v6.退出时保存设置()
         If Form_v6_调试播放器.ffplayHandle <> IntPtr.Zero Then Form_v6_调试播放器.停止()
         网络功能_v6_自动更新.退出时取消下载()
-        If Not 重启助手已启动 AndAlso (重启请求待执行 OrElse 网络功能_v6_自动更新.有待安装更新) Then
+        If 需要启动退出助手 Then
             Try
                 If 网络功能_v6_自动更新.有待安装更新 Then
                     网络功能_v6_自动更新.启动已准备的更新助手(重启请求待执行)
@@ -152,6 +158,7 @@ Partial Public Class FormMain_v6
                 End If
                 重启助手已启动 = True
                 重启请求待执行 = False
+                设置_v6.实例对象.插件管理_PowerShell重启说明已显示 = True
             Catch 异常 As Exception
                 重启请求待执行 = False
                 事件参数.Cancel = True
@@ -159,6 +166,7 @@ Partial Public Class FormMain_v6
                 Return
             End Try
         End If
+        设置_v6.退出时保存设置()
     End Function
 
     <CodeAnalysis.SuppressMessage("Performance", "CA1861:不要将常量数组作为参数", Justification:="<挂起>")>
