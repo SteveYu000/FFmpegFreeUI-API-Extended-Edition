@@ -58,6 +58,7 @@ internal static partial class Program
             Console.WriteLine("PASS: concurrent Agent runs, stop isolation, per-conversation drafts and colors");
             if (args.Contains("--agent-only")) { Console.WriteLine($"PASS: {checks} checks"); return 0; }
             TestPresetCopies(directory);
+            TestBitrateArgumentsAcrossQualityModes();
             TestThemeAndVmaf();
             Console.WriteLine("PASS: light/dark theme, first-load colors, VMAF AUTO and model selection");
             Console.WriteLine("PASS: preset isolation and atomic persistence");
@@ -120,6 +121,53 @@ internal static partial class Program
         元数据_要写入的信息 = [new() { 字段 = "title", 值 = "original" }],
         流控制_将视频参数应用于指定流 = ["0"]
     };
+
+    private static void TestBitrateArgumentsAcrossQualityModes()
+    {
+        var modes = new[]
+        {
+            预设数据_v6.视频全局质量控制方式.未选择,
+            预设数据_v6.视频全局质量控制方式.CRF,
+            预设数据_v6.视频全局质量控制方式.CQP,
+            预设数据_v6.视频全局质量控制方式.VBR,
+            预设数据_v6.视频全局质量控制方式.CBR,
+            预设数据_v6.视频全局质量控制方式.TPE
+        };
+        foreach (var mode in modes)
+        {
+            var preset = new 预设数据_v6
+            {
+                输出容器 = "mkv",
+                视频参数_编码器_类型 = 预设数据_v6.视频编码器类型.视频,
+                视频参数_编码器_具体编码 = "libx264",
+                视频参数_比特率_控制方式 = mode,
+                视频参数_质量控制_参数名 = "crf",
+                视频参数_质量控制_值 = "20",
+                视频参数_比特率_基础 = "2500k",
+                视频参数_比特率_最低值 = "1000k",
+                视频参数_比特率_最高值 = "3500k",
+                视频参数_比特率_缓冲区 = "5000k"
+            };
+            var command = 预设管理_v6.将预设数据转换为命令行(preset, "input.mp4", "output.mkv");
+            Check(command.Contains("-b:v:0 2500k", StringComparison.Ordinal), $"Base bitrate missing for {mode}: {command}");
+            Check(command.Contains("-minrate:v:0 1000k", StringComparison.Ordinal), $"Minimum bitrate missing for {mode}");
+            Check(command.Contains("-maxrate:v:0 3500k", StringComparison.Ordinal), $"Maximum bitrate missing for {mode}");
+            Check(command.Contains("-bufsize:v:0 5000k", StringComparison.Ordinal), $"Buffer size missing for {mode}");
+        }
+
+        var empty = new 预设数据_v6
+        {
+            输出容器 = "mkv",
+            视频参数_编码器_类型 = 预设数据_v6.视频编码器类型.视频,
+            视频参数_编码器_具体编码 = "libx264",
+            视频参数_比特率_控制方式 = 预设数据_v6.视频全局质量控制方式.CRF
+        };
+        var emptyCommand = 预设管理_v6.将预设数据转换为命令行(empty, "input.mp4", "output.mkv");
+        Check(!emptyCommand.Contains("-b:v:0 ", StringComparison.Ordinal), "Empty base bitrate should not be emitted");
+        Check(!emptyCommand.Contains("-minrate:v:0 ", StringComparison.Ordinal), "Empty minimum bitrate should not be emitted");
+        Check(!emptyCommand.Contains("-maxrate:v:0 ", StringComparison.Ordinal), "Empty maximum bitrate should not be emitted");
+        Check(!emptyCommand.Contains("-bufsize:v:0 ", StringComparison.Ordinal), "Empty buffer size should not be emitted");
+    }
 
     private static void TestPresetCopies(string directory)
     {
