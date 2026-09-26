@@ -446,16 +446,15 @@ internal static partial class Program
         var pending = 编码队列_v6.添加命令行任务("--output-fixture", "pending", "");
         编码队列_v6.开始任务([first.ID]);
         await WaitUntil(() => first.当前进程ID > 0, "First task did not start");
-        编码队列_v6.开始任务([second.ID]);
-        编码队列_v6.停止任务([first.ID]);
         pending.允许自动启动 = true;
-        await WaitUntil(() => !first.正在执行 && second.状态 == 编码任务状态_v6.已完成 && !second.正在执行,
-            "Concurrent tasks did not finish");
-        编码队列_v6.请求调度();
+        编码队列_v6.停止任务([first.ID]);
+        await WaitUntil(() => !first.正在执行, "Stopped task did not release its execution slot");
         await Task.Delay(100);
-        Check(pending.状态 == 编码任务状态_v6.未处理, "Another task finishing must not undo a manual scheduling pause");
-        编码队列_v6.应用自动开始任务设置(true);
-        await WaitUntil(() => pending.状态 == 编码任务状态_v6.已完成 && !pending.正在执行, "Explicit resume did not run pending task");
+        Check(pending.状态 == 编码任务状态_v6.未处理, "Manually stopping a task must not advance the queue by itself");
+        编码队列_v6.开始任务([second.ID]);
+        await WaitUntil(() => second.状态 == 编码任务状态_v6.已完成 && !second.正在执行 &&
+                            pending.状态 == 编码任务状态_v6.已完成 && !pending.正在执行,
+            "A later task finishing naturally did not advance the queue");
         Check(pending.当前进程ID == 0, "Completed scheduled task must release its process");
         编码队列_v6.移除任务([first.ID, second.ID, pending.ID]);
         编码队列_v6.应用自动开始任务设置(false);
