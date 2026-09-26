@@ -6,10 +6,8 @@ choices, and exporting the actual VMAF model and warning. With `--ffmpeg`, the
 suite additionally runs the application's generated AUTO VMAF command when the
 supplied FFmpeg has discoverable models.
 
-Build LakeUI first: the model selector uses the two custom-content rendering hooks
-in `ModernComboBox`, and Agent running rows use `ModernListBox.ItemForeColorNeeded`.
-An alternate DLL can be supplied to builds/tests with
-`-p:LakeUIAssembly=<absolute-path-to-LakeUI.dll>`.
+LakeUI is restored from NuGet with the solution; a sibling LakeUI source checkout
+or manually supplied DLL is not required.
 
 Agent checks use a local gated SSE fixture (no external API or credentials) to
 exercise overlapping runs, cancellation isolation, interleaved responses and
@@ -45,7 +43,7 @@ dotnet run --project tests/FFmpegFreeUI.RegressionTests -- --ui-preview
 
 ## Running checks
 
-Run on Windows with .NET 10 and the application's existing LakeUI reference available:
+Run on Windows with .NET 10; LakeUI is restored automatically from NuGet:
 
 ```powershell
 dotnet run --project tests/FFmpegFreeUI.RegressionTests/FFmpegFreeUI.RegressionTests.csproj
