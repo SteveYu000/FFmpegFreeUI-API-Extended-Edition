@@ -26,8 +26,8 @@
 - `dotnet restore` 成功；Release 解决方案构建 0 错误、0 警告；回归测试 419 项检查通过。
 - 旧插件源码 `E:\DesktopPlus\Works\Code\3fui_plugin_ab-av1\FFmpegFreeUI.AbAv1.vbproj` Release 构建 0 错误、0 警告。旧部署 DLL 的运行时加载失败被用户明确判定为插件自身问题，本轮不修复、不计作宿主兼容通过；实际编码任务也未执行。
 - `git diff --check` 与暂存区检查通过；README 标记后的上游段与 `upstream/main` 逐字一致。Ext SDK `AssemblyVersion` 保持 `2.0.0.0`，公共契约未改。主程序版本为 `v6.2.32-ext.1+v2.5`，文件版本 `6.2.32.1`。
-- 实际 Release `FFmpegFreeUI.exe` SHA-256：`602D26091627F9178DEB208DDD3DCC7ADAB64DA8737C462085835D0C6AEB3133`；`FFmpegFreeUI.dll`：`AA4595C6A65B12F93F1475C6761A9C7B05D013E9A941832CD60CFC4C042192CA`；输出 LakeUI DLL：`FC61D41BFF8139EB15BAECD1CD3CC5CF6CF247E2A7549AEC7C14F3094369A11F`。
-- 用与 Release 主程序 DLL 哈希一致的隔离发布副本运行实际 3FUI，复制支持者 DLL，分别检查背景关闭、开启干净玻璃并重启后的画面；查看起始页、参数总览、色彩管理、质量/流控制及插件管理。CRF 选择能出现在参数总览；未见持续黑块或旧帧。隔离发布目录和其中的临时支持者 DLL 已删除，源 DLL 未动。
+- 提交后重新构建的 Release `FFmpegFreeUI.exe` SHA-256：`602D26091627F9178DEB208DDD3DCC7ADAB64DA8737C462085835D0C6AEB3133`；`FFmpegFreeUI.dll`：`F1230DEAE6C9CAADABC870A3BDFAB55D8C0F67CDE0FF8712439F9A2DF4E1008C`；输出 LakeUI DLL：`FC61D41BFF8139EB15BAECD1CD3CC5CF6CF247E2A7549AEC7C14F3094369A11F`。
+- 用与最终 Release `FFmpegFreeUI.dll` 哈希一致（`F1230DEAE6C9CAADABC870A3BDFAB55D8C0F67CDE0FF8712439F9A2DF4E1008C`）、未重新编译的隔离发布副本运行实际 3FUI：背景关闭时查看起始页、参数总览、色彩管理和插件管理；复制支持者 DLL 后选择“使用干净玻璃”，核对设置值 `SP_毛玻璃模式 = 1` 并重启，再查看起始页、参数总览、色彩管理、流控制和插件管理的即时与稳定画面。未见持续黑块或旧帧。先前构建还验证了 CRF 选择能出现在参数总览。本轮隔离发布目录及其中临时支持者 DLL 已删除，源 DLL 未动。
 - 本轮仅执行合并相关的常规视觉烟测；未做 50 ms / 250 ms 精确帧、多 DPI/分辨率矩阵或定量性能采样。此前已知的小字号中文发虚原因尚未确认；主程序更新首次提示也尚未用线上更高版本验证。
 
 ## 稳定设计决定
