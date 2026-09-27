@@ -18,19 +18,14 @@ Partial Class Form_v6_参数面板_流控制
     Private components As System.ComponentModel.IContainer
 
     '注意: 以下过程是 Windows 窗体设计器所必需的
-    '可以使用 Windows 窗体设计器修改它。  
+    '可以使用 Windows 窗体设计器修改它。
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form_v6_参数面板_流控制))
         ModernPanel1 = New LakeUI.ModernPanel()
-        ModernPanel1.BackColor = Color.Transparent
-        ModernPanel1.BackColor1 = Color.Transparent
         HCL_流控制底部说明 = New LakeUI.HtmlColorLabel()
         Panel7 = New LakeUI.ModernPanel()
-        Panel7.BackColor = Color.Transparent
-        Panel7.BackColor1 = Color.Transparent
-        Panel7.BorderSize = 0
         HCL_首个输入文件提示 = New LakeUI.HtmlColorLabel()
         MCB_附件选项 = New LakeUI.ModernComboBox()
         JustEmptyControl6 = New LakeUI.JustEmptyControl()
@@ -40,9 +35,6 @@ Partial Class Form_v6_参数面板_流控制
         HCL_元数据章节附件标题 = New LakeUI.HtmlColorLabel()
         HCL_保留附加内容提示 = New LakeUI.HtmlColorLabel()
         Panel6 = New LakeUI.ModernPanel()
-        Panel6.BackColor = Color.Transparent
-        Panel6.BackColor1 = Color.Transparent
-        Panel6.BorderSize = 0
         HCL_mp4字幕格式提示 = New LakeUI.HtmlColorLabel()
         MCK_字幕转为mov_text = New LakeUI.ModernCheckBox()
         MCK_混流同名SSA字幕 = New LakeUI.ModernCheckBox()
@@ -50,39 +42,24 @@ Partial Class Form_v6_参数面板_流控制
         MCK_混流同名SRT字幕 = New LakeUI.ModernCheckBox()
         HCL_混流同名字幕标题 = New LakeUI.HtmlColorLabel()
         Panel4 = New LakeUI.ModernPanel()
-        Panel4.BackColor = Color.Transparent
-        Panel4.BackColor1 = Color.Transparent
-        Panel4.BorderSize = 0
         HCL_可视化流选择器说明 = New LakeUI.HtmlColorLabel()
         MB_打开可视化流选择器 = New LakeUI.ModernButton()
         Panel3 = New LakeUI.ModernPanel()
-        Panel3.BackColor = Color.Transparent
-        Panel3.BackColor1 = Color.Transparent
-        Panel3.BorderSize = 0
         HCL_字幕流选择格式 = New LakeUI.HtmlColorLabel()
         JustEmptyControl4 = New LakeUI.JustEmptyControl()
         Panel2 = New LakeUI.ModernPanel()
-        Panel2.BackColor = Color.Transparent
-        Panel2.BackColor1 = Color.Transparent
-        Panel2.BorderSize = 0
         MCK_保留其他字幕流 = New LakeUI.ModernCheckBox()
         MCB_字幕流操作 = New LakeUI.ModernComboBox()
         JustEmptyControl3 = New LakeUI.JustEmptyControl()
         MTB_字幕流选择 = New LakeUI.ModernTextBox()
         HCL_字幕流选择说明 = New LakeUI.HtmlColorLabel()
         Panel1 = New LakeUI.ModernPanel()
-        Panel1.BackColor = Color.Transparent
-        Panel1.BackColor1 = Color.Transparent
-        Panel1.BorderSize = 0
         HCL_音频流选择格式 = New LakeUI.HtmlColorLabel()
         MCK_保留其他音频流 = New LakeUI.ModernCheckBox()
         JustEmptyControl2 = New LakeUI.JustEmptyControl()
         MTB_音频流选择 = New LakeUI.ModernTextBox()
         HCL_音频流选择说明 = New LakeUI.HtmlColorLabel()
         Panel5 = New LakeUI.ModernPanel()
-        Panel5.BackColor = Color.Transparent
-        Panel5.BackColor1 = Color.Transparent
-        Panel5.BorderSize = 0
         HCL_视频流选择格式 = New LakeUI.HtmlColorLabel()
         MCK_保留其他视频流 = New LakeUI.ModernCheckBox()
         JustEmptyControl1 = New LakeUI.JustEmptyControl()
@@ -100,6 +77,8 @@ Partial Class Form_v6_参数面板_流控制
         '
         ' ModernPanel1
         '
+        ModernPanel1.BackColor = Color.Transparent
+        ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
         ModernPanel1.Controls.Add(HCL_流控制底部说明)
         ModernPanel1.Controls.Add(Panel7)
@@ -130,15 +109,18 @@ Partial Class Form_v6_参数面板_流控制
         HCL_流控制底部说明.Dock = DockStyle.Bottom
         HCL_流控制底部说明.Font = New Font("Microsoft YaHei UI", 9F)
         HCL_流控制底部说明.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_流控制底部说明.Location = New Point(20, 607)
+        HCL_流控制底部说明.Location = New Point(20, 613)
         HCL_流控制底部说明.Margin = New Padding(2)
         HCL_流控制底部说明.Name = "HCL_流控制底部说明"
-        HCL_流控制底部说明.Size = New Size(846, 86)
+        HCL_流控制底部说明.Size = New Size(846, 80)
         HCL_流控制底部说明.TabIndex = 24
         HCL_流控制底部说明.Text = resources.GetString("HCL_流控制底部说明.Text")
         '
         ' Panel7
         '
+        Panel7.BackColor = Color.Transparent
+        Panel7.BackColor1 = Color.Transparent
+        Panel7.BorderSize = 0
         Panel7.Controls.Add(HCL_首个输入文件提示)
         Panel7.Controls.Add(MCB_附件选项)
         Panel7.Controls.Add(JustEmptyControl6)
@@ -146,7 +128,7 @@ Partial Class Form_v6_参数面板_流控制
         Panel7.Controls.Add(JustEmptyControl5)
         Panel7.Controls.Add(MCB_元数据选项)
         Panel7.Dock = DockStyle.Top
-        Panel7.Location = New Point(20, 467)
+        Panel7.Location = New Point(20, 452)
         Panel7.Name = "Panel7"
         Panel7.Padding = New Padding(0, 10, 0, 0)
         Panel7.Size = New Size(846, 42)
@@ -283,11 +265,11 @@ Partial Class Form_v6_参数面板_流控制
         HCL_元数据章节附件标题.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_元数据章节附件标题.Dock = DockStyle.Top
         HCL_元数据章节附件标题.Font = New Font("Microsoft YaHei UI", 11F)
-        HCL_元数据章节附件标题.Location = New Point(20, 431)
+        HCL_元数据章节附件标题.Location = New Point(20, 418)
         HCL_元数据章节附件标题.Margin = New Padding(2)
         HCL_元数据章节附件标题.Name = "HCL_元数据章节附件标题"
         HCL_元数据章节附件标题.Padding = New Padding(0, 15, 0, 0)
-        HCL_元数据章节附件标题.Size = New Size(846, 36)
+        HCL_元数据章节附件标题.Size = New Size(846, 34)
         HCL_元数据章节附件标题.TabIndex = 22
         HCL_元数据章节附件标题.Text = "元数据 # 章节 # 附件"
         '
@@ -298,26 +280,29 @@ Partial Class Form_v6_参数面板_流控制
         HCL_保留附加内容提示.Dock = DockStyle.Top
         HCL_保留附加内容提示.Font = New Font("Microsoft YaHei UI", 9F)
         HCL_保留附加内容提示.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_保留附加内容提示.Location = New Point(20, 391)
+        HCL_保留附加内容提示.Location = New Point(20, 381)
         HCL_保留附加内容提示.Margin = New Padding(2)
         HCL_保留附加内容提示.Name = "HCL_保留附加内容提示"
         HCL_保留附加内容提示.Padding = New Padding(0, 5, 0, 0)
-        HCL_保留附加内容提示.Size = New Size(846, 40)
+        HCL_保留附加内容提示.Size = New Size(846, 37)
         HCL_保留附加内容提示.TabIndex = 21
         HCL_保留附加内容提示.Text = "这些功能强制使用 <span style=""color:YellowGreen"">-map</span>，因为无法在一般情况下处理这些需求<br>就像 <span style=""color:YellowGreen"">最下方所说的</span> 一样，注意对其他类的流使用 -map，也就是 <span style=""color:IndianRed"">填写上面的文本框</span>"
         '
         ' Panel6
         '
+        Panel6.BackColor = Color.Transparent
+        Panel6.BackColor1 = Color.Transparent
+        Panel6.BorderSize = 0
         Panel6.Controls.Add(HCL_mp4字幕格式提示)
         Panel6.Controls.Add(MCK_字幕转为mov_text)
         Panel6.Controls.Add(MCK_混流同名SSA字幕)
         Panel6.Controls.Add(MCK_混流同名ASS字幕)
         Panel6.Controls.Add(MCK_混流同名SRT字幕)
         Panel6.Dock = DockStyle.Top
-        Panel6.Location = New Point(20, 349)
+        Panel6.Location = New Point(20, 341)
         Panel6.Name = "Panel6"
-        Panel6.Padding = New Padding(0, 10, 0, 0)
-        Panel6.Size = New Size(846, 42)
+        Panel6.Padding = New Padding(0, 8, 0, 0)
+        Panel6.Size = New Size(846, 40)
         Panel6.TabIndex = 20
         '
         ' HCL_mp4字幕格式提示
@@ -327,7 +312,7 @@ Partial Class Form_v6_参数面板_流控制
         HCL_mp4字幕格式提示.Dock = DockStyle.Fill
         HCL_mp4字幕格式提示.Font = New Font("Microsoft YaHei UI", 9F)
         HCL_mp4字幕格式提示.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
-        HCL_mp4字幕格式提示.Location = New Point(417, 10)
+        HCL_mp4字幕格式提示.Location = New Point(417, 8)
         HCL_mp4字幕格式提示.Margin = New Padding(2)
         HCL_mp4字幕格式提示.Name = "HCL_mp4字幕格式提示"
         HCL_mp4字幕格式提示.Size = New Size(429, 32)
@@ -347,7 +332,7 @@ Partial Class Form_v6_参数面板_流控制
         MCK_字幕转为mov_text.BoxUncheckedBackColor = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
         MCK_字幕转为mov_text.ClickAnywhere = True
         MCK_字幕转为mov_text.Dock = DockStyle.Left
-        MCK_字幕转为mov_text.Location = New Point(263, 10)
+        MCK_字幕转为mov_text.Location = New Point(263, 8)
         MCK_字幕转为mov_text.Name = "MCK_字幕转为mov_text"
         MCK_字幕转为mov_text.Padding = New Padding(0, 0, 30, 0)
         MCK_字幕转为mov_text.Size = New Size(154, 32)
@@ -366,7 +351,7 @@ Partial Class Form_v6_参数面板_流控制
         MCK_混流同名SSA字幕.BoxUncheckedBackColor = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
         MCK_混流同名SSA字幕.ClickAnywhere = True
         MCK_混流同名SSA字幕.Dock = DockStyle.Left
-        MCK_混流同名SSA字幕.Location = New Point(175, 10)
+        MCK_混流同名SSA字幕.Location = New Point(175, 8)
         MCK_混流同名SSA字幕.Name = "MCK_混流同名SSA字幕"
         MCK_混流同名SSA字幕.Padding = New Padding(0, 0, 30, 0)
         MCK_混流同名SSA字幕.Size = New Size(88, 32)
@@ -385,7 +370,7 @@ Partial Class Form_v6_参数面板_流控制
         MCK_混流同名ASS字幕.BoxUncheckedBackColor = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
         MCK_混流同名ASS字幕.ClickAnywhere = True
         MCK_混流同名ASS字幕.Dock = DockStyle.Left
-        MCK_混流同名ASS字幕.Location = New Point(87, 10)
+        MCK_混流同名ASS字幕.Location = New Point(87, 8)
         MCK_混流同名ASS字幕.Name = "MCK_混流同名ASS字幕"
         MCK_混流同名ASS字幕.Padding = New Padding(0, 0, 30, 0)
         MCK_混流同名ASS字幕.Size = New Size(88, 32)
@@ -404,7 +389,7 @@ Partial Class Form_v6_参数面板_流控制
         MCK_混流同名SRT字幕.BoxUncheckedBackColor = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
         MCK_混流同名SRT字幕.ClickAnywhere = True
         MCK_混流同名SRT字幕.Dock = DockStyle.Left
-        MCK_混流同名SRT字幕.Location = New Point(0, 10)
+        MCK_混流同名SRT字幕.Location = New Point(0, 8)
         MCK_混流同名SRT字幕.Name = "MCK_混流同名SRT字幕"
         MCK_混流同名SRT字幕.Padding = New Padding(0, 0, 30, 0)
         MCK_混流同名SRT字幕.Size = New Size(87, 32)
@@ -417,20 +402,23 @@ Partial Class Form_v6_参数面板_流控制
         HCL_混流同名字幕标题.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_混流同名字幕标题.Dock = DockStyle.Top
         HCL_混流同名字幕标题.Font = New Font("Microsoft YaHei UI", 11F)
-        HCL_混流同名字幕标题.Location = New Point(20, 313)
+        HCL_混流同名字幕标题.Location = New Point(20, 307)
         HCL_混流同名字幕标题.Margin = New Padding(2)
         HCL_混流同名字幕标题.Name = "HCL_混流同名字幕标题"
         HCL_混流同名字幕标题.Padding = New Padding(0, 15, 0, 0)
-        HCL_混流同名字幕标题.Size = New Size(846, 36)
+        HCL_混流同名字幕标题.Size = New Size(846, 34)
         HCL_混流同名字幕标题.TabIndex = 19
         HCL_混流同名字幕标题.Text = "混流同名字幕"
         '
         ' Panel4
         '
+        Panel4.BackColor = Color.Transparent
+        Panel4.BackColor1 = Color.Transparent
+        Panel4.BorderSize = 0
         Panel4.Controls.Add(HCL_可视化流选择器说明)
         Panel4.Controls.Add(MB_打开可视化流选择器)
         Panel4.Dock = DockStyle.Top
-        Panel4.Location = New Point(20, 271)
+        Panel4.Location = New Point(20, 265)
         Panel4.Name = "Panel4"
         Panel4.Padding = New Padding(0, 10, 0, 0)
         Panel4.Size = New Size(846, 42)
@@ -468,10 +456,13 @@ Partial Class Form_v6_参数面板_流控制
         '
         ' Panel3
         '
+        Panel3.BackColor = Color.Transparent
+        Panel3.BackColor1 = Color.Transparent
+        Panel3.BorderSize = 0
         Panel3.Controls.Add(HCL_字幕流选择格式)
         Panel3.Controls.Add(JustEmptyControl4)
         Panel3.Dock = DockStyle.Top
-        Panel3.Location = New Point(20, 239)
+        Panel3.Location = New Point(20, 233)
         Panel3.Name = "Panel3"
         Panel3.Size = New Size(846, 32)
         Panel3.TabIndex = 17
@@ -501,12 +492,15 @@ Partial Class Form_v6_参数面板_流控制
         '
         ' Panel2
         '
+        Panel2.BackColor = Color.Transparent
+        Panel2.BackColor1 = Color.Transparent
+        Panel2.BorderSize = 0
         Panel2.Controls.Add(MCK_保留其他字幕流)
         Panel2.Controls.Add(MCB_字幕流操作)
         Panel2.Controls.Add(JustEmptyControl3)
         Panel2.Controls.Add(MTB_字幕流选择)
         Panel2.Dock = DockStyle.Top
-        Panel2.Location = New Point(20, 197)
+        Panel2.Location = New Point(20, 191)
         Panel2.Name = "Panel2"
         Panel2.Padding = New Padding(0, 10, 0, 0)
         Panel2.Size = New Size(846, 42)
@@ -597,22 +591,25 @@ Partial Class Form_v6_参数面板_流控制
         HCL_字幕流选择说明.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_字幕流选择说明.Dock = DockStyle.Top
         HCL_字幕流选择说明.Font = New Font("Microsoft YaHei UI", 11F)
-        HCL_字幕流选择说明.Location = New Point(20, 161)
+        HCL_字幕流选择说明.Location = New Point(20, 157)
         HCL_字幕流选择说明.Margin = New Padding(2)
         HCL_字幕流选择说明.Name = "HCL_字幕流选择说明"
         HCL_字幕流选择说明.Padding = New Padding(0, 15, 0, 0)
-        HCL_字幕流选择说明.Size = New Size(846, 36)
+        HCL_字幕流选择说明.Size = New Size(846, 34)
         HCL_字幕流选择说明.TabIndex = 15
         HCL_字幕流选择说明.Text = "使用哪些文件的哪些 <span style=""color:MediumPurple"">字幕</span>（s）"
         '
         ' Panel1
         '
+        Panel1.BackColor = Color.Transparent
+        Panel1.BackColor1 = Color.Transparent
+        Panel1.BorderSize = 0
         Panel1.Controls.Add(HCL_音频流选择格式)
         Panel1.Controls.Add(MCK_保留其他音频流)
         Panel1.Controls.Add(JustEmptyControl2)
         Panel1.Controls.Add(MTB_音频流选择)
         Panel1.Dock = DockStyle.Top
-        Panel1.Location = New Point(20, 119)
+        Panel1.Location = New Point(20, 115)
         Panel1.Name = "Panel1"
         Panel1.Padding = New Padding(0, 10, 0, 0)
         Panel1.Size = New Size(846, 42)
@@ -684,22 +681,25 @@ Partial Class Form_v6_参数面板_流控制
         HCL_音频流选择说明.AutoSizeMode = AutoSizeMode.GrowAndShrink
         HCL_音频流选择说明.Dock = DockStyle.Top
         HCL_音频流选择说明.Font = New Font("Microsoft YaHei UI", 11F)
-        HCL_音频流选择说明.Location = New Point(20, 83)
+        HCL_音频流选择说明.Location = New Point(20, 81)
         HCL_音频流选择说明.Margin = New Padding(2)
         HCL_音频流选择说明.Name = "HCL_音频流选择说明"
         HCL_音频流选择说明.Padding = New Padding(0, 15, 0, 0)
-        HCL_音频流选择说明.Size = New Size(846, 36)
+        HCL_音频流选择说明.Size = New Size(846, 34)
         HCL_音频流选择说明.TabIndex = 13
         HCL_音频流选择说明.Text = "将 <span style=""color:MediumSeaGreen"">音频参数</span> 应用于哪些文件和流（a）"
         '
         ' Panel5
         '
+        Panel5.BackColor = Color.Transparent
+        Panel5.BackColor1 = Color.Transparent
+        Panel5.BorderSize = 0
         Panel5.Controls.Add(HCL_视频流选择格式)
         Panel5.Controls.Add(MCK_保留其他视频流)
         Panel5.Controls.Add(JustEmptyControl1)
         Panel5.Controls.Add(MTB_视频流选择)
         Panel5.Dock = DockStyle.Top
-        Panel5.Location = New Point(20, 41)
+        Panel5.Location = New Point(20, 39)
         Panel5.Name = "Panel5"
         Panel5.Padding = New Padding(0, 10, 0, 0)
         Panel5.Size = New Size(846, 42)
@@ -774,7 +774,7 @@ Partial Class Form_v6_参数面板_流控制
         HCL_视频流选择说明.Location = New Point(20, 20)
         HCL_视频流选择说明.Margin = New Padding(2)
         HCL_视频流选择说明.Name = "HCL_视频流选择说明"
-        HCL_视频流选择说明.Size = New Size(846, 21)
+        HCL_视频流选择说明.Size = New Size(846, 19)
         HCL_视频流选择说明.TabIndex = 10
         HCL_视频流选择说明.Text = "将 <span style=""color:CornflowerBlue"">视频参数</span> 应用于哪些文件和流（v）"
         '
