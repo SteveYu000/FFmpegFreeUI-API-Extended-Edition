@@ -19,7 +19,7 @@ public sealed partial class SamplePlugin
         var page = new Panel
         {
             AutoScroll = true,
-            BackColor = Color.Transparent,
+            BackColor = Color.FromArgb(54, 54, 54),
             Dock = DockStyle.Fill,
             Padding = new Padding(24)
         };
@@ -27,7 +27,7 @@ public sealed partial class SamplePlugin
         {
             AutoSize = true,
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
-            BackColor = Color.Transparent,
+            BackColor = page.BackColor,
             Dock = DockStyle.Top,
             FlowDirection = FlowDirection.TopDown,
             Padding = Padding.Empty,
@@ -36,6 +36,7 @@ public sealed partial class SamplePlugin
         var title = new Label
         {
             AutoSize = true,
+            BackColor = page.BackColor,
             Font = new Font("Microsoft YaHei UI", 13F),
             ForeColor = Color.Gainsboro,
             Margin = new Padding(0, 0, 0, 12),
@@ -44,15 +45,16 @@ public sealed partial class SamplePlugin
         var description = new Label
         {
             AutoSize = true,
+            BackColor = page.BackColor,
             Font = new Font("Microsoft YaHei UI", 10F),
             ForeColor = Color.Silver,
             Margin = new Padding(0, 0, 0, 18),
-            MaximumSize = new Size(720, 0),
-            Text = "这个页面通过 host.PluginSettings 注册，只显示在插件管理器中，不占用主导航入口。"
+            Text = "此页仅在插件管理器中显示。"
         };
         var detailedLog = new CheckBox
         {
             AutoSize = true,
+            BackColor = page.BackColor,
             Checked = _detailedSettingsLog,
             Font = new Font("Microsoft YaHei UI", 10F),
             ForeColor = Color.Silver,
@@ -64,7 +66,7 @@ public sealed partial class SamplePlugin
         var writeLog = new Button
         {
             AutoSize = false,
-            BackColor = Color.FromArgb(45, 220, 220, 220),
+            BackColor = Color.FromArgb(64, 64, 64),
             FlatStyle = FlatStyle.Flat,
             Font = new Font("Microsoft YaHei UI", 10F),
             ForeColor = Color.CornflowerBlue,

@@ -930,6 +930,8 @@ if (host.PageEntries.AvailableTargets.Any(x =>
 
 若插件页面要自动获得 FFmpegFreeUI 的个性化背景和“超容器背景映射”，页面底板必须是 **LakeUI 的 `ModernPanel`**，控件名称必须精确为 `ModernPanel1`，并设为 `DockStyle.Fill`。普通 WinForms 页面不需要依赖 LakeUI，也能正常显示，只是不会自动获得这项背景映射。
 
+可运行的验证样例见独立的 [LakeUI 背景测试插件](../Samples/FFmpegFreeUI.Ext.BackgroundTest/README.md)：左侧页面使用直接根容器，插件管理设置页使用嵌套根容器，两页都能单独开关插件自己的背景。现有 C# 综合示例仍保持纯 WinForms，不依赖 LakeUI。
+
 本仓库当前兼容性测试使用的旧插件以 NuGet `LakeUI 5.5.0` 编译既有公共控件，而实际宿主运行的是 LakeUI 5.109.0。引用必须限制为编译用途，插件发布目录中只能放插件自己的程序集，不能携带旧版 `LakeUI.dll`：
 
 ```xml
@@ -1023,7 +1025,8 @@ public void Initialize(IExtFFmpegFreeUIHost host)
 约定如下：
 
 - 每个 `IExtFFmpegFreeUIPlugin.Id` 最多注册一个设置页；重复注册会抛出异常。
-- `CreatePage` 在用户点击齿轮时于 UI 线程调用，每次都应返回一个未被其他容器占用、尚未释放的新 `Control`；推荐使用 `UserControl` 或 `Panel`。
+- `CreatePage` 在用户点击齿轮时于 UI 线程调用，每次都应返回一个未被其他容器占用、尚未释放的新 `Control`。最小做法是返回普通 WinForms `Panel`，将它和内部布局容器、标签、复选框设置为不透明背景；[示例插件设置页](../Samples/FFmpegFreeUI.Ext.PluginApi.Sample/SamplePlugin.Settings.cs)不依赖 LakeUI。
+- 如果插件另外需要透出个性化背景，可直接返回名为 `ModernPanel1` 的 LakeUI `ModernPanel` 根容器，或返回包含该根容器的 `UserControl`；与普通插件页面一样，该面板必须设置 `DockStyle.Fill`。宿主会查找它，并把它的 `BackgroundSource` 接到插件管理器的设置页底板；子级 LakeUI 控件再以该根容器为 `BackgroundSource`。不要在中间加入透明的原生 WinForms `Panel`、`FlowLayoutPanel`、`Label` 等，以免出现黑块或文字重叠。完整做法见[页面背景与 LakeUI 5 合成规则](#page-entries)。
 - 设置页会填满插件管理器的内容区域。用户点击“返回插件详情”时，页面控件会被释放；下次进入会重新调用工厂。
 - `IExtPluginSettingsPageContext.PageControl` 在工厂执行期间为 `null`，工厂返回后可在 `Cleanup` 中读取。
 - 宿主只负责入口和页面生命周期，不替插件保存全局配置。插件应把设置写入自己的配置文件，并在创建新页面时重新读取；不要把全局插件配置写入随编码预设保存的 `StateJson`。

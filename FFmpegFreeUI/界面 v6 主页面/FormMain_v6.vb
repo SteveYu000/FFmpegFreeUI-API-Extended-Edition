@@ -123,7 +123,7 @@ Public Class FormMain_v6
         Return ModernTabListControl1.Items.Count
     End Function
 
-    Private Function 查找可绑定背景映射的插件ModernPanel(根控件 As Control) As ModernPanel
+    Friend Function 查找可绑定背景映射的插件ModernPanel(根控件 As Control) As ModernPanel
         If 根控件 Is Nothing Then Return Nothing
 
         Dim 根控件类型 As Type = 根控件.GetType()

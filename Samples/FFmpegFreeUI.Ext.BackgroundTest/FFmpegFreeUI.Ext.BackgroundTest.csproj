@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>FFmpegFreeUI.Ext.BackgroundTest.3fui</AssemblyName>
+    <RootNamespace>FFmpegFreeUI.Ext.BackgroundTest</RootNamespace>
+    <Description>LakeUI ModernPanel1 背景映射测试插件</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FFmpegFreeUI.Ext.PluginSdk\FFmpegFreeUI.Ext.PluginSdk.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <!-- 只用于编译；运行时使用宿主提供的 LakeUI，不能在 Plugin 目录部署私有副本。 -->
+    <PackageReference Include="LakeUI" Version="[5.109.0]" PrivateAssets="all" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <Import Project="..\..\FFmpegFreeUI.Ext.PluginSdk\FFmpegFreeUI.Ext.PluginSdk.Deploy.targets" />
+
+</Project>

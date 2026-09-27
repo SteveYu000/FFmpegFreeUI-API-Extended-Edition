@@ -388,6 +388,16 @@ Public Class Form_v6_插件管理
         page.Dock = DockStyle.Fill
         page.Margin = Padding.Empty
         P_插件设置内容.Controls.Add(page)
+        ' 设置页与普通插件页面一样：仅对约定的 GPU 根容器接入背景来源。
+        ' 原生 WinForms 控件继续由插件自行选择不透明背景，不改变既有 SDK 合同。
+        Dim gpuRoot = FormMain_v6.查找可绑定背景映射的插件ModernPanel(page)
+        If gpuRoot IsNot Nothing Then
+            If SP_UnLock AndAlso 设置_v6.实例对象.SP_毛玻璃模式 > 0 Then
+                gpuRoot.BackColor = Color.Transparent
+                gpuRoot.BackColor1 = Color.Transparent
+            End If
+            gpuRoot.BackgroundSource = P_插件设置内容
+        End If
         当前插件设置页 = page
         当前设置页插件标识 = pluginId
 

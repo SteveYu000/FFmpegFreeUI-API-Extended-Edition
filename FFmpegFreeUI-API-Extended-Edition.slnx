@@ -5,6 +5,7 @@
     <Project Path="FFmpegFreeUI.Ext.PluginSdk/FFmpegFreeUI.Ext.PluginSdk.csproj" />
   </Folder>
   <Folder Name="/Samples/">
+    <Project Path="Samples/FFmpegFreeUI.Ext.BackgroundTest/FFmpegFreeUI.Ext.BackgroundTest.csproj" />
     <Project Path="Samples/FFmpegFreeUI.Ext.PluginApi.Sample/FFmpegFreeUI.Ext.PluginApi.Sample.csproj" />
     <Project Path="Samples/FFmpegFreeUI.Ext.PluginApi.VbVmafSample/FFmpegFreeUI.Ext.PluginApi.VbVmafSample.vbproj" />
   </Folder>

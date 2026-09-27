@@ -1,7 +1,6 @@
 Imports System.ComponentModel
 Imports System.Diagnostics
 Imports System.IO
-Imports System.Reflection
 Imports System.Text
 Imports LakeUI
 
@@ -83,43 +82,9 @@ Partial Public Class FormMain_v6
     End Function
 
     Private Sub 配置插件页面背景核心(页面 As Control)
-        Dim 根面板 = 查找可绑定背景映射的插件ModernPanel核心(页面)
+        Dim 根面板 = 查找可绑定背景映射的插件ModernPanel(页面)
         If 根面板 IsNot Nothing Then 绑定选项卡核心(根面板)
     End Sub
-
-    Private Function 查找可绑定背景映射的插件ModernPanel核心(根控件 As Control) As ModernPanel
-        If 根控件 Is Nothing Then Return Nothing
-        Dim 当前类型 As Type = 根控件.GetType()
-        While 当前类型 IsNot Nothing
-            Dim 字段 = 当前类型.GetField("ModernPanel1", BindingFlags.Public Or BindingFlags.NonPublic Or BindingFlags.Instance)
-            If 字段 IsNot Nothing Then
-                Dim 面板 = TryCast(字段.GetValue(根控件), ModernPanel)
-                If 插件ModernPanel可绑定背景映射核心(面板) Then Return 面板
-            End If
-            Dim 属性 = 当前类型.GetProperty("ModernPanel1", BindingFlags.Public Or BindingFlags.NonPublic Or BindingFlags.Instance)
-            If 属性 IsNot Nothing Then
-                Dim 面板 = TryCast(属性.GetValue(根控件), ModernPanel)
-                If 插件ModernPanel可绑定背景映射核心(面板) Then Return 面板
-            End If
-            当前类型 = 当前类型.BaseType
-        End While
-        Return 查找子控件中的插件ModernPanel核心(根控件)
-    End Function
-
-    Private Function 查找子控件中的插件ModernPanel核心(控件 As Control) As ModernPanel
-        If 控件 Is Nothing Then Return Nothing
-        Dim 面板 = TryCast(控件, ModernPanel)
-        If 插件ModernPanel可绑定背景映射核心(面板) Then Return 面板
-        For Each 子控件 As Control In 控件.Controls
-            Dim 子面板 = 查找子控件中的插件ModernPanel核心(子控件)
-            If 子面板 IsNot Nothing Then Return 子面板
-        Next
-        Return Nothing
-    End Function
-
-    Private Shared Function 插件ModernPanel可绑定背景映射核心(面板 As ModernPanel) As Boolean
-        Return 面板 IsNot Nothing AndAlso String.Equals(面板.Name, "ModernPanel1", StringComparison.Ordinal) AndAlso 面板.Dock = DockStyle.Fill
-    End Function
 
     Private Async Function 执行关闭流程Async(事件参数 As CancelEventArgs) As Task
         事件参数.Cancel = False
