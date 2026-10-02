@@ -15,7 +15,7 @@
       <Private>false</Private>
     </ProjectReference>
     <!-- 只用于编译；运行时使用宿主提供的 LakeUI，不能在 Plugin 目录部署私有副本。 -->
-    <PackageReference Include="LakeUI" Version="[5.109.0]" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="LakeUI" Version="[5.110.0]" PrivateAssets="all" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <Import Project="..\..\FFmpegFreeUI.Ext.PluginSdk\FFmpegFreeUI.Ext.PluginSdk.Deploy.targets" />

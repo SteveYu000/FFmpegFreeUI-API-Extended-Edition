@@ -8,6 +8,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../FFmpegFreeUI/FFmpegFreeUI.vbproj" />
-    <PackageReference Include="LakeUI" Version="5.109.0" />
+    <PackageReference Include="LakeUI" Version="5.110.0" />
   </ItemGroup>
 </Project>
