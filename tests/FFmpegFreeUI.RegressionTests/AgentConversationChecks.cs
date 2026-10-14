@@ -14,12 +14,24 @@ internal static partial class Program
     private static T AgentMember<T>(object owner, string name)
     {
         var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        owner = AgentStateOwner(owner, name);
         return (T)(owner.GetType().GetField(name, flags)?.GetValue(owner)
             ?? owner.GetType().GetProperty(name, flags)!.GetValue(owner))!;
     }
 
-    private static void AgentSet(object owner, string name, object value) =>
+    private static void AgentSet(object owner, string name, object value)
+    {
+        owner = AgentStateOwner(owner, name);
         owner.GetType().GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!.SetValue(owner, value);
+    }
+
+    private static object AgentStateOwner(object owner, string name)
+    {
+        var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        if (owner is Form_v6_Agent && owner.GetType().GetField(name, flags) is null && owner.GetType().GetProperty(name, flags) is null)
+            return owner.GetType().GetProperty("AgentController", flags)!.GetValue(owner)!;
+        return owner;
+    }
 
     private static void PumpAgentUntil(Func<bool> predicate, string message)
     {

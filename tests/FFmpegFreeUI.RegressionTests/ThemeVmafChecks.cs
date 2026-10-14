@@ -105,11 +105,18 @@ internal static partial class Program
             Check(row.SubItems.All(x => x.ForeColor.ToArgb() == Color.Black.ToArgb()), "Pending queue text must be black");
             using var chart = new Form_v6_集成工具_质量评测图表();
             界面主题_v6.应用当前主题到窗体(chart);
-            Invoke(chart, "设置数据源", new Func<string, Dictionary<string, List<double>>>(_ => new() { ["sample"] = new() { 80, 90 } }), new Func<string, Dictionary<string, string>>(_ => new()));
+            Invoke(chart, "设置数据源", new Func<string, Dictionary<string, Form_v6_集成工具_质量评测图表.图表序列数据>>(_ => new()
+            {
+                ["sample"] = new() { 每帧数据 = new() { 80, 90 }, 每帧帧号 = new() { 0, 30 }, 评测帧率 = 30, 评测起始秒数 = 2 }
+            }), new Func<string, Dictionary<string, string>>(_ => new()));
             Invoke(chart, "刷新图表");
             var graph = (Ultra2DChart)chart.Controls.Find("Ultra2DChart1", true).Single();
             Check(graph.PlotBackColor.ToArgb() == Color.White.ToArgb(), "Chart plot must be white");
             Check(graph.Series[0].LineThickness == 2 && graph.Series[0].Color == Color.FromArgb(0, 94, 184), "Light chart saturated line");
+            Check(graph.Series[0].ConnectMissingValues && (int)graph.Series[0].Points[1].Tag == 30, "Chart preserves actual subsampled frame numbers");
+            Check(graph.LineHoverTooltipFormatter!(graph.Series[0], 1, 90).Contains("00:00:03.000"), "Chart tooltip uses frame rate and clip start for timestamps");
+            Check((string)typeof(Form_v6_集成工具_质量评测图表).GetMethod("格式化帧时间戳", BindingFlags.Static | BindingFlags.NonPublic)!
+                .Invoke(null, new object[] { 0, double.NaN, 0d })! == "未知", "Non-finite chart frame rates are rejected");
             设置_v6.实例对象.界面主题 = 2;
             界面主题_v6.刷新主题(true);
             界面主题_v6.应用当前主题到窗体(form);

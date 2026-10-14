@@ -214,7 +214,7 @@ dotnet restore .\FFmpegFreeUI-API-Extended-Edition.slnx
 dotnet build .\FFmpegFreeUI-API-Extended-Edition.slnx -c Debug --no-restore
 ```
 
-当前主程序通过 NuGet 使用 **LakeUI 5.109.0**，执行 `dotnet restore` 时会自动还原 LakeUI 及其依赖，不再需要同级 LakeUI 源码仓库或本地 `HintPath`。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需显式引用 LakeUI。
+当前主程序通过 NuGet 使用 **LakeUI 5.115.0**，执行 `dotnet restore` 时会自动还原 LakeUI 及其依赖，不再需要同级 LakeUI 源码仓库或本地 `HintPath`。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需显式引用 LakeUI。
 
 ### 2.2 SDK 引用与编辑器提示
 

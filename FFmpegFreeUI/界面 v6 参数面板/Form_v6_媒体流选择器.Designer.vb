@@ -17,24 +17,16 @@ Partial Class Form_v6_媒体流选择器
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim ListColumn1 As LakeUI.UltraDetailListView.ListColumn = New LakeUI.UltraDetailListView.ListColumn()
         ModernPanel1 = New LakeUI.ModernPanel()
-        ModernPanel1.BackColor = Color.Transparent
-        ModernPanel1.BackColor1 = Color.Transparent
-        列表面板 = New LakeUI.ModernPanel()
-        列表面板.BackColor = Color.Transparent
+        UltraDetailListView1 = New LakeUI.UltraDetailListView()
         顶部面板 = New LakeUI.ModernPanel()
-        顶部面板.BackColor = Color.Transparent
-        顶部面板.BackColor1 = Color.Transparent
-        顶部面板.BorderSize = 0
         MB_全选字幕 = New LakeUI.ModernButton()
         JustEmptyControl2 = New LakeUI.JustEmptyControl()
         MB_全选音频 = New LakeUI.ModernButton()
         JustEmptyControl1 = New LakeUI.JustEmptyControl()
         MB_全选视频 = New LakeUI.ModernButton()
         底部面板 = New LakeUI.ModernPanel()
-        底部面板.BackColor = Color.Transparent
-        底部面板.BackColor1 = Color.Transparent
-        底部面板.BorderSize = 0
         MB_确认选择 = New LakeUI.ModernButton()
         MB_重置选择 = New LakeUI.ModernButton()
         JustEmptyControl3 = New LakeUI.JustEmptyControl()
@@ -47,8 +39,10 @@ Partial Class Form_v6_媒体流选择器
         ' ModernPanel1
         '
         ModernPanel1.AllowDrop = True
+        ModernPanel1.BackColor = Color.Transparent
+        ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
-        ModernPanel1.Controls.Add(列表面板)
+        ModernPanel1.Controls.Add(UltraDetailListView1)
         ModernPanel1.Controls.Add(顶部面板)
         ModernPanel1.Controls.Add(底部面板)
         ModernPanel1.Dock = DockStyle.Fill
@@ -58,22 +52,53 @@ Partial Class Form_v6_媒体流选择器
         ModernPanel1.Size = New Size(665, 462)
         ModernPanel1.TabIndex = 0
         '
-        ' 列表面板
+        ' UltraDetailListView1
         '
-        列表面板.AllowDrop = True
-        列表面板.BackColor1 = Color.Transparent
-        列表面板.BorderSize = 0
-        列表面板.Dock = DockStyle.Fill
-        列表面板.Location = New Point(12, 52)
-        列表面板.Name = "列表面板"
-        列表面板.Padding = New Padding(10, 0, 10, 0)
-        列表面板.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.Vertical
-        列表面板.Size = New Size(641, 358)
-        列表面板.TabIndex = 2
+        UltraDetailListView1.AnimationDuration = 300
+        UltraDetailListView1.BackgroundColor = Color.Transparent
+        UltraDetailListView1.BorderSize = 0
+        UltraDetailListView1.BottomLinesSpacing = 3
+        UltraDetailListView1.CheckBoxBorderRadius = 3
+        UltraDetailListView1.CheckBoxBorderSize = 0
+        UltraDetailListView1.CheckBoxInnerPadding = 5
+        UltraDetailListView1.CheckBoxSize = 20
+        UltraDetailListView1.CheckBoxUncheckedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        UltraDetailListView1.CheckBoxVisible = True
+        ListColumn1.Width = 500
+        UltraDetailListView1.Columns.Add(ListColumn1)
+        UltraDetailListView1.Dock = DockStyle.Fill
+        UltraDetailListView1.DragSelectZoneRatio = 1F
+        UltraDetailListView1.GroupBackColor = Color.Transparent
+        UltraDetailListView1.GroupBorderColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
+        UltraDetailListView1.GroupForeColor = Color.Gainsboro
+        UltraDetailListView1.GroupHeight = 35
+        UltraDetailListView1.HeaderBackColor = Color.Transparent
+        UltraDetailListView1.HeaderBorderColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        UltraDetailListView1.HeaderBorderWidth = 2
+        UltraDetailListView1.HeaderForeColor = Color.DarkGray
+        UltraDetailListView1.HeaderHeight = 40
+        UltraDetailListView1.HeaderVisible = False
+        UltraDetailListView1.ItemCornerRadius = 10
+        UltraDetailListView1.ItemPadding = New Padding(10, 5, 5, 5)
+        UltraDetailListView1.ItemSelectedBackColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        UltraDetailListView1.Location = New Point(12, 42)
+        UltraDetailListView1.Margin = New Padding(2, 2, 2, 2)
+        UltraDetailListView1.MoreIndicatorColor = Color.FromArgb(CByte(120), CByte(220), CByte(220), CByte(220))
+        UltraDetailListView1.Name = "UltraDetailListView1"
+        UltraDetailListView1.ScrollBarThumbColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        UltraDetailListView1.ScrollBarThumbHoverColor = Color.FromArgb(CByte(120), CByte(220), CByte(220), CByte(220))
+        UltraDetailListView1.ScrollBarTrackColor = Color.FromArgb(CByte(20), CByte(220), CByte(220), CByte(220))
+        UltraDetailListView1.SelectionRectBorderColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
+        UltraDetailListView1.SelectionRectFillColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        UltraDetailListView1.Size = New Size(641, 378)
+        UltraDetailListView1.TabIndex = 7
         '
         ' 顶部面板
         '
         顶部面板.AllowDrop = True
+        顶部面板.BackColor = Color.Transparent
+        顶部面板.BackColor1 = Color.Transparent
+        顶部面板.BorderSize = 0
         顶部面板.Controls.Add(MB_全选字幕)
         顶部面板.Controls.Add(JustEmptyControl2)
         顶部面板.Controls.Add(MB_全选音频)
@@ -82,8 +107,7 @@ Partial Class Form_v6_媒体流选择器
         顶部面板.Dock = DockStyle.Top
         顶部面板.Location = New Point(12, 12)
         顶部面板.Name = "顶部面板"
-        顶部面板.Padding = New Padding(0, 0, 0, 10)
-        顶部面板.Size = New Size(641, 40)
+        顶部面板.Size = New Size(641, 30)
         顶部面板.TabIndex = 0
         '
         ' MB_全选字幕
@@ -153,15 +177,17 @@ Partial Class Form_v6_媒体流选择器
         ' 底部面板
         '
         底部面板.AllowDrop = True
+        底部面板.BackColor = Color.Transparent
+        底部面板.BackColor1 = Color.Transparent
+        底部面板.BorderSize = 0
         底部面板.Controls.Add(MB_确认选择)
         底部面板.Controls.Add(MB_重置选择)
         底部面板.Controls.Add(JustEmptyControl3)
         底部面板.Controls.Add(MB_打开文件)
         底部面板.Dock = DockStyle.Bottom
-        底部面板.Location = New Point(12, 410)
+        底部面板.Location = New Point(12, 420)
         底部面板.Name = "底部面板"
-        底部面板.Padding = New Padding(0, 10, 0, 0)
-        底部面板.Size = New Size(641, 40)
+        底部面板.Size = New Size(641, 30)
         底部面板.TabIndex = 1
         '
         ' MB_确认选择
@@ -172,7 +198,7 @@ Partial Class Form_v6_媒体流选择器
         MB_确认选择.BorderSize = 0
         MB_确认选择.Dock = DockStyle.Right
         MB_确认选择.HoverBackColor1 = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
-        MB_确认选择.Location = New Point(521, 10)
+        MB_确认选择.Location = New Point(521, 0)
         MB_确认选择.Margin = New Padding(2)
         MB_确认选择.Name = "MB_确认选择"
         MB_确认选择.PressedBackColor1 = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
@@ -188,7 +214,7 @@ Partial Class Form_v6_媒体流选择器
         MB_重置选择.BorderSize = 0
         MB_重置选择.Dock = DockStyle.Left
         MB_重置选择.HoverBackColor1 = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
-        MB_重置选择.Location = New Point(110, 10)
+        MB_重置选择.Location = New Point(110, 0)
         MB_重置选择.Margin = New Padding(2)
         MB_重置选择.Name = "MB_重置选择"
         MB_重置选择.PressedBackColor1 = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
@@ -199,7 +225,7 @@ Partial Class Form_v6_媒体流选择器
         ' JustEmptyControl3
         '
         JustEmptyControl3.Dock = DockStyle.Left
-        JustEmptyControl3.Location = New Point(100, 10)
+        JustEmptyControl3.Location = New Point(100, 0)
         JustEmptyControl3.Name = "JustEmptyControl3"
         JustEmptyControl3.Size = New Size(10, 30)
         JustEmptyControl3.TabIndex = 1
@@ -212,7 +238,7 @@ Partial Class Form_v6_媒体流选择器
         MB_打开文件.BorderSize = 0
         MB_打开文件.Dock = DockStyle.Left
         MB_打开文件.HoverBackColor1 = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
-        MB_打开文件.Location = New Point(0, 10)
+        MB_打开文件.Location = New Point(0, 0)
         MB_打开文件.Margin = New Padding(2)
         MB_打开文件.Name = "MB_打开文件"
         MB_打开文件.PressedBackColor1 = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
@@ -232,7 +258,6 @@ Partial Class Form_v6_媒体流选择器
         ForeColor = Color.Silver
         MinimumSize = New Size(640, 360)
         Name = "Form_v6_媒体流选择器"
-        ShowIcon = False
         ShowInTaskbar = False
         StartPosition = FormStartPosition.Manual
         Text = "v6 媒体流选择器"
@@ -245,7 +270,6 @@ Partial Class Form_v6_媒体流选择器
     Friend WithEvents ModernPanel1 As LakeUI.ModernPanel
     Friend WithEvents 顶部面板 As LakeUI.ModernPanel
     Friend WithEvents 底部面板 As LakeUI.ModernPanel
-    Friend WithEvents 列表面板 As LakeUI.ModernPanel
     Friend WithEvents MB_全选视频 As LakeUI.ModernButton
     Friend WithEvents MB_全选音频 As LakeUI.ModernButton
     Friend WithEvents MB_全选字幕 As LakeUI.ModernButton
@@ -255,4 +279,5 @@ Partial Class Form_v6_媒体流选择器
     Friend WithEvents JustEmptyControl1 As LakeUI.JustEmptyControl
     Friend WithEvents JustEmptyControl2 As LakeUI.JustEmptyControl
     Friend WithEvents JustEmptyControl3 As LakeUI.JustEmptyControl
+    Friend WithEvents UltraDetailListView1 As LakeUI.UltraDetailListView
 End Class

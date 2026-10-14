@@ -79,6 +79,8 @@ internal static partial class Program
             Console.WriteLine("PASS: process output drainage and cancellation");
             await TestScheduler(directory);
             Console.WriteLine("PASS: scheduler error recovery and stop isolation");
+            await TestExtPreparation(directory);
+            Console.WriteLine("PASS: ordered output reservation and Ext before-prepare error recovery");
             if (args.Length == 2)
             {
                 await TestRealEncoding(directory, args[1]);
@@ -108,8 +110,16 @@ internal static partial class Program
         checks++;
     }
 
-    private static object? Invoke(object instance, string name, params object[] arguments) =>
-        instance.GetType().GetMethod(name, PrivateInstance)!.Invoke(instance, arguments);
+    private static object? Invoke(object instance, string name, params object[] arguments)
+    {
+        var method = instance.GetType().GetMethod(name, PrivateInstance);
+        if (method is null && instance is Form_v6_Agent)
+        {
+            instance = instance.GetType().GetProperty("AgentController", PrivateInstance)!.GetValue(instance)!;
+            method = instance.GetType().GetMethod(name, PrivateInstance);
+        }
+        return (method ?? throw new MissingMethodException(instance.GetType().FullName, name)).Invoke(instance, arguments);
+    }
 
     private static 预设数据_v6 CreatePreset() => new()
     {

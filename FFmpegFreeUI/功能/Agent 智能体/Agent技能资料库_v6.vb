@@ -199,12 +199,12 @@ PowerShell 优先用于只读检查、诊断、结构化计算和用户明确要
 
 - `get_queue_summary`：读取队列摘要或详情。可用 `id/ids`、1-based `index/indexes`、`target=all`；大队列用 `offset/limit` 分页。`detail`、`include_commands`、`include_preset_json` 和 `include_performance` 会增加返回体，按需打开。
 - `get_queue_task_logs`：读取日志。先用队列摘要获得 ID，再用 `mode`/`modes` 选择 `all`、`latest_non_progress`、`errors`、`current_stage`，并用 `log_limit` 限制条数。
-- `control_queue_tasks`：控制 `start`、`pause`、`resume`、`stop`、`remove`、`reset`。停止或移除全部必须有用户明确指令；执行后检查返回的 `eligible_count`、`before` 和 `after`。
+- `control_queue_tasks`：控制 `start`、`pause`、`resume`、`stop`、`remove`、`reset`。`start` 单次只启动一个指定任务，不触发自动补满；多任务需分别调用。停止或移除全部必须有用户明确指令；执行后检查返回的 `eligible_count`、`before` 和 `after`。
 - `sync_parameter_panel_to_queue`：把当前面板同步到尚未开始的预设任务。只有用户明确要求同步时调用；不会修改已开始、暂停、完成、出错或命令行任务。
 - `get_ui_tabs` / `switch_ui_tab`：读取或切换主页面、参数面板、集成工具、设置和嵌套页。控件未初始化或用户要求切换页面时使用。
 - `get_prepare_files` / `set_prepare_files` / `submit_prepare_files_to_queue`：操作准备文件页。`set_prepare_files` 的 `mode` 为 `append`、`replace` 或 `clear`；它与对话附件列表不是同一功能。
 - `get_integrated_tool_state`：读取 `merge`、`mux` 或 `extract` 的当前配置和状态，配置或运行前先调用。
-- `configure_integrated_tool`：配置集成工具。`merge` 使用必填 `files` 字符串数组，可选 `output` 和 `mode`（`replace`、`append`、`clear`）；`mux` 的 `files` 是对象数组，每项至少有 `path`，可包含 `video`、`audio`、`subtitle`、`chapters`、`metadata`，另有 `output`、`mode`，以及可选的 `default_video`、`default_audio`、`default_subtitle`（值使用状态中的 `文件索引:类型:流索引`）；`extract` 使用必填 `file`，可选 `output_location` 和 `selected_streams`。
+- `configure_integrated_tool`：配置集成工具。`merge` 使用必填 `files` 字符串数组，可选 `output` 和 `mode`（`replace`、`append`、`clear`）；`mux` 的 `files` 是对象数组，每项至少有 `path`，可包含 `video`、`audio`、`subtitle`、`chapters`、`metadata`，另有 `output`、`mode`，以及可选的 `default_video`、`default_audio`、`default_subtitle`（值使用状态中的 `文件索引:类型:流索引`）；`extract` 使用 `file` 读取新文件，仅修改当前勾选或输出位置时省略 `file`，可选 `output_location` 和 `selected_streams`。
 - `run_integrated_tool`：运行当前集成工具配置。合并和混流会加入编码队列，抽流直接执行；抽流一次配置后只运行一次。抽流可在 payload 中传 `force_auto_name`（默认 `true`）。
 - `get_system_hardware`：读取处理器、内存和显卡概要，只用于辅助建议，不能代替实际编码器可用性检查。
 - `get_parameter_panel_controls`：扫描用户可见控件和说明控件；需要定位控件名、候选项或页面文案时使用，不用它替代结构化参数状态。
@@ -349,7 +349,9 @@ CRF、CQP、VBR、CBR、TPE 分支不同。NVENC 的 CQP/VBR/CBR 和 AMF 的 CQP
 
 `get_queue_task_logs` 读取指定任务日志。默认一次返回四档：`all`、`latest_non_progress`、`errors`、`current_stage`。先用 `get_queue_summary` 获取任务 ID 或序号，再读日志。日志可能很长，优先读指定任务和指定档位。
 
-`control_queue_tasks` 支持 `start`、`pause`、`resume`、`stop`、`remove`、`reset`。可以按 ID 或 1-based 序号指定任务，也可以 `target=all` 控制全部。停止或移除全部必须是用户明确要求。工具返回会包含匹配任务、可执行数量、前后状态和错误。
+`control_queue_tasks` 支持 `start`、`pause`、`resume`、`stop`、`remove`、`reset`。`start` 单次调用只能启动一个指定任务，优先传 `id` 或 1-based `index`；多目标或 `target=all` 会整次拒绝，多任务需分别调用。Agent 启动与手动启动相同，只启动指定任务，不触发自动补满并发数量；任务自然结束后仍按正常自动调度处理后续任务。其他 action 可按 ID 或序号指定多个任务，也可 `target=all` 控制全部。停止或移除全部必须是用户明确要求。工具返回会包含匹配任务、可执行数量、前后状态和错误。
+
+自动补满由空队列首次添加任务（已启用自动开始时）或任务自然结束（包括失败）触发，均按当前队列顺序启动并分配输出文件名。非空队列继续添加、手动或 Agent 启动、暂停、恢复、停止、重置、排序、移除任务及设置变更都不触发补满。等待停止清理的调度会在清理结束后继续，仍属于此前自然结束触发的调度。
 
 队列摘要、日志和控制结果仅在非空时返回 `missing_ids`、`missing_indexes`、`errors`，缺省表示没有对应问题；空 `tasks`、日志数组、控制前后数组仍保留。返回 JSON 使用紧凑格式，不改变字段类型、日志顺序、分页和权限行为。
 
@@ -383,14 +385,16 @@ CRF、CQP、VBR、CBR、TPE 分支不同。NVENC 的 CQP/VBR/CBR 和 AMF 的 CQP
 
 1. 调用 `get_integrated_tool_state(tool=extract)`，读取当前文件、输出位置、运行状态和可选流。每条流含全局索引、类型序号、编码、语言、标题、附件信息、推荐扩展名及完整 `ffprobe` 信息。
 2. 调用一次 `configure_integrated_tool(tool=extract)`，在 payload 中传入目标 `file`、可选的 `output_location`，以及包含全部目标流的 `selected_streams`。
-3. 必要时再次读取状态，确认当前文件和所有目标流均已选中。
+3. 必要时再次读取状态，确认当前文件和所有目标流的 `selected` 均为 true（表示复选框已勾选）。`page_status` 提供读取状态或错误信息。
 4. 只调用一次 `run_integrated_tool(tool=extract)`，等待该次批量运行完成后再报告结果。
 
 处理另一个输入文件时，才为该文件重复上述流程。运行中不要重新配置或再次运行；结果为失败、取消或 `success` 不为 true 时，不得宣称已完成。
 
 ## 选择与输出
 
-`selected_streams` 的每项可用全局索引，或 `v/a/s/t:序号`（分别为视频、音频、字幕、附件）。传入该字段会以完整列表替换当前选择；省略该字段会保留页面已有选择；显式空数组才取消全部选择。
+`selected_streams` 的每项可用全局索引，或 `v/a/s/t:序号`（分别为视频、音频、字幕、附件）。索引来自状态中的实际媒体流，不包含说明行。传入该字段会以完整列表替换当前勾选；仅修改当前文件的勾选或输出位置时省略 `file`，省略 `selected_streams` 会保留已有勾选，显式空数组取消全部勾选。传入 `file` 会重新读取文件并重置勾选，需要同时传入全部目标流。
+
+状态中流的 `selected` 字段和运行工具均使用复选框勾选状态，与列表行的高亮选中状态无关。
 
 默认 `force_auto_name=true`，所有选中流均自动命名，适用于多流批量提取。只选一个流且需要手动指定文件名时，才将其设为 false。输出默认在源文件目录，也可通过 `output_location` 指定已有目录。成功后以返回的 `outputs` 作为实际写出的文件路径；不要根据推测的文件名报告结果。"
     End Function
