@@ -66,6 +66,9 @@ internal static partial class Program
             Console.WriteLine("PASS: preset isolation and atomic persistence");
             TestQueueOperations(directory);
             Console.WriteLine("PASS: queue ordering, task lifecycle guards, and naming");
+            TestNavigationCounters();
+            TestBitrateVisualization();
+            Console.WriteLine("PASS: inserted plugin entries, navigation counters and bitrate aggregation");
             TestProgress();
             Console.WriteLine("PASS: progress parsing and numeric boundaries");
             TestPendingCache();
@@ -79,6 +82,8 @@ internal static partial class Program
             Console.WriteLine("PASS: process output drainage and cancellation");
             await TestScheduler(directory);
             Console.WriteLine("PASS: scheduler error recovery and stop isolation");
+            await TestIdleQueueAddition();
+            Console.WriteLine("PASS: adding automatic tasks to a retained but idle queue");
             await TestExtPreparation(directory);
             Console.WriteLine("PASS: ordered output reservation and Ext before-prepare error recovery");
             if (args.Length == 2)
@@ -269,6 +274,10 @@ internal static partial class Program
         Check(编码进度_v6.转换时间("25:01:02.123456") == TimeSpan.FromHours(25) + TimeSpan.FromMinutes(1) + TimeSpan.FromSeconds(2.123456),
             "FFmpeg clocks must support more than 24 hours and microseconds");
         Check(编码进度_v6.转换时间("NaN") == TimeSpan.Zero, "Non-finite duration must be rejected");
+        Check(编码进度_v6.格式化秒(90062) == "1d1h1m2s", "Long ETA must retain its day component");
+        Check(编码进度_v6.格式化秒(86400) == "1d0h0m0s", "Exact day boundary must not wrap to zero hours");
+        Check(编码进度_v6.格式化秒(86399) == "23h59m59s", "Sub-day ETA remains unchanged");
+        Check(编码进度_v6.格式化秒(double.PositiveInfinity) == "", "Non-finite ETA remains rejected");
         Check(编码进度_v6.转换时间(TimeSpan.MaxValue.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture)) == TimeSpan.Zero,
             "Rounded TimeSpan maximum must not overflow");
         var progress = new 编码进度_v6();

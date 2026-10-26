@@ -9,6 +9,7 @@ Public Class Form_v6_集成工具
             (1, Form_v6_集成工具_混流, Form_v6_集成工具_混流.ModernPanel1),
             (2, Form_v6_集成工具_抽流, Form_v6_集成工具_抽流.ModernPanel1),
             (4, Form_v6_集成工具_质量评测, Form_v6_集成工具_质量评测.ModernPanel1),
+            (5, Form_v6_集成工具_比特率可视化, Form_v6_集成工具_比特率可视化.ModernPanel1),
             (8, Form_v6_集成工具_Whisper生成字幕, Form_v6_集成工具_Whisper生成字幕.ModernPanel1)
         }
         For Each 绑定项 In 页面绑定
@@ -17,7 +18,7 @@ Public Class Form_v6_集成工具
         Next
 
         If SP_UnLock AndAlso 设置_v6.实例对象.窗口样式 = 2 AndAlso 设置_v6.实例对象.SP_毛玻璃模式 > 0 Then
-            For Each 绑定项 In 页面绑定.Take(4)
+            For Each 绑定项 In 页面绑定
                 绑定项.面板.Padding = New Padding(10, 20, 20, 20)
             Next
         End If

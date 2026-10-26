@@ -288,9 +288,9 @@ Public Class 编码队列_v6
             added.Add(task)
         Next
         If added.Count = 0 Then Return added
-        Dim 应启动空队列 As Boolean
+        Dim 应启动空闲队列 As Boolean
         SyncLock 队列锁
-            应启动空队列 = 队列项目.Count = 0 AndAlso added.Any(Function(task) task.允许自动启动)
+            应启动空闲队列 = Not 队列项目.Any(Function(task) 是否进行中任务(task) OrElse task.正在执行) AndAlso added.Any(Function(task) task.允许自动启动)
             队列项目.AddRange(added)
             For Each task In added
                 任务索引.Add(task.ID, task)
@@ -300,7 +300,7 @@ Public Class 编码队列_v6
             触发插件事件("task.added", task)
         Next
         RaiseEvent 队列已变化()
-        If 应启动空队列 Then 请求自动调度()
+        If 应启动空闲队列 Then 请求自动调度()
         Return added
     End Function
 
@@ -317,15 +317,15 @@ Public Class 编码队列_v6
         Ext插件扩展桥接_v2.应用任务管线上下文(task, context)
         Dim processedTaskName As String = Nothing
         If context.Properties.TryGetValue("taskName", processedTaskName) Then task.任务名称 = If(processedTaskName, "")
-        Dim 应启动空队列 As Boolean
+        Dim 应启动空闲队列 As Boolean
         SyncLock 队列锁
-            应启动空队列 = 队列项目.Count = 0 AndAlso task.允许自动启动
+            应启动空闲队列 = Not 队列项目.Any(Function(item) 是否进行中任务(item) OrElse item.正在执行) AndAlso task.允许自动启动
             队列项目.Add(task)
             任务索引.Add(task.ID, task)
         End SyncLock
         触发插件事件("task.added", task)
         RaiseEvent 队列已变化()
-        If 应启动空队列 Then 请求自动调度()
+        If 应启动空闲队列 Then 请求自动调度()
         Return task
     End Function
 
@@ -592,7 +592,7 @@ Public Class 编码队列_v6
         RaiseEvent 队列已变化()
     End Sub
 
-    ' 仅由空队列首次添加、任务自然结束及其等待停止清理的后续流程请求。
+    ' 仅由空闲队列添加可自动启动任务、任务自然结束及其等待停止清理的后续流程请求。
     Private Shared Sub 请求自动调度()
         SyncLock 队列锁
             完成提示待调度结束检查 = True

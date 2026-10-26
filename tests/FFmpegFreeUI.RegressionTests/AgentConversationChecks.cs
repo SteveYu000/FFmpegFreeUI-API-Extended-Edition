@@ -158,6 +158,7 @@ internal static partial class Program
                 ((string)Invoke(form, "GetActiveResponseTextSnapshot", a)!).Contains("reply-A-") &&
                 ((string)Invoke(form, "GetActiveResponseTextSnapshot", b)!).Contains("reply-B-"), "Both runs must stream concurrently");
             Check(AgentMember<bool>(runA, "Busy") && AgentMember<bool>(runB, "Busy"), "Both conversations stay running");
+            Check(form.获取正在推理任务数量() == 2, "Agent counter includes concurrent conversations");
             Check(selectors.All(x => x.Enabled), "All bottom dropdowns remain enabled during inference");
             var runningPermission = b.PermissionLevel;
             var permissionSelector = AgentMember<ModernComboBox>(form, "MCB_权限控制");
@@ -191,6 +192,7 @@ internal static partial class Program
             Invoke(form, "RequestStopAgentTask");
             PumpAgentUntil(() => taskA.IsCompleted, "Selected run must cancel");
             taskA.GetAwaiter().GetResult();
+            Check(form.获取正在推理任务数量() == 1, "Stopping one conversation preserves the other running count");
             Check(room.Items.Last().Text == room.FindItem(a.Turns.Last().Id).Title && room.Items.Last().Text.Contains("已停止"), "Bottom overview retains final stopped status");
             Check(!AgentMember<CancellationTokenSource>(runB, "RequestCts").IsCancellationRequested && !taskB.IsCompleted,
                 "Stopping A must not cancel or finish B");
@@ -219,6 +221,7 @@ internal static partial class Program
             endpoint.Release("B");
             PumpAgentUntil(() => taskB.IsCompleted, "Uncancelled run must complete after release");
             taskB.GetAwaiter().GetResult();
+            Check(form.获取正在推理任务数量() == 0, "Completed Agent conversations leave no running count");
             Check(b.Turns.Last().State == "completed" && b.Messages.Last().Content.Contains("reply-B-"), "Other conversation completes normally");
             Check(!b.Messages.Any(x => x.Content.Contains("reply-A-")), "Completed histories never mix responses");
             Check(input.Text == "next draft B" && send.Text == "发送", "Finishing preserves next draft and resets send button");

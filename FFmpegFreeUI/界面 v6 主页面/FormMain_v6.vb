@@ -27,6 +27,10 @@ Public Class FormMain_v6
         设置_v6.加载SP自定义背景图()
 
         绑定主页面选项卡()
+        AddHandler 编码队列_v6.队列已变化, AddressOf 请求刷新任务数量选项卡
+        AddHandler 编码队列_v6.任务已更新, AddressOf 编码任务已更新
+        AddHandler Form_v6_Agent.正在推理任务数量已变化, AddressOf 请求刷新任务数量选项卡
+        刷新任务数量选项卡()
         应用窗口样式()
         ModernTabListControl1.SelectedIndex = 0
         ModernTextBox1.Parent = ModernTabListControl1
@@ -38,8 +42,14 @@ Public Class FormMain_v6
 
     End Sub
 
+    Private Sub FormMain_v6_FormClosed(发送者 As Object, 事件参数 As FormClosedEventArgs) Handles Me.FormClosed
+        RemoveHandler 编码队列_v6.队列已变化, AddressOf 请求刷新任务数量选项卡
+        RemoveHandler 编码队列_v6.任务已更新, AddressOf 编码任务已更新
+        RemoveHandler Form_v6_Agent.正在推理任务数量已变化, AddressOf 请求刷新任务数量选项卡
+    End Sub
+
     Private Sub FormMain_v6_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        Me.ModernTabListControl1.Focus()
+        ModernTabListControl1.Focus()
         Application.DoEvents()
         启动参数响应_v6.处理首次启动参数()
 
@@ -240,5 +250,35 @@ Public Class FormMain_v6
         t1 &= $"   |   RAM {MainAppUsageCounter.GetActivePrivateWorkingSetBytes() / 1024 / 1024:F0}M / {MainAppUsageCounter.GetCommitSizeBytes() / 1024 / 1024:F0}M"
         t1 &= $"   |   GPU {MainAppUsageCounter.GetGpuUsagePercent():F1}% {MainAppUsageCounter.GetGpuDedicatedMemoryBytes() / 1024 / 1024:F0}M + {MainAppUsageCounter.GetGpuSharedMemoryBytes() / 1024 / 1024:F0}M"
         Me.ThisIsYourWindow1.TitleTextPrivateProtocol = t1
+    End Sub
+
+    Private Sub 编码任务已更新(任务 As 编码任务_v6)
+        请求刷新任务数量选项卡()
+    End Sub
+
+    Private Sub 请求刷新任务数量选项卡()
+        If IsDisposed OrElse Disposing OrElse Not IsHandleCreated Then Return
+        If InvokeRequired Then
+            Try
+                BeginInvoke(Sub() 刷新任务数量选项卡())
+            Catch ex As InvalidOperationException
+            End Try
+            Return
+        End If
+        刷新任务数量选项卡()
+    End Sub
+
+    Private Sub 刷新任务数量选项卡()
+        If IsDisposed OrElse Disposing OrElse ModernTabListControl1 Is Nothing Then Return
+        Dim queueCount = 编码队列_v6.获取进行中任务数量()
+        Dim agentCount = Form_v6_Agent.获取正在推理任务数量()
+        ' Ext 插件可在任意入口前后插页，不能依赖设计器中的固定索引。
+        For Each page As ModernTabListControl.ModernTabPage In ModernTabListControl1.Items
+            If page.BoundControl Is Form_v6_编码队列 Then
+                page.Text = If(queueCount > 0, $"编码队列 ({queueCount})", "编码队列")
+            ElseIf page.BoundControl Is Form_v6_Agent Then
+                page.Text = If(agentCount > 0, $"Agent 智能体 ({agentCount})", "Agent 智能体")
+            End If
+        Next
     End Sub
 End Class
