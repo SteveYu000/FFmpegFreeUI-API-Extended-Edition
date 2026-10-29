@@ -20,9 +20,9 @@ internal static partial class Program
     private static List<VmafModelDisplayItem> Models() =>
         (List<VmafModelDisplayItem>)StaticQuality("构建Vmaf模型显示项", ModelNames, true);
 
-    private static VmafModelDisplayItem Auto(List<VmafModelDisplayItem> models, int width, int height, double fps, out string note)
+    private static VmafModelDisplayItem Auto(List<VmafModelDisplayItem> models, int width, int height, double fps, out string note, bool isHdr = false)
     {
-        object[] args = { models, width, height, fps, "" };
+        object[] args = { models, width, height, fps, "", isHdr };
         var selected = (VmafModelDisplayItem)StaticQuality("解析AutoVmaf模型", args);
         note = (string)args[4];
         return selected;
@@ -38,8 +38,9 @@ internal static partial class Program
         Check(Auto(published, 3840, 1600, 60, out _).ModelValue == "vmaf_v1.0.16_hfr_1d5h_2160", "Published V1 naming");
         Check(Auto(published, 1920, 1080, 24, out _).ModelValue == "vmaf_v1.0.16_3d0h", "Published V1 normal naming");
         TestQualityState();
-        Check(!models.Any(x => x.ModelValue == "vmaf_v0.6.1" || x.ModelValue.Contains("float") || x.ModelValue.Contains("_b_")), "Hidden model families leaked");
-        Check(models.Where(x => x.UseCuda).All(x => x.ModelValue.Contains("v0.") && x.ModelValue.Contains("neg")), "V1 must not offer CUDA");
+        Check(!models.Any(x => x.ModelValue.Contains("float") || x.ModelValue.Contains("_b_")), "Research/bootstrap model families must remain hidden");
+        Check(models.Where(x => x.UseCuda).All(x => x.ModelValue.Contains("v0.") && !x.IsHdr), "V1/HDR must not offer CUDA");
+        TestHdrModelAvailability();
         using var combo = new VmafModelComboBox();
         combo.ReplaceDisplayItems(models);
         Check(combo.SelectedModelValue == "AUTO" && combo.SelectedIndex == 1, "AUTO must be first/default model");
@@ -90,7 +91,7 @@ internal static partial class Program
             Check(form.BackColor.ToArgb() == Color.White.ToArgb(), "Content background");
             Check(nav.TabStripBackColor == Color.FromArgb(220, 234, 247), "Navigation background");
             Check(nav.IndicatorColor == Color.FromArgb(15, 124, 140), "Fixed teal indicator");
-            Check(nav.TabItemSelectedBackColor == Color.FromArgb(200, 227, 232), "Light teal selection");
+            Check(nav.TabItemSelectedBackColor == 界面配色_v6.浅色选中背景, "Navigation follows the upstream unified light selection color");
             Check(control.BackColor1 == Color.FromArgb(241, 247, 252), "Control background must not become dark grey");
             TestThemeBorders();
             dynamicLabel.Text = "<span style=\"color:#007A00\">15</span>";
@@ -260,7 +261,10 @@ internal static partial class Program
                 var combo = (VmafModelComboBox)page.Controls.Find("MCB_模型选择", true).Single();
                 Check(combo.SelectedModelValue == "AUTO" && combo.Text == "AUTO", "Opening page must use AUTO regardless of saved model");
                 Check(!combo.SelectedUsesCuda && combo.SelectedModel.IsAuto, "Opening page must not restore manual CUDA/local choices");
-                Check(combo.Models.Count == 1, "Legacy model names must not be inserted into the selector");
+                var catalog = (List<VmafModelDisplayItem>)StaticQuality("构建Vmaf模型显示项", Array.Empty<string>(), false);
+                Check(combo.Models.Where(item => !item.IsAuto && !item.IsSectionHeader).Select(item => (item.ModelValue, item.UseCuda))
+                    .SequenceEqual(catalog.Select(item => (item.ModelValue, item.UseCuda))),
+                    "Opening page keeps the official catalog without restoring saved manual/local choices");
                 var report = (string)Invoke(page, "生成当前列表导出记录")!;
                 Check(report.Contains("实际模型：vmaf_v1.0.16_hfr_3d0h") && report.Contains("超出校准区间"), "Export actual model and warning");
                 Invoke(page, "保存页面状态");

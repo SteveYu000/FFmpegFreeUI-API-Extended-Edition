@@ -45,6 +45,7 @@ Public Class Form_v6_参数面板
     Private ReadOnly 原生参数选项卡 As New Dictionary(Of String, ModernTabListControl.ModernTabPage)(StringComparer.OrdinalIgnoreCase)
     Private _正在刷新聚合页面 As Boolean
     Private _插件参数面板目录已注册 As Boolean
+    Private _默认参数已初始化 As Boolean
 
 
     Private Sub Form_v6_参数面板_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -126,8 +127,19 @@ Public Class Form_v6_参数面板
         Me.私有界面_附加内容.ModernTabControl1.SelectedIndex = 0
         '==================================================
         确保注册插件参数面板目录()
-        预设管理_v6.重置面板(Me)
+        初始化默认参数()
         私有界面_预设管理.刷新预设列表()
+    End Sub
+
+    Public Sub 初始化默认参数()
+        If _默认参数已初始化 Then Return
+        _默认参数已初始化 = True
+        Try
+            预设管理_v6.重置面板(Me)
+        Catch
+            _默认参数已初始化 = False
+            Throw
+        End Try
     End Sub
 
     Private Sub Form_v6_参数面板_Shown(sender As Object, e As EventArgs) Handles Me.Shown
