@@ -42,7 +42,7 @@ internal static partial class Program
         {
             var cancelled = Execute("run_windows_executable", new { executable = Environment.ProcessPath, arguments = new[] { "--wait-fixture" } }, cts.Token);
             PumpAgentUntil(() => cancelled.IsCompleted, "Executable cancellation must finish");
-            Check(cancelled.IsCanceled, "User cancellation remains cancellation rather than tool success");
+            Check(cancelled.IsCanceled, $"User cancellation remains cancellation rather than tool success; state={cancelled.Status}; detail={cancelled.Exception?.ToString() ?? (cancelled.IsCompletedSuccessfully ? cancelled.Result : "")}");
         }
         using (var result = JsonDocument.Parse(PumpAgentTask(Execute("run_windows_executable", new {
             executable = Environment.ProcessPath, arguments = new[] { "--output-fixture" }, max_output_chars = 128

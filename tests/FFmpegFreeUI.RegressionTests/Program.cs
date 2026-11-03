@@ -53,6 +53,7 @@ internal static partial class Program
             };
             TestAgentConversations(directory);
             TestAgentAudit(directory);
+            TestUpstream6243(directory);
             TestAgentPresentation(directory);
             TestQueuePresetTools(directory);
             Console.WriteLine("PASS: concurrent Agent runs, stop isolation, per-conversation drafts and colors");
