@@ -262,7 +262,7 @@ internal static partial class Program
                 Check(combo.SelectedModelValue == "AUTO" && combo.Text == "AUTO", "Opening page must use AUTO regardless of saved model");
                 Check(!combo.SelectedUsesCuda && combo.SelectedModel.IsAuto, "Opening page must not restore manual CUDA/local choices");
                 var catalog = (List<VmafModelDisplayItem>)StaticQuality("构建Vmaf模型显示项", Array.Empty<string>(), false);
-                Check(combo.Models.Where(item => !item.IsAuto && !item.IsSectionHeader).Select(item => (item.ModelValue, item.UseCuda))
+                Check(combo.Models.Where(item => !item.IsAuto && !item.IsCheckOtherModels).Select(item => (item.ModelValue, item.UseCuda))
                     .SequenceEqual(catalog.Select(item => (item.ModelValue, item.UseCuda))),
                     "Opening page keeps the official catalog without restoring saved manual/local choices");
                 var report = (string)Invoke(page, "生成当前列表导出记录")!;

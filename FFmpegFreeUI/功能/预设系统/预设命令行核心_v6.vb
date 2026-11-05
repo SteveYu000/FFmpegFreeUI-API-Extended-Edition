@@ -225,11 +225,14 @@ Partial Public Class 预设管理_v6
             额外输入.AddRange(附加片段.额外输入)
             输出前.AddRange(附加片段.输出前)
         End If
+        Dim 丢弃输出 = 阶段 = 预设数据_v6.命令行阶段.二次编码第一遍 OrElse a.输出_输出文件参数使用方法 = 预设数据_v6.输出文件参数使用方法.声明丢弃输出
+        If Not 丢弃输出 AndAlso a.输出_MP4索引前置 AndAlso If(a.输出容器, "").Trim().ToLowerInvariant() = ".mp4" Then
+            输出前.Add("-movflags +faststart")
+        End If
         AddRaw(输出前, 应用自定义参数通配字符串(a.自定义参数_之后参数, 输入文件, 输出文件))
         添加插件命令参数(输出前, pluginArguments, Ext插件命令参数位置_v2.输出之前, 输入文件, 输出文件)
         添加插件命令参数(输出后, pluginArguments, Ext插件命令参数位置_v2.输出之后, 输入文件, 输出文件)
 
-        Dim 丢弃输出 = 阶段 = 预设数据_v6.命令行阶段.二次编码第一遍 OrElse a.输出_输出文件参数使用方法 = 预设数据_v6.输出文件参数使用方法.声明丢弃输出
         Dim 输出目标 = If(丢弃输出, "NUL", 输出文件)
         Dim 命令 As New List(Of String)
         命令.AddRange(前置.Where(Function(x) x <> ""))

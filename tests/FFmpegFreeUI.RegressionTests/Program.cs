@@ -63,6 +63,8 @@ internal static partial class Program
             TestPresetCopies(directory);
             TestBitrateArgumentsAcrossQualityModes();
             TestThemeAndVmaf();
+            TestMp4FastStart();
+            TestOtherVmafCandidates();
             Console.WriteLine("PASS: light/dark theme, first-load colors, VMAF AUTO and model selection");
             Console.WriteLine("PASS: preset isolation and atomic persistence");
             TestQueueOperations(directory);
@@ -82,6 +84,7 @@ internal static partial class Program
             await TestProcessLifecycle();
             Console.WriteLine("PASS: process output drainage and cancellation");
             await TestScheduler(directory);
+            await TestSchedulerForwardAndWrap();
             Console.WriteLine("PASS: scheduler error recovery and stop isolation");
             await TestIdleQueueAddition();
             Console.WriteLine("PASS: adding automatic tasks to a retained but idle queue");

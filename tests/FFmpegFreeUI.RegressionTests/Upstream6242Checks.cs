@@ -22,15 +22,16 @@ internal static partial class Program
         var catalog = (List<VmafModelDisplayItem>)StaticQuality("构建Vmaf模型显示项", Array.Empty<string>(), false);
         Check(catalog.Count(model => model.IsHdr) == 8 && catalog.Where(model => model.IsHdr).All(model => !model.IsRuntimeDetected),
             "Official HDR catalog must not imply runtime availability");
-        Check(catalog.Count(model => model.IsNonNeg) == 4 && catalog.Where(model => model.UseCuda).All(model => !model.IsCudaAvailable),
-            "Legacy non-NEG catalog keeps all four choices without claiming CUDA support");
+        Check(catalog.All(model => !model.IsNonNeg && !model.UseCuda),
+            "Default catalog excludes non-NEG and unavailable CUDA choices until runtime detection");
         void MustReject(VmafModelDisplayItem model, string explanation)
         {
             try { StaticQuality("检查Vmaf模型可用性", model); throw new InvalidOperationException(explanation); }
             catch (TargetInvocationException error) when (error.InnerException is InvalidOperationException) { checks++; }
         }
         MustReject(catalog.First(model => model.IsHdr), "Undetected HDR must not reach FFmpeg");
-        MustReject(catalog.First(model => model.UseCuda), "Missing CUDA filter must not reach FFmpeg");
+        MustReject(new() { ModelValue = "vmaf_v0.6.1neg", UseCuda = true, IsRuntimeDetected = false },
+            "Undetected built-in models must not reach FFmpeg");
         var scanned = (List<VmafModelDisplayItem>)StaticQuality("构建Vmaf模型显示项", new[] {
             "vmaf_v1.0.16_3d0h", "hdr_vmaf_v1.1.8_3d0h", "hdr_vmaf_v1.1.8_hfr_3d0h"
         }, true);
@@ -44,13 +45,22 @@ internal static partial class Program
             "Catalog-only HDR falls back to detected SDR with an explicit warning");
         using var combo = new VmafModelComboBox();
         combo.ReplaceDisplayItems(catalog);
-        var header = combo.Models.ToList().FindIndex(model => model.IsSectionHeader) + 1;
-        combo.SelectedIndex = header;
-        Check(header > 1 && combo.SelectedModel?.IsAuto == true, "Non-NEG section header is not a selectable model");
+        var command = combo.Models.ToList().FindIndex(model => model.IsCheckOtherModels) + 1;
+        var checkRequests = 0;
+        combo.CheckOtherModelsRequested += (_, _) => checkRequests++;
+        combo.SelectedIndex = command;
+        Check(command > 1 && checkRequests == 1 && combo.SelectedModel?.IsAuto == true,
+            "Other-model command fires once and restores the selected model");
         combo.AddDisplayItem(new() { ModelValue = "local-hdr.json", IsLocal = true });
         Check(combo.SelectedModelValue == "local-hdr.json" &&
-            combo.Models.ToList().FindIndex(model => model.IsLocal) < combo.Models.ToList().FindIndex(model => model.IsSectionHeader),
-            "Local models remain selectable before the non-NEG warning section");
+            combo.Models.ToList().FindIndex(model => model.IsLocal) < combo.Models.ToList().FindIndex(model => model.IsCheckOtherModels),
+            "Local models remain selectable before the other-model command");
+        combo.AddDisplayItem(new() { ModelValue = "vmaf_float_v0.6.1", IsOtherModel = true });
+        Check(combo.SelectedModelValue == "vmaf_float_v0.6.1" && !combo.SelectedModel!.UsesCapsules &&
+            combo.Models.ToList().FindIndex(model => model.IsOtherModel) > combo.Models.ToList().FindIndex(model => model.IsCheckOtherModels),
+            "Manually verified other models retain their raw identity below the command");
+        Check((string)StaticQuality("获取Vmaf模型说明", combo.SelectedModel!) == "",
+            "Other models do not inherit an unrelated official model description");
         var infoType = typeof(Form_v6_集成工具_质量评测).GetNestedType("视频流信息", BindingFlags.NonPublic)!;
         var info = Activator.CreateInstance(infoType, true)!;
         void SetColor(string name, string value) => infoType.GetProperty(name)!.SetValue(info, value);
