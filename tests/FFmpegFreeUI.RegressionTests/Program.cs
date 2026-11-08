@@ -65,6 +65,7 @@ internal static partial class Program
             TestThemeAndVmaf();
             TestMp4FastStart();
             TestOtherVmafCandidates();
+            TestUpstream630(directory);
             Console.WriteLine("PASS: light/dark theme, first-load colors, VMAF AUTO and model selection");
             Console.WriteLine("PASS: preset isolation and atomic persistence");
             TestQueueOperations(directory);
