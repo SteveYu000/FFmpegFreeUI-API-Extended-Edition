@@ -214,7 +214,7 @@ dotnet restore .\FFmpegFreeUI-API-Extended-Edition.slnx
 dotnet build .\FFmpegFreeUI-API-Extended-Edition.slnx -c Debug --no-restore
 ```
 
-当前主程序通过 NuGet 使用 **LakeUI 5.117.0**，执行 `dotnet restore` 时会自动还原 LakeUI 及其依赖，不再需要同级 LakeUI 源码仓库或本地 `HintPath`。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需显式引用 LakeUI。
+当前主程序以 `net10.0-windows` 为目标框架，通过 NuGet 使用 **LakeUI 5.201.0**。执行 `dotnet restore` 时会自动还原依赖，不需要同级 LakeUI 源码仓库或本地 `HintPath`。Ext SDK 和插件项目继续使用 `net10.0-windows10.0.17763.0`，已发布的 SDK 程序集身份与公共接口保持不变；主程序的发布目标不要求插件修改现有目标框架。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需显式引用 LakeUI。
 
 ### 2.2 SDK 引用与编辑器提示
 
@@ -932,11 +932,11 @@ if (host.PageEntries.AvailableTargets.Any(x =>
 
 可运行的验证样例见独立的 [LakeUI 背景测试插件](../Samples/FFmpegFreeUI.Ext.BackgroundTest/README.md)：左侧页面使用直接根容器，插件管理设置页使用嵌套根容器，两页都能单独开关插件自己的背景。现有 C# 综合示例仍保持纯 WinForms，不依赖 LakeUI。
 
-本仓库当前兼容性测试使用的旧插件以 NuGet `LakeUI 5.5.0` 编译既有公共控件，而实际宿主运行的是 LakeUI 5.117.0。引用必须限制为编译用途，插件发布目录中只能放插件自己的程序集，不能携带旧版 `LakeUI.dll`：
+当前宿主运行 **LakeUI 5.201.0**。新建 LakeUI 页面时，使用与目标宿主一致的编译引用；已有插件不必仅因宿主升级而自动重新编译，但必须另做运行时与视觉兼容验证。引用必须限制为编译用途，插件发布目录中只能放插件自己的程序集，不能携带私有的 `LakeUI.dll`：
 
 ```xml
 <PackageReference Include="LakeUI"
-                  Version="[5.5.0]"
+                  Version="[5.201.0]"
                   PrivateAssets="all"
                   ExcludeAssets="runtime" />
 ```

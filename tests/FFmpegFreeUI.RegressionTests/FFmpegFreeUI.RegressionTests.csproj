@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../FFmpegFreeUI/FFmpegFreeUI.vbproj" />
-    <PackageReference Include="LakeUI" Version="5.117.0" />
+    <PackageReference Include="LakeUI" Version="5.201.0" />
   </ItemGroup>
 </Project>
