@@ -557,7 +557,7 @@ Public Class Form_v6_集成工具_混流
                                       同步属性面板()
                                       调整列宽()
                                   End Sub
-        显示窗体(selector, FormMain_v6)
+        显示窗体(selector, Me)
     End Sub
 
     Private Sub 同步属性面板()

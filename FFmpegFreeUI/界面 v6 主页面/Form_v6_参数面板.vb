@@ -199,7 +199,7 @@ Public Class Form_v6_参数面板
         End If
         窗口.目标控件 = 完成按钮返回的控件
         窗口.Text = 标题栏
-        显示窗体(窗口, FormMain_v6)
+        显示窗体(窗口, If(窗口布局_v6.获取顶层窗口(完成按钮返回的控件), FormMain_v6))
     End Sub
 
     Public Sub 请求刷新参数状态()

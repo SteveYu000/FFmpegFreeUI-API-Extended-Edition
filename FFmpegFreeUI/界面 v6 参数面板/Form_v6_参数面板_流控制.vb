@@ -15,7 +15,7 @@ Public Class Form_v6_参数面板_流控制
         AddHandler selector.FormClosed, Sub()
                                             If 所属参数面板对象 IsNot Nothing Then 所属参数面板对象.请求刷新参数状态()
                                         End Sub
-        显示窗体(selector, FormMain_v6)
+        显示窗体(selector, Me)
     End Sub
 
 End Class

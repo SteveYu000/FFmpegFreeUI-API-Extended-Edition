@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net11.0-windows10.0.17763.0</TargetFramework>
+    <!-- 使用普通 Windows 目标，避免引入未使用的 Windows SDK .NET 投影。 -->
+    <TargetFramework>net11.0-windows</TargetFramework>
     <StartupObject>FFmpegFreeUI.My.MyApplication</StartupObject>
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
@@ -22,7 +23,7 @@
     <Version>6.5.0-ext.1+v2.5</Version>
     <InformationalVersion>v6.5.0-ext.1+v2.5</InformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
     <ApplicationIcon>ico.ico</ApplicationIcon>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
     <Title>FFmpegFreeUI API Extended Edition</Title>

@@ -41,7 +41,7 @@ Public Class Form_v6_集成工具_质量评测图表
         界面主题_v6.应用当前主题到窗体(当前窗体)
         当前窗体.设置数据源(dataProvider, scoreProvider)
         当前窗体.刷新图表()
-        当前窗体.显示到主窗口中心()
+        显示窗体(当前窗体, owner)
     End Sub
 
     Public Shared Sub 刷新当前图表()
@@ -100,32 +100,7 @@ Public Class Form_v6_集成工具_质量评测图表
         Return $"{CLng(Math.Floor(timestamp.TotalHours)):00}:{timestamp.Minutes:00}:{timestamp.Seconds:00}.{timestamp.Milliseconds:000}"
     End Function
 
-    Private Sub 显示到主窗口中心()
-        Dim basis As Form = FormMain_v6
-        If basis Is Nothing OrElse basis.IsDisposed Then basis = Owner
 
-        If Visible Then
-            Focus()
-        ElseIf basis IsNot Nothing AndAlso Not basis.IsDisposed Then
-            Show(basis)
-        Else
-            Show()
-        End If
-
-        Dim basisBounds As Rectangle
-        If basis IsNot Nothing AndAlso Not basis.IsDisposed AndAlso basis.Visible Then
-            basisBounds = basis.Bounds
-        Else
-            basisBounds = Screen.FromControl(Me).WorkingArea
-        End If
-
-        Dim targetLeft = basisBounds.Left + (basisBounds.Width - Width) \ 2
-        Dim targetTop = basisBounds.Top + (basisBounds.Height - Height) \ 2
-        Dim workArea = Screen.FromRectangle(New Rectangle(targetLeft, targetTop, Width, Height)).WorkingArea
-
-        Left = Math.Max(workArea.Left, Math.Min(targetLeft, workArea.Right - Width))
-        Top = Math.Max(workArea.Top, Math.Min(targetTop, workArea.Bottom - Height))
-    End Sub
 
     Private Sub MCB_指标选择_SelectedIndexChanged(sender As Object, e As EventArgs) Handles MCB_指标选择.SelectedIndexChanged
         刷新图表()

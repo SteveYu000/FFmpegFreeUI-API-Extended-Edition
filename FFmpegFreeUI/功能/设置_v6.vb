@@ -29,6 +29,12 @@ Public Class 设置_v6
     Public Property 界面主题 As Integer = 2
     ''' <summary>0=直角；1=圆角。旧配置缺少此字段时，Windows 11 默认圆角，其他系统默认直角。</summary>
     Public Property 窗口圆角 As Integer = If(LakeUI.DwmWindowStyle.IsCornerModeSupported, 1, 0)
+    ''' <summary>0=使用默认大小；1=使用上次关闭时的大小。</summary>
+    Public Property 窗口布局 As Integer = 0
+    ''' <summary>主窗口正常状态的外部尺寸，按 96 DPI 保存。</summary>
+    Public Property 上次窗口宽度 As Integer = 0
+    Public Property 上次窗口高度 As Integer = 0
+    Public Property 上次窗口最大化 As Boolean = False
     Public Property 启用性能计数器 As Integer = 0
 
     Public Property 字体 As String = SystemFonts.DefaultFont.FontFamily.Name
@@ -200,6 +206,10 @@ Public Class 设置_v6
         界面主题_v6.刷新主题(True)
     End Sub
 
+    Public Shared Sub 设置窗口布局(index As Integer)
+        If index < 0 OrElse index > 1 Then Return
+        实例对象.窗口布局 = index
+    End Sub
     Public Shared Sub 设置窗口圆角(index As Integer)
         If index < 0 OrElse index > 1 Then Return
         Dim 选择 = If(LakeUI.DwmWindowStyle.IsCornerModeSupported, index, 0)

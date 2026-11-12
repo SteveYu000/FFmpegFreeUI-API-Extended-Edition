@@ -214,7 +214,7 @@ dotnet restore .\FFmpegFreeUI-API-Extended-Edition.slnx
 dotnet build .\FFmpegFreeUI-API-Extended-Edition.slnx -c Debug --no-restore
 ```
 
-当前主程序、PluginHost 和回归项目以 `net11.0-windows10.0.17763.0` 为目标框架，通过 NuGet 使用 **LakeUI 5.301.0**。执行 `dotnet restore` 时会自动还原依赖，不需要同级 LakeUI 源码仓库或本地 `HintPath`。Ext SDK 与普通 C#/VB 示例继续使用 `net10.0-windows10.0.17763.0`，已发布 SDK 的程序集身份与公共接口保持不变。只有引用 LakeUI 5.301 的背景测试插件跟随它改为 .NET 11；普通插件无需仅因宿主升级而更改目标。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需显式引用 LakeUI。
+当前主程序和回归项目以 `net11.0-windows` 为目标框架，避免引入未使用的 Windows SDK .NET 投影；PluginHost 使用 `net11.0-windows10.0.17763.0` 以引用既有 SDK。上述项目通过 NuGet 使用 **LakeUI 5.301.0**。执行 `dotnet restore` 时会自动还原依赖，不需要同级 LakeUI 源码仓库或本地 `HintPath`。Ext SDK 与普通 C#/VB 示例继续使用 `net10.0-windows10.0.17763.0`，已发布 SDK 的程序集身份与公共接口保持不变。只有引用 LakeUI 5.301 的背景测试插件跟随它改为 .NET 11；普通插件无需仅因宿主升级而更改目标。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需显式引用 LakeUI。
 
 ### 2.2 SDK 引用与编辑器提示
 

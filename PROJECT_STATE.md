@@ -4,98 +4,94 @@
 
 最后更新：2026-11-12
 
+## 当前工作：精简发布与窗口布局
+
+- 起点 main / 6719237，工作树干净。用户要求恢复精简发布；界面显示新增“窗口布局”（使用默认大小 / 使用上次关闭时的大小）；功能子窗口打开时与实际顶层父窗口同大小。
+- 功能实现及下述功能验证已完成，改动尚未提交；没有推送、打标签或发布 Release / NuGet。
+- 只修改宿主、回归及目标框架说明，SDK 契约、程序集身份、普通示例和第三方插件源码未改。用户原 C:\Apps\FFmpegFreeUI API Extended 及配置未覆盖、未关闭。
+- 保留本轮隔离副本和发布物供复查；用户手动操作过的 BackgroundOff 配置未还原或清理。测试副本已正常退出。
+
 ## 当前基线
 
 | 项目 | 当前值 |
 | --- | --- |
-| 主分支 | main |
+| 分支 / 本轮起点 | main / 6719237 |
 | 最近合入的上游版本 / 提交 | 6.5.0 / b5305ec4804535297fec3a8612a4256d50aee559 |
 | 上游合并提交 | f66575d10ce4f2ca295484f5ac484f5d610b3ffe |
-| 本轮开始状态 | 0fe29cc，工作树干净；用户原 3FUI 正在运行，未关闭或覆盖 |
-| 产品版本 / 文件版本 | v6.5.0-ext.1+v2.5 / 6.5.0.1 |
-| Ext API / NuGet / SDK AssemblyVersion | v2.5 / 2.5.0 / 2.0.0.0，保持不变 |
-| 主程序、PluginHost、回归及 LakeUI 背景样例目标 | net11.0-windows10.0.17763.0，与新上游/依赖匹配 |
-| SDK、普通 C# / VB 插件样例目标 | net10.0-windows10.0.17763.0，保持已发布编译目标 |
-| LakeUI | 纯 NuGet 5.301.0，不启用本地 DLL 覆盖 |
+| 产品版本 / 文件版本 | v6.5.0-ext.1+v2.5 / 6.5.0.1，不升版 |
+| Ext API / NuGet / SDK AssemblyVersion | v2.5 / 2.5.0 / 2.0.0.0，不变 |
+| 主程序与回归目标 | net11.0-windows，SupportedOSPlatformVersion 7.0 是 TFM 配置要求，不代表支持 Windows 7 |
+| PluginHost 与 LakeUI 背景样例目标 | net11.0-windows10.0.17763.0 |
+| SDK、普通 C# / VB 插件样例目标 | net10.0-windows10.0.17763.0，保持已发布目标 |
+| LakeUI | 纯 NuGet 5.301.0，无本地 DLL 覆盖 |
 | LakeUI 包声明的源码提交 | d844f8dfc4b843797fb992cfb3ad9a95f16428ea，与 5.201.0 相同 |
 | 主解决方案 | FFmpegFreeUI-API-Extended-Edition.slnx |
 | 验证环境 | .NET SDK 11.0.100 / Microsoft.WindowsDesktop.App 11.0.0 / win-x64 |
 
-## 当前工作结果：上游 6.5.0 已合并
+## 本轮修改机制
 
-- 已通过命令级代理拉取官方最新 b5305ec（2026/11/11-1）；本轮只有一条新的上游提交，Release 于 2026-11-12 发布。
-- 上游主要迁移 .NET 11，升级产品版本，调整 README 运行环境及官方 Updater 的运行库检查/下载、TickCount64。没有更改官方插件 API、事件、宿主界面源码或 LakeUI 控件调用。
-- 主项目冲突逐项保留扩展版品牌、API 组件拆分和 NuGet 引用；同步 .NET 11 / Windows 17763 和 6.5.0 版本。移除上游重新带入的本机 LakeUIAssembly 路径。
-- Updater/Program.vb、Updater/Updater.vbproj 的修改/删除冲突继续保留扩展版既有删除；没有恢复官方强制升级器。本项目仍使用自有仓库检查更新、用户确认后升级。
-- PluginHost 和回归项目随主程序升为 .NET 11；引用新 LakeUI 的独立背景测试插件也改为 .NET 11。SDK 目录、公开签名、程序集身份和普通最小插件源码均未改；SDK 的 NuGet 发布工作流继续构建 .NET 10 SDK 项目。
-- 发布脚本的 SDK 最低检查及 Desktop Runtime 提示改为 11，保留 UTF-8 BOM，默认仍发布主程序和两个 Ext DLL。
-- 更新开发指南、README 扩展版版本及第三方声明；分界线后的 README 已逐字核对为本次上游内容。
-- .NET 11 新增分析器暴露两处警告：将裁剪窗口 Designer 的组件字段移至方法后；缓存 PowerShell 工具固定的 command 字段名数组。没有屏蔽分析器或修改 SDK 契约，Agent 原有行为由既有回归覆盖。
-
-## LakeUI 5.301 依赖核对
-
-- 已核对官方 NuGet v3 元数据：5.301.0 资产为 lib/net11.0-windows，5.201.0 为 lib/net10.0-windows；均声明相同源码提交、GPL-3.0-only 和 Vortice 3.8.3 依赖。
-- 两版 XML 文档均为 1358 个成员，名称无增删，文档 SHA-256 均为 F4740A1641805BD38DA20E22010012AA0304C12646072DA267F9CA645CEA5296。该检查覆盖文档成员，不代替对所有未公开实现或第三方 DLL 的完整认证。
-- 本轮没有新的 LakeUI 渲染源码差异，没有修改宿主布局、背景映射、HWND/presenter 生命周期或 ComboBox/TabControl 调用；沿用上一轮对 d844f8d 源码的审阅结论。
-- 已用未重新编译的 .NET 10 SDK 和旧示例 DLL 在真实 .NET 11 宿主检查；另用本轮编译的背景插件验证新开发配置。实际运行结果见下表。
+- 精简：主程序和回归使用普通 Windows TFM，避免引入未使用的 Windows SDK .NET 投影。PluginHost 保留其 SDK 引用需要的 17763 目标；发布仍为主 EXE + 两个 Ext DLL，无裁剪、无运行时打包。
+- 设置页：在 Designer 中按现有页面风格新增窗口布局行。旧配置默认使用默认大小；记忆选项保存正常窗口的 96 DPI 尺寸及最大化状态，启动按当前 DPI 还原并限制在工作区内，显式 fullscreen 参数优先。
+- 保存时机：从关闭流程中移除提前保存，改为实际 FormClosed 记录布局后保存设置，避免取消退出时覆盖历史布局；最小化时保留最近的普通/最大化状态。
+- 子窗口：新增内部窗口布局_v6，解析嵌入页面所属的实际顶层 Form；首次显示前及窗体自身 Load 完成后统一应用父窗口大小，避开字体、DPI 和 LakeUI Attach 对首次尺寸的改写。重新打开已隐藏窗口时重新应用当前父窗口尺寸。
+- 清理旧方案：移除参数预览、任务日志、质量图表各自竞争的 BeginInvoke 居中/定位逻辑；参数子页、裁剪返回页、混流和媒体流选择器传递真实父窗口。系统文件/字体/颜色选择器及紧凑消息框保留原布局。
+- 未修改 LakeUI 绘制、背景映射或 presenter 生命周期；没有增加渲染 Timer、循环 Invalidate、长延时或插件兼容垫片。
 
 ## 自动验证
 
-- 完整 restore + Release 解决方案构建通过；最终合并提交再次构建 **0 错误、0 警告**。
-- 完整回归 **583 项通过，退出代码 0**；包括 Agent 进程、参数/预设、队列、Ext 准备阶段、自有更新及回滚。
-- 未修改的旧插件 E:\DesktopPlus\Works\Code\3fui_plugin_ab-av1 Release 构建 **0 错误、0 警告**，工作树保持干净。按用户既有范围，不测试其部署旧 DLL 或完整评分链。
-- SDK 目录相对 0fe29cc 无差异；实际旧 SDK 程序集身份为 FFmpegFreeUI.Ext.PluginSdk, Version=2.0.0.0。
-- 发布 PowerShell 脚本通过语法解析；README 上游内容一致，git diff --check 通过。没有执行本轮单文件发布或覆盖既有发布目录。
+- 完整 restore + Release 解决方案构建：0 错误、0 警告。
+- 完整回归：612 项通过，退出代码 0；新增 29 项覆盖旧配置、非法选项、JSON 往返、96/120/144/192 DPI 尺寸换算、1280×720/1920×1080/800×450 工作区限制、嵌入页面父窗口解析及 Load 后子窗口尺寸。
+- 未修改的旧插件 E:\DesktopPlus\Works\Code\3fui_plugin_ab-av1 Release 构建：0 错误、0 警告，工作树保持干净。按既有范围不测试该插件旧 DLL 或完整评分链。
+- SDK 目录无改动；README 分界线后仍与本次上游原文一致；git diff --check 通过。
+- DPI/工作区数学回归与通用 WinForms 回归不等于实际多 DPI 视觉测试。
 
-## 本轮真实界面验证
+## 本轮真实程序验证
 
-使用 f66575d 上实际编译的主程序建立背景关闭/开启两个合法位置的隔离副本，显式设置微软雅黑。用户 C:\Apps\FFmpegFreeUI API Extended 原程序及其配置不变。背景开启副本部署已有合法支持者 DLL 和背景图片，实际画面确认已激活。
-
-Computer Use 的 launch_app 两次报 accessibility window-opened handler did not become ready；改用进程命令启动已编译程序后，Computer Use 正常选择、操作并捕获实际 DirectX 窗口，没有用自建窗体代替宿主。
+实际发布物位于 artifacts/window-layout-review-20261112-4a7e8c10/SingleFileFinal。BackgroundOff / BackgroundOn 均使用同一最终 EXE 和 Host DLL，并加载修改前 SDK、.NET 10 编译的 C# 示例及旧 LakeUI 背景示例；未给插件目录放入私有 LakeUI。背景开启副本使用已有合法支持者 DLL 和背景图片，已从实际屏幕确认激活。
 
 | 场景 | 实际结果 |
 | --- | --- |
-| 背景关闭/开启时启动，加载两个修改前的示例 DLL 和旧 SDK | 均执行；管理页面显示两个插件已加载，进程模块路径/哈希吻合 |
-| 旧 LakeUI 背景样例嵌套设置页 | 两种背景均实际打开；有背景时继承宿主图像，无背景时显示正常底色 |
-| 旧背景样例独立导航页及蓝底开关、恢复 | 有背景执行；蓝底只覆盖本插件页，关闭后恢复宿主背景，左侧全局背景不变 |
-| 旧背景样例嵌套设置页的蓝底开关 | 无背景执行，实际切换为蓝底 |
-| 旧纯 WinForms 示例设置页 | 无背景执行，实际显示标题、说明、复选框及按钮 |
-| 最大化/恢复 | 有背景的旧插件嵌套设置页执行；约 1199×699 / 1707×1067 逻辑像素，背景及页面内容随窗口恢复 |
-| 本轮 .NET 11 编译的背景样例 | 有背景副本重启后实际打开独立页并切换蓝底；进程实际加载的新插件哈希已核对，仍使用修改前 SDK |
-| 最终视觉检查 | 本轮编译主程序 + 新背景样例的实际窗口再截图；测试副本均正常退出 |
-| 浅色主题、多 DPI、指定 1280×720/1920×1080、精确立即/50/250/1000 ms、连续下拉、最小化/恢复、长期 CPU/GPU | **本轮未执行完整渲染验收矩阵**。本轮是目标框架/包重编译迁移，无新增渲染机制；上述烟测不能记成完整矩阵通过 |
+| 背景关闭：默认启动与旧插件初始化 | 真实窗口显示，两个旧插件入口出现；已核对实际加载路径/哈希 |
+| 背景关闭：新设置行、展开下拉和选择记忆大小 | 标题与两个选项可见；正常退出后配置保存模式 1、1199×699、非最大化 |
+| 背景关闭：抽帧子窗口 | 实际捕获的主窗口/子窗口客户区均为约 1199×699 逻辑像素，内容显示完成 |
+| 背景开启：设置页及下拉切换 | 窗口布局标题、说明、当前选项与下拉显示，背景正确；通过 UI 切回默认模式 |
+| 背景开启：保存尺寸启动 | 启动恢复预先准备的 1350×820 尺寸 |
+| 背景开启：实际拖动缩放、退出、重开 | 调整到 1301×761，退出后配置保存该尺寸，重开实际窗口恢复同尺寸 |
+| 背景开启：普通及最大化父窗口的抽帧子窗口 | 实际显示约 1301×761 和 1707×1067，分别与打开时父窗口同大小，背景/内容完整显示 |
+| 背景开启：最大化退出/重开/还原 | 配置保存正常尺寸 1301×761 和 Maximized=true；重开实际为约 1707×1067，恢复普通窗口后为 1301×761 |
+| 背景开启：默认模式忽略历史布局 | UI 选择模式 0 后保留历史尺寸/最大化记录，重开实际为默认约 1199×699，未受历史最大化影响 |
+| 背景开启：最小化/恢复与最终视觉回归 | 最小化后恢复到同一默认尺寸；最终真实 EXE 首页显示完成，随后正常退出 |
+| 100%/125%/150%/200% DPI 完整屏幕矩阵；指定 1280×720/1920×1080；精确立即/50/250/1000 ms；全部功能子窗口逐项；长期 CPU/GPU | 未完整执行。仅完成当前显示配置下的上述真实功能检查，不能标记完整渲染验收全部通过 |
 
-测试中没有对第三方插件做源码适配；没有新增长延时、渲染 Timer、循环 Invalidate、自定义 GPU 视图或兼容垫片。
+Computer Use 的 activate_window 会将最大化窗口还原；已用激活前后的实际截图核对该工具副作用，不据此修改宿主代码。重开后的首次捕获偶有其他用户应用遮挡，激活测试副本后再次检查；不将外部遮挡视为宿主黑块。此前用户手动使用窗口并以 Escape 暂停的阶段未继续输入；收到“继续”后恢复测试。
 
-### 实际测试产物哈希（SHA-256）
+## 发布物与证据
 
-| 文件 | 版本/用途 | SHA-256 |
-| --- | --- | --- |
-| FFmpegFreeUI.exe | 6.5.0.1，实际隔离进程 | 6F908813BE768E31B968F03A1C9DFC3827223A0E22B10E906AFB375D26C90CB7 |
-| FFmpegFreeUI.dll | 6.5.0.1 | 9B30123BBE260DBD5A31F310744D88E863F5BC16D2302FDCB0D7369DEE2A7B2D |
-| FFmpegFreeUI.Ext.PluginHost.dll | 2.5.0.0 | 4E56231FBF4C2D49B0990B73F6E45D1F2B5A03E753FB796E6C64422DD247E299 |
-| LakeUI.dll | 5.301 | 71869F199C5FB07C1E06F58AA12EEB3F98A46EE61EAC9886E01865B1095F6D44 |
-| 修改前 SDK DLL | AssemblyVersion 2.0.0.0 / FileVersion 2.5.0.0 | 0B4291459C90BF1A353418A70320035ABC31AE8C39314E69F82561FBB400E469 |
-| 修改前 C# 示例 DLL | .NET 10，未重新编译后部署 | 6B20A497D442FC283748C9EC42939FEA0A25004EFE509381C6475B66297EE8D8 |
-| 修改前背景示例 DLL | .NET 10 / LakeUI 5.201 编译 | CC745C65CB61AD2BD606885E2A505981C6840A788633CC08B0B0CAECDF9FB523 |
-| 新背景示例 DLL | .NET 11 / LakeUI 5.301 编译 | D242F033251E8C912207B54B1AE68BDEFBA91B8732FFD2FD6B44CD77AA177367 |
+- SingleFileFinal：EXE 12786040 字节 / 12.19 MiB；Host 103936 字节；SDK 51200 字节；三文件共 12941176 字节 / 12.34 MiB。
+- 发布依赖不含 Microsoft.Windows.SDK.NET.dll / WinRT.Runtime.dll。此前 Windows 17763 主目标会额外带入约 23.12 MiB Windows SDK .NET 和 WinRT.Runtime，是体积增长的原因。
+- 使用默认发布脚本对应的参数发布到新目录，未运行会清理既有发布目录的常规脚本；没有覆盖原 artifacts/FrameworkDependentSingleFile。
 
-实际进程还核对了 Microsoft.NETCore.App 11.0.0 / Windows Forms 11.0.0 的加载路径；未误测用户原程序。
+| 文件 | SHA-256 |
+| --- | --- |
+| SingleFileFinal/FFmpegFreeUI.exe | AD5165999E6F0D9E7D0C18F341D938741935AD86BCC9E7368DBE43E418F8A4DE |
+| SingleFileFinal/FFmpegFreeUI.Ext.PluginHost.dll | B3B4A72095DD1A44E7202BE2B4DE791D5EFA69E9902B5C18D51215A19307A614 |
+| SingleFileFinal/FFmpegFreeUI.Ext.PluginSdk.dll | 50D9DC9926A7AB5FAF7A392469B3D2525F911701401AB07954BA759D2017D2CE |
+| 实际隔离测试的修改前 SDK DLL，AssemblyVersion 2.0.0.0 / FileVersion 2.5.0.0 | B583D43E7D82EC1260AE6872A57E074427873513D3B19F7EFF39D115C276A5AC |
 
-## 体积与上一轮基线
+同目录保留 publish-hashes.json、off-loaded-modules.json 及 off-saved-layout.json、on-saved-normal-layout.json、on-saved-maximized-layout.json、on-saved-default-layout.json。隔离副本供复查，勿当成用户原安装目录或擅自清理手动改过的配置。
 
-- 上一轮 6.3.0 + net10.0-windows + LakeUI 5.201 的框架依赖单文件 EXE 为 12.27 MiB，含两 Ext DLL 共 12.42 MiB；这是历史验证结果，不是当前 6.5.0 的发布物。
-- 上游这次恢复带 Windows 17763 版本的 TFM，本项目按上游同步后，实际依赖图重新包含 Microsoft.Windows.SDK.NET.dll（23646008 字节）和 WinRT.Runtime.dll（598840 字节），会增加发布体积。
-- 官方 6.5.0 GitHub Release 的 x64 EXE 为 37421435 字节 / 35.69 MiB，arm64 为 34.00 MiB。没有擅自覆盖本项目既有单文件发布物，本轮未测出本项目新的单文件大小。
-- 本轮没有单独进行 TFM/裁剪/发布体积优化，不能继续把上一轮 12.27 MiB 写成当前体积。
+## 上游 6.5.0 合并基线摘要
+
+- 已合入 b5305ec（2026/11/11-1，Release 于 2026-11-12 发布）：迁移 .NET 11、产品版本、README 运行环境及官方 Updater 的运行库检查/下载、TickCount64；没有官方插件 API、事件或宿主界面源码变动。
+- 逐项解决项目及 Updater 修改/删除冲突；保留扩展版品牌、API 组件拆分、自有仓库检查更新和用户确认，未恢复上游强制升级器；移除重新带入的本机 LakeUIAssembly 引用。
+- LakeUI 5.201/5.301 包资产分别为 net10/net11，均声明相同源码提交、GPL-3.0-only 和 Vortice 3.8.3。两版 XML 1358 个成员一致，SHA-256 F4740A1641805BD38DA20E22010012AA0304C12646072DA267F9CA645CEA5296；该结果不等于所有内部实现或第三方插件完整认证。
+- 合并轮次曾通过 583 项回归、旧插件源码构建和背景开/关真实旧插件烟测；本轮已用 612 项回归及上述实际发布物功能测试更新基线。旧轮详细哈希保留在 artifacts/upstream-650-review-20261112-d9c518a7。
 
 ## 既有问题和稳定约定
 
-- 浅色插件详情低对比度是宿主 插件详情视图_v6.vb 的硬编码亮色造成；上一轮实际旧版对照已确认。本轮未改配色，也未重新验证浅色主题，仍待单独修复。
-- 官方 API 优先，Ext 补充；统一 IExtFFmpegFreeUIHost，SDK AssemblyVersion 保持 2.0.0.0；SDK 兼容、LakeUI 依赖和插件自身行为分开判断。
-- 自有更新从扩展版仓库检查，经用户确认升级。没有恢复官方强制更新器，也没有发布新 NuGet 包、打标签、推送或创建 Release。
-- README 分界线后必须与已合入上游原文一致。
-- 支持者 DLL：C:\Apps\FFmpegFreeUI ReadyToRun x64\FFmpegFreeUISupporter_v6.dll，SHA-256 A08B0B3A00ECBF6AD2A83B39BE105D4C385D3AFD8DC4C5CE94D1C7E400D5741E，仅用于合法隔离验证。
-- 本轮隔离副本及旧 DLL 备份均已在核实绝对路径、无重解析点、无运行进程后清理。artifacts/upstream-650-review-20261112-d9c518a7 只保留本轮哈希记录 JSON；未清理其他轮次或用户文件。
+- 浅色插件详情低对比度是宿主 插件详情视图_v6.vb 的硬编码亮色造成，旧版本对照已确认；本轮未改配色，未重新验证浅色主题，仍待单独修复。
+- 官方 API 优先，Ext 补充；SDK AssemblyVersion 保持 2.0.0.0；SDK 兼容、LakeUI 依赖和插件自身行为分别判断。
+- README 的“以下是上游仓库原内容”之后必须与已合入上游原文一致。
+- 合法支持者 DLL：C:\Apps\FFmpegFreeUI ReadyToRun x64\FFmpegFreeUISupporter_v6.dll，SHA-256 A08B0B3A00ECBF6AD2A83B39BE105D4C385D3AFD8DC4C5CE94D1C7E400D5741E，仅用于合法隔离验证。
 - upstream：https://github.com/Lake1059/FFmpegFreeUI.git；origin：https://github.com/SteveYu000/FFmpegFreeUI-API-Extended-Edition.git。
-- 网络使用命令级 http://127.0.0.1:7897 代理与 Git OpenSSL，未更改全局配置、TLS 校验或系统代理。
+- 网络需要时用命令级 http://127.0.0.1:7897 代理与 Git OpenSSL，不更改全局配置、TLS 校验或系统代理。

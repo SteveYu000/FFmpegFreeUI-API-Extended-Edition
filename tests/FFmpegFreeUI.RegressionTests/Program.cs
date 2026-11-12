@@ -62,6 +62,8 @@ internal static partial class Program
             Console.WriteLine("PASS: crop preview timestamps, aspect ratios and selection parsing");
             TestPresetCopies(directory);
             TestBitrateArgumentsAcrossQualityModes();
+            TestWindowLayout();
+            Console.WriteLine("PASS: window layout persistence, DPI scaling, screen bounds and child ownership");
             TestThemeAndVmaf();
             TestMp4FastStart();
             TestOtherVmafCandidates();

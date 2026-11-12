@@ -14,6 +14,7 @@ Public Class FormMain_v6
     Private 退出里程碑检查已完成 As Boolean = False
     Private 重启请求待执行 As Boolean = False
     Private 重启助手已启动 As Boolean = False
+    Private 最近非最小化窗口状态 As FormWindowState = FormWindowState.Normal
 
     Private Sub FormMain_v6_Load(sender As Object, e As EventArgs) Handles Me.Load
         UI同步上下文 = Threading.SynchronizationContext.Current
@@ -33,6 +34,7 @@ Public Class FormMain_v6
         AddHandler Form_v6_Agent.正在推理任务数量已变化, AddressOf 请求刷新任务数量选项卡
         刷新任务数量选项卡()
         应用窗口样式()
+        窗口布局_v6.恢复主窗口(Me)
         ModernTabListControl1.SelectedIndex = 0
         ModernTextBox1.Parent = ModernTabListControl1
         确保注册插件主导航目标()
@@ -46,11 +48,16 @@ Public Class FormMain_v6
     End Sub
 
     Private Sub FormMain_v6_FormClosed(发送者 As Object, 事件参数 As FormClosedEventArgs) Handles Me.FormClosed
+        窗口布局_v6.记录主窗口(Me, 最近非最小化窗口状态)
+        设置_v6.退出时保存设置()
         RemoveHandler 编码队列_v6.队列已变化, AddressOf 请求刷新任务数量选项卡
         RemoveHandler 编码队列_v6.任务已更新, AddressOf 编码任务已更新
         RemoveHandler Form_v6_Agent.正在推理任务数量已变化, AddressOf 请求刷新任务数量选项卡
     End Sub
 
+    Private Sub FormMain_v6_SizeChanged(sender As Object, e As EventArgs) Handles Me.SizeChanged
+        If WindowState <> FormWindowState.Minimized Then 最近非最小化窗口状态 = WindowState
+    End Sub
     Private Sub FormMain_v6_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         ModernTabListControl1.Focus()
         Application.DoEvents()

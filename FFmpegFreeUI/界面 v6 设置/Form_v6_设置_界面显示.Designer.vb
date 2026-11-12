@@ -23,6 +23,9 @@ Partial Class Form_v6_设置_界面显示
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         ModernPanel1 = New LakeUI.ModernPanel()
+        P_窗口布局 = New LakeUI.ModernPanel()
+        MCB_窗口布局 = New LakeUI.ModernComboBox()
+        HCL_窗口布局 = New LakeUI.HtmlColorLabel()
         Panel4 = New LakeUI.ModernPanel()
         MCB_窗口圆角 = New LakeUI.ModernComboBox()
         HtmlColorLabel3 = New LakeUI.HtmlColorLabel()
@@ -33,6 +36,7 @@ Partial Class Form_v6_设置_界面显示
         MCB_全局字体 = New LakeUI.ModernComboBox()
         HtmlColorLabel1 = New LakeUI.HtmlColorLabel()
         ModernPanel1.SuspendLayout()
+        P_窗口布局.SuspendLayout()
         Panel4.SuspendLayout()
         Panel3.SuspendLayout()
         Panel2.SuspendLayout()
@@ -43,6 +47,8 @@ Partial Class Form_v6_设置_界面显示
         ModernPanel1.BackColor = Color.Transparent
         ModernPanel1.BackColor1 = Color.Transparent
         ModernPanel1.BorderSize = 0
+        ModernPanel1.Controls.Add(P_窗口布局)
+        ModernPanel1.Controls.Add(HCL_窗口布局)
         ModernPanel1.Controls.Add(Panel4)
         ModernPanel1.Controls.Add(HtmlColorLabel3)
         ModernPanel1.Controls.Add(Panel3)
@@ -56,6 +62,62 @@ Partial Class Form_v6_设置_界面显示
         ModernPanel1.ScrollBarMode = LakeUI.ModernPanel.ScrollMode.Vertical
         ModernPanel1.Size = New Size(752, 625)
         ModernPanel1.TabIndex = 0
+        '
+        ' P_窗口布局
+        '
+        P_窗口布局.BackColor = Color.Transparent
+        P_窗口布局.BackColor1 = Color.Transparent
+        P_窗口布局.BorderSize = 0
+        P_窗口布局.Controls.Add(MCB_窗口布局)
+        P_窗口布局.Dock = DockStyle.Top
+        P_窗口布局.Location = New Point(20, 298)
+        P_窗口布局.Name = "P_窗口布局"
+        P_窗口布局.Padding = New Padding(0, 10, 0, 0)
+        P_窗口布局.Size = New Size(712, 42)
+        P_窗口布局.TabIndex = 17
+        '
+        ' MCB_窗口布局
+        '
+        MCB_窗口布局.BackColor1 = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCB_窗口布局.BorderRadius = 10
+        MCB_窗口布局.BorderSize = 0
+        MCB_窗口布局.Dock = DockStyle.Left
+        MCB_窗口布局.DropDownBackdropBlurPasses = 2
+        MCB_窗口布局.DropDownBackdropBlurRadius = 30
+        MCB_窗口布局.DropDownBackdropMode = LakeUI.PopupBackdropMode.Auto
+        MCB_窗口布局.DropDownHoverColor = Color.FromArgb(CByte(20), CByte(220), CByte(220), CByte(220))
+        MCB_窗口布局.DropDownMode = LakeUI.ModernComboBox.DropDownDisplayMode.Overlay
+        MCB_窗口布局.DropDownPadding = New Padding(10)
+        MCB_窗口布局.DropDownSelectedColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCB_窗口布局.DropDownSelectedForeColor = Color.White
+        MCB_窗口布局.HoverBackColor1 = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
+        MCB_窗口布局.Items.Add("使用默认大小")
+        MCB_窗口布局.Items.Add("使用上次关闭时的大小")
+        MCB_窗口布局.Location = New Point(0, 10)
+        MCB_窗口布局.Margin = New Padding(2, 2, 2, 2)
+        MCB_窗口布局.Name = "MCB_窗口布局"
+        MCB_窗口布局.Padding = New Padding(10, 0, 10, 0)
+        MCB_窗口布局.SelectionColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
+        MCB_窗口布局.Size = New Size(300, 32)
+        MCB_窗口布局.TabIndex = 0
+        MCB_窗口布局.ToolTipGap = -1
+        MCB_窗口布局.ToolTipMaxWidth = 350
+        MCB_窗口布局.ToolTipPadding = New Padding(15)
+        MCB_窗口布局.WaterTextForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
+        '
+        ' HCL_窗口布局
+        '
+        HCL_窗口布局.AutoSize = True
+        HCL_窗口布局.AutoSizeMode = AutoSizeMode.GrowAndShrink
+        HCL_窗口布局.Dock = DockStyle.Top
+        HCL_窗口布局.ForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
+        HCL_窗口布局.Location = New Point(20, 255)
+        HCL_窗口布局.Margin = New Padding(2)
+        HCL_窗口布局.Name = "HCL_窗口布局"
+        HCL_窗口布局.Padding = New Padding(0, 20, 0, 0)
+        HCL_窗口布局.Size = New Size(712, 43)
+        HCL_窗口布局.TabIndex = 16
+        HCL_窗口布局.Text = "<span style=""font-size:13; color:Silver"">窗口布局</span>   下次启动时生效；可记住窗口大小及最大化状态"
         '
         ' Panel4
         '
@@ -237,12 +299,16 @@ Partial Class Form_v6_设置_界面显示
         Text = "Form_v6_设置_界面显示"
         ModernPanel1.ResumeLayout(False)
         ModernPanel1.PerformLayout()
+        P_窗口布局.ResumeLayout(False)
         Panel4.ResumeLayout(False)
         Panel3.ResumeLayout(False)
         Panel2.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
 
+    Friend WithEvents P_窗口布局 As LakeUI.ModernPanel
+    Friend WithEvents MCB_窗口布局 As LakeUI.ModernComboBox
+    Friend WithEvents HCL_窗口布局 As LakeUI.HtmlColorLabel
     Friend WithEvents ModernPanel1 As LakeUI.ModernPanel
     Friend WithEvents HtmlColorLabel1 As LakeUI.HtmlColorLabel
     Friend WithEvents Panel2 As LakeUI.ModernPanel

@@ -52,13 +52,7 @@ Public Class Form_v6_编码队列_任务日志
             AddHandler 当前实例.FormClosed, Sub() 当前实例 = Nothing
         End If
         当前实例.同步选择(selectedIds)
-        界面主题_v6.应用当前主题到窗体(当前实例)
-        If 当前实例.Visible Then
-            当前实例.Activate()
-        Else
-            当前实例.居中到v6主窗口()
-            当前实例.Show(owner)
-        End If
+        显示窗体(当前实例, If(窗口布局_v6.获取顶层窗口(TryCast(owner, Control)), FormMain_v6))
     End Sub
 
     Public Shared Sub 同步队列选择(selectedIds As IEnumerable(Of String))
@@ -82,7 +76,6 @@ Public Class Form_v6_编码队列_任务日志
             ModernPanel1.BackColor = Color.Transparent
             ModernPanel1.BackColor1 = Color.Transparent
         End If
-        BeginInvoke(Sub() 居中到v6主窗口())
         ModernTextBox1.SyntaxHighlighter = FFmpeg输出语法高亮器_v6.默认实例
         ModernTextBox1.EnableSyntaxHighlight = True
         ModernTextBox1.MaxUndoCount = 0
@@ -516,26 +509,7 @@ Public Class Form_v6_编码队列_任务日志
         Return IO.Path.GetFileName(task.输入文件)
     End Function
 
-    Private Sub 居中到v6主窗口()
-        Try
-            Dim mainForm As Form = FormMain_v6
-            Dim baseBounds As Rectangle
-            If mainForm IsNot Nothing AndAlso Not mainForm.IsDisposed AndAlso mainForm.Visible AndAlso mainForm.WindowState <> FormWindowState.Minimized Then
-                baseBounds = mainForm.Bounds
-            Else
-                baseBounds = Screen.FromPoint(Cursor.Position).WorkingArea
-            End If
 
-            Dim screenArea = Screen.FromRectangle(baseBounds).WorkingArea
-            Dim x = baseBounds.Left + CInt(Math.Round((baseBounds.Width - Width) / 2.0))
-            Dim y = baseBounds.Top + CInt(Math.Round((baseBounds.Height - Height) / 2.0))
-            x = Math.Max(screenArea.Left, Math.Min(x, screenArea.Right - Width))
-            y = Math.Max(screenArea.Top, Math.Min(y, screenArea.Bottom - Height))
-            StartPosition = FormStartPosition.Manual
-            Location = New Point(x, y)
-        Catch
-        End Try
-    End Sub
 
     Private Function 获取当前显示模式() As 编码任务日志显示模式_v6
         Select Case MCB_显示模式.SelectedIndex

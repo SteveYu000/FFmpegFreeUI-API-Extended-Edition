@@ -288,8 +288,9 @@ Public Class Form_v6_集成工具_比特率可视化
                 selector.MB_全选字幕.Enabled = False
                 禁用拖入(selector)
                 界面主题_v6.应用当前主题到窗体(selector)
-                selector.StartPosition = FormStartPosition.CenterParent
-                selector.ShowDialog(FindForm())
+                Dim owner = 窗口布局_v6.获取顶层窗口(Me)
+                窗口布局_v6.准备子窗口(selector, owner)
+                selector.ShowDialog(owner)
             End Using
             Dim choices As New HashSet(Of String)((video.Text & "," & audio.Text).Split(","c, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase)
             data.已选 = New HashSet(Of Integer)(data.信息.流.Where(Function(s) choices.Contains(s.选择符)).Select(Function(s) s.索引))

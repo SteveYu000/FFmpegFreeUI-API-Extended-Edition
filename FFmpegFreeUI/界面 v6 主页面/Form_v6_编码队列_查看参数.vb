@@ -43,7 +43,6 @@ Public Class Form_v6_编码队列_查看参数
             ModernPanel1.BackColor = Color.Transparent
             ModernPanel1.BackColor1 = Color.Transparent
         End If
-        BeginInvoke(Sub() 居中到v6主窗口())
     End Sub
 
     Private Sub Form_v6_编码队列_查看参数_SizeChanged(sender As Object, e As EventArgs) Handles Me.SizeChanged
@@ -60,24 +59,5 @@ Public Class Form_v6_编码队列_查看参数
         ExFloatingTip(MB_复制命令行模板, "已复制实际命令行", 1200)
     End Sub
 
-    Private Sub 居中到v6主窗口()
-        Try
-            Dim mainForm As Form = FormMain_v6
-            Dim baseBounds As Rectangle
-            If mainForm IsNot Nothing AndAlso Not mainForm.IsDisposed AndAlso mainForm.Visible AndAlso mainForm.WindowState <> FormWindowState.Minimized Then
-                baseBounds = mainForm.Bounds
-            Else
-                baseBounds = Screen.FromPoint(Cursor.Position).WorkingArea
-            End If
 
-            Dim screenArea = Screen.FromRectangle(baseBounds).WorkingArea
-            Dim x = baseBounds.Left + CInt(Math.Round((baseBounds.Width - Width) / 2.0))
-            Dim y = baseBounds.Top + CInt(Math.Round((baseBounds.Height - Height) / 2.0))
-            x = Math.Max(screenArea.Left, Math.Min(x, screenArea.Right - Width))
-            y = Math.Max(screenArea.Top, Math.Min(y, screenArea.Bottom - Height))
-            StartPosition = FormStartPosition.Manual
-            Location = New Point(x, y)
-        Catch
-        End Try
-    End Sub
 End Class

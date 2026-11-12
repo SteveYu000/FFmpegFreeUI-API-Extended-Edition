@@ -5,6 +5,7 @@ Public Class Form_v6_设置_界面显示
         _正在加载新增外观设置 = True
         Try
             MCB_界面主题.SelectedIndex = Math.Clamp(设置_v6.实例对象.界面主题, 0, 2)
+            MCB_窗口布局.SelectedIndex = If(设置_v6.实例对象.窗口布局 = 1, 1, 0)
             If LakeUI.DwmWindowStyle.IsCornerModeSupported Then
                 MCB_窗口圆角.Enabled = True
                 MCB_窗口圆角.SelectedIndex = Math.Clamp(设置_v6.实例对象.窗口圆角, 0, 1)
@@ -23,6 +24,7 @@ Public Class Form_v6_设置_界面显示
         Dim topPadding = CInt(Math.Round(20.0R * DeviceDpi / 96.0R))
         HtmlColorLabel2.Padding = New Padding(0, topPadding, 0, 0)
         HtmlColorLabel3.Padding = New Padding(0, topPadding, 0, 0)
+        HCL_窗口布局.Padding = New Padding(0, topPadding, 0, 0)
         ModernPanel1.PerformLayout()
     End Sub
 
@@ -39,5 +41,9 @@ Public Class Form_v6_设置_界面显示
     Private Sub MCB_窗口圆角_SelectedIndexChanged(sender As Object, e As EventArgs) Handles MCB_窗口圆角.SelectedIndexChanged
         If _正在加载新增外观设置 OrElse MCB_窗口圆角.SelectedIndex < 0 Then Return
         设置_v6.设置窗口圆角(MCB_窗口圆角.SelectedIndex)
+    End Sub
+    Private Sub MCB_窗口布局_SelectedIndexChanged(sender As Object, e As EventArgs) Handles MCB_窗口布局.SelectedIndexChanged
+        If _正在加载新增外观设置 OrElse MCB_窗口布局.SelectedIndex < 0 Then Return
+        设置_v6.设置窗口布局(MCB_窗口布局.SelectedIndex)
     End Sub
 End Class

@@ -386,15 +386,13 @@ Module Module1
     End Function
 
     Public Sub 显示窗体(哪个窗口 As Form, 以谁为基准显示 As Form)
+        Dim owner = 窗口布局_v6.获取顶层窗口(以谁为基准显示)
         界面主题_v6.应用当前主题到窗体(哪个窗口)
-        If 哪个窗口.Visible = True Then
-            哪个窗口.Focus()
-            哪个窗口.Left = (以谁为基准显示.Width - 哪个窗口.Width) * 0.5 + 以谁为基准显示.Left
-            哪个窗口.Top = (以谁为基准显示.Height - 哪个窗口.Height) * 0.5 + 以谁为基准显示.Top
+        窗口布局_v6.准备子窗口(哪个窗口, owner)
+        If 哪个窗口.Visible Then
+            哪个窗口.Activate()
         Else
-            哪个窗口.Left = (以谁为基准显示.Width - 哪个窗口.Width) * 0.5 + 以谁为基准显示.Left
-            哪个窗口.Top = (以谁为基准显示.Height - 哪个窗口.Height) * 0.5 + 以谁为基准显示.Top
-            哪个窗口.Show(以谁为基准显示)
+            哪个窗口.Show(owner)
             界面主题_v6.应用当前主题到窗体(哪个窗口)
         End If
     End Sub

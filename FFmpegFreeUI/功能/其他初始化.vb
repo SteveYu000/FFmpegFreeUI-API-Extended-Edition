@@ -137,7 +137,6 @@ Partial Public Class FormMain_v6
                 Return
             End Try
         End If
-        设置_v6.退出时保存设置()
     End Function
 
     <CodeAnalysis.SuppressMessage("Performance", "CA1861:不要将常量数组作为参数", Justification:="<挂起>")>
