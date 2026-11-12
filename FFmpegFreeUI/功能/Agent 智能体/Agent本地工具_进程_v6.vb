@@ -446,6 +446,8 @@ Partial Public Class AgentLocalTools
     Public NotInheritable Class PowerShellRunSession
         Inherits ConsoleRunSession
 
+        Private Shared ReadOnly CommandInputPropertyNames As String() = {"command"}
+
         Protected Overrides ReadOnly Property DisplayName As String
             Get
                 Return "PowerShell"
@@ -454,7 +456,7 @@ Partial Public Class AgentLocalTools
 
         Protected Overrides ReadOnly Property InputPropertyNames As String()
             Get
-                Return New String() {"command"}
+                Return CommandInputPropertyNames
             End Get
         End Property
 

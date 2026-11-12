@@ -163,13 +163,13 @@ if (-not (Test-Path -LiteralPath $主项目 -PathType Leaf)) {
 
 $dotnet版本 = (& dotnet --version)
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($dotnet版本)) {
-    throw "未找到 dotnet SDK，请先安装 .NET 10 SDK。"
+    throw "未找到 dotnet SDK，请先安装 .NET 11 SDK。"
 }
 
 $主版本文本 = ($dotnet版本.Trim() -split '\.')[0]
 $主版本 = 0
-if (-not [int]::TryParse($主版本文本, [ref]$主版本) -or $主版本 -lt 10) {
-    throw "当前 dotnet SDK 版本为 $dotnet版本，本项目需要 .NET 10 SDK。"
+if (-not [int]::TryParse($主版本文本, [ref]$主版本) -or $主版本 -lt 11) {
+    throw "当前 dotnet SDK 版本为 $dotnet版本，本项目需要 .NET 11 SDK。"
 }
 
 $插件宿主文件 = ""
@@ -205,4 +205,4 @@ foreach ($目标架构 in $目标架构列表) {
 
 Write-Host ""
 Write-Host "全部任务完成。输出根目录：$输出根目录" -ForegroundColor Green
-Write-Host "目标电脑需要安装与架构匹配的 .NET Desktop Runtime 10。" -ForegroundColor Yellow
+Write-Host "目标电脑需要安装与架构匹配的 .NET Desktop Runtime 11。" -ForegroundColor Yellow

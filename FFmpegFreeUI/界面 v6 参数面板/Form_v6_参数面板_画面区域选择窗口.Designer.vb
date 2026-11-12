@@ -18,9 +18,6 @@ Partial Class Form_v6_参数面板_画面区域选择窗口
         End Try
     End Sub
 
-    'Windows 窗体设计器所必需的
-    Private 组件容器 As System.ComponentModel.IContainer
-
     '注意: 以下过程是 Windows 窗体设计器所必需的
     '可以使用 Windows 窗体设计器修改它。
     '不要使用代码编辑器修改它。
@@ -309,6 +306,9 @@ Partial Class Form_v6_参数面板_画面区域选择窗口
         面板_操作栏.PerformLayout()
         ResumeLayout(False)
     End Sub
+    'Windows 窗体设计器所必需的
+    Private 组件容器 As System.ComponentModel.IContainer
+
     Friend WithEvents 面板_窗口内容 As LakeUI.ModernPanel
     Friend WithEvents PPB_画面区域预览 As LakeUI.PixelPictureBox
     Friend WithEvents 间隔_预览区 As LakeUI.JustEmptyControl

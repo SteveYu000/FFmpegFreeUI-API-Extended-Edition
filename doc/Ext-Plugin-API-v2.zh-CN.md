@@ -189,10 +189,10 @@ Plugin\
 
 ### 2.1 必备环境
 
-插件和宿主当前使用 Windows、.NET 10 与 WinForms。开发机需要：
+宿主当前使用 Windows、.NET 11 与 WinForms；已发布的 Ext SDK 和不依赖新 LakeUI 的插件仍可使用 .NET 10。开发机需要：
 
 - Windows 10/11；目标体系结构应与准备调试的 FFmpegFreeUI 发行包兼容；
-- .NET 10 SDK，而不只是 .NET Desktop Runtime；
+- 构建宿主或使用 LakeUI 5.301 的页面插件需要 .NET 11 SDK；只开发基于现有 SDK 的普通插件可继续使用 .NET 10 SDK。运行宿主需要 .NET 11 Desktop Runtime；
 - Visual Studio（安装“.NET 桌面开发”工作负载）、Rider，或 Visual Studio Code 配合 C# Dev Kit；
 - 若使用 VB.NET，选择支持 VB 项目的 Visual Studio、Rider 或 `dotnet` CLI。
 
@@ -203,7 +203,7 @@ dotnet --info
 dotnet --list-sdks
 ```
 
-列表中应存在 `10.0.x`。只有运行时而没有 SDK 时，编辑器可能能打开代码，但不能还原或编译插件。
+构建完整源码时，列表中应存在 `11.0.x` 或兼容的新 SDK；普通 .NET 10 插件也可使用 `10.0.x`。只有运行时而没有 SDK 时，编辑器可能能打开代码，但不能还原或编译插件。
 
 在完整源码仓库中首次构建：
 
@@ -214,7 +214,7 @@ dotnet restore .\FFmpegFreeUI-API-Extended-Edition.slnx
 dotnet build .\FFmpegFreeUI-API-Extended-Edition.slnx -c Debug --no-restore
 ```
 
-当前主程序以 `net10.0-windows` 为目标框架，通过 NuGet 使用 **LakeUI 5.201.0**。执行 `dotnet restore` 时会自动还原依赖，不需要同级 LakeUI 源码仓库或本地 `HintPath`。Ext SDK 和插件项目继续使用 `net10.0-windows10.0.17763.0`，已发布的 SDK 程序集身份与公共接口保持不变；主程序的发布目标不要求插件修改现有目标框架。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需显式引用 LakeUI。
+当前主程序、PluginHost 和回归项目以 `net11.0-windows10.0.17763.0` 为目标框架，通过 NuGet 使用 **LakeUI 5.301.0**。执行 `dotnet restore` 时会自动还原依赖，不需要同级 LakeUI 源码仓库或本地 `HintPath`。Ext SDK 与普通 C#/VB 示例继续使用 `net10.0-windows10.0.17763.0`，已发布 SDK 的程序集身份与公共接口保持不变。只有引用 LakeUI 5.301 的背景测试插件跟随它改为 .NET 11；普通插件无需仅因宿主升级而更改目标。只开发不使用 LakeUI 控件的独立 Ext 插件时，无需显式引用 LakeUI。
 
 ### 2.2 SDK 引用与编辑器提示
 
@@ -932,11 +932,11 @@ if (host.PageEntries.AvailableTargets.Any(x =>
 
 可运行的验证样例见独立的 [LakeUI 背景测试插件](../Samples/FFmpegFreeUI.Ext.BackgroundTest/README.md)：左侧页面使用直接根容器，插件管理设置页使用嵌套根容器，两页都能单独开关插件自己的背景。现有 C# 综合示例仍保持纯 WinForms，不依赖 LakeUI。
 
-当前宿主运行 **LakeUI 5.201.0**。新建 LakeUI 页面时，使用与目标宿主一致的编译引用；已有插件不必仅因宿主升级而自动重新编译，但必须另做运行时与视觉兼容验证。引用必须限制为编译用途，插件发布目录中只能放插件自己的程序集，不能携带私有的 `LakeUI.dll`：
+当前宿主运行 **LakeUI 5.301.0**，该包要求 .NET 11。新建 LakeUI 页面时，将插件目标设为 `net11.0-windows10.0.17763.0` 并使用与目标宿主一致的编译引用；SDK 仍可引用现有的 .NET 10 版本。已有按 LakeUI 5.201 或更早版本编译的插件不必仅因宿主升级而自动重新编译，但必须另做运行时与视觉兼容验证。引用必须限制为编译用途，插件发布目录中只能放插件自己的程序集，不能携带私有的 `LakeUI.dll`：
 
 ```xml
 <PackageReference Include="LakeUI"
-                  Version="[5.201.0]"
+                  Version="[5.301.0]"
                   PrivateAssets="all"
                   ExcludeAssets="runtime" />
 ```
