@@ -1,4 +1,4 @@
-Imports System.ComponentModel
+﻿Imports System.ComponentModel
 Imports System.Diagnostics
 Imports System.IO
 Imports System.Reflection
@@ -72,7 +72,11 @@ Public Class FormMain_v6
             PrecisionTimer1.Start()
         End If
 
-        If 编码队列_v6.存在未处理任务缓存() Then 检查并询问加载未处理任务缓存()
+        Try
+            编码队列_v6.恢复持久化队列()
+        Catch 异常 As Exception
+            ExOverlayMsgBox(Me, "恢复编码队列失败：" & 异常.Message, MsgBoxStyle.Critical, "恢复失败")
+        End Try
         用户使用统计_v6.启动时后台检查(Me)
     End Sub
 
@@ -115,7 +119,7 @@ Public Class FormMain_v6
         Dim targets As (Id As String, DisplayName As String, Index As Integer)() = {
             (Ext插件页面目标_v2.主导航_起始页面, "起始页面", 0),
             (Ext插件页面目标_v2.主导航_编码队列, "编码队列", 1),
-            (Ext插件页面目标_v2.主导航_准备文件, "准备文件", 3),
+            (Ext插件页面目标_v2.参数面板("overview"), "参数总览", 3),
             (Ext插件页面目标_v2.主导航_参数面板, "参数面板", 4),
             (Ext插件页面目标_v2.主导航_Agent, "Agent 智能体", 5),
             (Ext插件页面目标_v2.主导航_Studios, "3FUI Studios", 6),
@@ -134,6 +138,7 @@ Public Class FormMain_v6
                 "main",
                 ModernTabListControl1,
                 ModernTabListControl1.Items(target.Index),
+                parameterSurface:=If(target.Id = Ext插件页面目标_v2.参数面板("overview"), Form_v6_参数面板, Nothing),
                 configurePage:=AddressOf 配置插件页面背景)
         Next
     End Sub
@@ -193,7 +198,10 @@ Public Class FormMain_v6
             selectedControl = ModernTabListControl1.Items(ModernTabListControl1.SelectedIndex).BoundControl
         End If
 
-        If selectedControl Is Form_v6_Agent Then
+        If selectedControl Is Form_v6_参数面板.私有界面_参数总览 Then
+            Form_v6_性能监控.停止()
+            Form_v6_参数面板.刷新参数总览页()
+        ElseIf selectedControl Is Form_v6_Agent Then
             Form_v6_性能监控.停止()
             Form_v6_Agent.检查并刷新模型列表()
         ElseIf selectedControl Is Form_v6_性能监控 Then
@@ -248,11 +256,6 @@ Public Class FormMain_v6
     Private Shared Function 转换为PowerShell字符串(value As String) As String
         Return "'" & If(value, "").Replace("'", "''") & "'"
     End Function
-
-    <CodeAnalysis.SuppressMessage("Performance", "CA1861:不要将常量数组作为参数", Justification:="<挂起>")>
-    Private Sub 检查并询问加载未处理任务缓存()
-        检查并询问加载未处理任务缓存核心()
-    End Sub
 
     Private Sub PrecisionTimer1_Tick(sender As Object, e As EventArgs) Handles PrecisionTimer1.Tick
         Dim t1 As String = "<Title>"

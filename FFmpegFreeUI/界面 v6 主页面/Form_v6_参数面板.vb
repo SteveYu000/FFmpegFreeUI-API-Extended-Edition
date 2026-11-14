@@ -50,10 +50,10 @@ Public Class Form_v6_参数面板
 
     Private Sub Form_v6_参数面板_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         确保缓存原生参数选项卡()
-        绑定原生参数选项卡("overview", 私有界面_参数总览)
-        绑定选项卡(私有界面_参数总览.ModernPanel1)
         绑定原生参数选项卡("presets", 私有界面_预设管理)
         绑定选项卡(私有界面_预设管理.ModernPanel1)
+        绑定原生参数选项卡("prepare-files", Form_v6_准备文件)
+        绑定选项卡(Form_v6_准备文件.ModernPanel1)
         '==================================================
         绑定原生参数选项卡("output", 私有界面_输出文件设置)
         绑定选项卡(私有界面_输出文件设置.ModernPanel1)
@@ -122,7 +122,7 @@ Public Class Form_v6_参数面板
         私有界面_附件.所属参数面板对象 = Me
         绑定选项卡(私有界面_附件.ModernPanel1)
         '==================================================
-        Me.ModernTabListControl1.SelectedIndex = Me.ModernTabListControl1.Items.IndexOf(原生参数选项卡("overview"))
+        Me.ModernTabListControl1.SelectedIndex = Me.ModernTabListControl1.Items.IndexOf(原生参数选项卡("presets"))
         Me.私有界面_自定义参数.ModernTabControl1.SelectedIndex = 0
         Me.私有界面_附加内容.ModernTabControl1.SelectedIndex = 0
         '==================================================
@@ -161,8 +161,8 @@ Public Class Form_v6_参数面板
         If 原生参数选项卡.Count > 0 Then Exit Sub
 
         Dim mappings As (Id As String, Index As Integer)() = {
-            ("overview", 0),
-            ("presets", 1),
+            ("presets", 0),
+            ("prepare-files", 1),
             ("output", 3),
             ("decoder", 4),
             ("video-encoder", 6),
@@ -214,17 +214,16 @@ Public Class Form_v6_参数面板
     End Sub
 
     Private Sub 刷新当前聚合页面()
+        If 私有界面_参数总览.Visible Then 刷新参数总览页()
         If ModernTabListControl1.SelectedIndex < 0 OrElse ModernTabListControl1.SelectedIndex >= ModernTabListControl1.Items.Count Then Exit Sub
         Dim selectedControl = ModernTabListControl1.Items(ModernTabListControl1.SelectedIndex).BoundControl
-        If selectedControl Is 私有界面_参数总览 Then
-            刷新参数总览页()
-        ElseIf selectedControl Is 私有界面_滤镜排序 Then
+        If selectedControl Is 私有界面_滤镜排序 Then
             刷新滤镜排序页()
         End If
     End Sub
 
-    Private Sub 刷新参数总览页()
-        If _正在刷新聚合页面 Then Exit Sub
+    Friend Sub 刷新参数总览页()
+        If 抑制自动刷新 OrElse IsDisposed OrElse _正在刷新聚合页面 Then Exit Sub
         _正在刷新聚合页面 = True
         Try
             预设管理_v6.刷新参数总览(Me)
@@ -298,8 +297,8 @@ Public Class Form_v6_参数面板
         Next
 
         Dim navigationPages As (Id As String, DisplayName As String)() = {
-            ("overview", "参数总览"),
             ("presets", "预设管理"),
+            ("prepare-files", "准备文件"),
             ("output", "输出文件设置"),
             ("decoder", "解码参数"),
             ("video-encoder", "视频编码器"),
@@ -316,12 +315,12 @@ Public Class Form_v6_参数面板
         }
         For Each page In navigationPages
             Ext插件扩展桥接_v2.注册插件页面目标(
-                Ext插件页面目标_v2.参数面板(page.Id),
+                If(page.Id = "prepare-files", Ext插件页面目标_v2.主导航_准备文件, Ext插件页面目标_v2.参数面板(page.Id)),
                 page.DisplayName,
                 "parameters",
                 ModernTabListControl1,
                 原生参数选项卡(page.Id),
-                Me,
+                If(page.Id = "prepare-files", Nothing, Me),
                 AddressOf 配置插件参数页面背景)
         Next
     End Sub

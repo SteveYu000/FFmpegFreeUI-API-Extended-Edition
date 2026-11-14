@@ -56,7 +56,7 @@ Partial Class FormMain_v6
         ModernTabPage1.Text = "起始页面"
         ModernTabPage2.Text = "编码队列"
         ModernTabPage3.IsSeparator = True
-        ModernTabPage4.Text = "准备文件"
+        ModernTabPage4.Text = "参数总览"
         ModernTabPage5.Text = "参数面板"
         ModernTabPage6.Text = "Agent 智能体"
         ModernTabPage7.Text = "3FUI Studios"

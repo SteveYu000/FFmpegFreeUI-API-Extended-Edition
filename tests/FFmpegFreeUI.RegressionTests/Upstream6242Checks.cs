@@ -81,8 +81,8 @@ internal static partial class Program
     {
         var previousTheme = 设置_v6.实例对象.界面主题;
         using var form = new Form();
-        using var opaque = new ModernComboBox { SelectionColor = Color.FromArgb(255, 1, 2, 3) };
-        using var translucent = new ModernComboBox { SelectionColor = Color.FromArgb(40, 1, 2, 3) };
+        using var opaque = new ModernComboBox { SelectionColor = Color.FromArgb(255, 1, 2, 3), DropDownSelectedColor = Color.FromArgb(255, 1, 2, 3) };
+        using var translucent = new ModernComboBox { SelectionColor = Color.FromArgb(40, 1, 2, 3), DropDownSelectedColor = Color.FromArgb(40, 1, 2, 3) };
         form.Controls.AddRange([opaque, translucent]);
         try
         {
@@ -91,8 +91,11 @@ internal static partial class Program
                 设置_v6.实例对象.界面主题 = theme;
                 界面主题_v6.刷新主题(true);
                 界面主题_v6.应用当前主题到窗体(form);
-                Check(opaque.SelectionColor == 界面配色_v6.获取选中背景(theme == 1), "Opaque selection color follows the selected theme");
-                Check(translucent.SelectionColor.A == 40, "Theme conversion preserves translucent selection alpha");
+                var textSelection = 界面配色_v6.获取文本选中背景(theme == 1);
+                Check(opaque.SelectionColor == textSelection, "Text selection uses the upstream theme-specific translucent color");
+                Check(translucent.SelectionColor == textSelection, "Original text selection alpha does not override the unified text highlight");
+                Check(opaque.DropDownSelectedColor == (theme == 1 ? 界面配色_v6.浅色选中背景 : Color.FromArgb(255, 1, 2, 3)), "Popup selection maps in light theme and restores its original dark color");
+                Check(translucent.DropDownSelectedColor.A == 40, "Popup theme conversion preserves translucent selection alpha");
             }
         }
         finally { 设置_v6.实例对象.界面主题 = previousTheme; 界面主题_v6.刷新主题(true); }

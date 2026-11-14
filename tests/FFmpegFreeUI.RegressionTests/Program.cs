@@ -72,6 +72,7 @@ internal static partial class Program
             Console.WriteLine("PASS: preset isolation and atomic persistence");
             TestQueueOperations(directory);
             Console.WriteLine("PASS: queue ordering, task lifecycle guards, and naming");
+            TestRecoveredProcessIdentity();
             TestNavigationCounters();
             TestBitrateVisualization();
             Console.WriteLine("PASS: inserted plugin entries, navigation counters and bitrate aggregation");

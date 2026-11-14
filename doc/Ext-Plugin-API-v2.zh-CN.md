@@ -1,4 +1,4 @@
-# FFmpegFreeUI Ext Plugin API v2.5 插件开发指南
+﻿# FFmpegFreeUI Ext Plugin API v2.5 插件开发指南
 
 本文面向希望扩展 FFmpegFreeUI 界面、原生参数和任务处理链的插件开发者，对应 Ext Plugin API `2.5.0`。
 
@@ -874,9 +874,11 @@ foreach (var target in host.EncodingQueueToolbar.AvailableTargets)
 
 | 区域 | SDK 常量 |
 |---|---|
-| 左侧主导航 | `ExtFFmpegFreeUIPageTargets.MainStart`、`MainEncodingQueue`、`MainPrepareFiles`、`MainParameters`、`MainAgent`、`MainStudios`、`MainMediaInfo`、`MainDebugPlayer`、`MainPerformance`、`MainIntegratedTools`、`MainSettings`、`MainSupporters`、`MainPluginManager` |
-| 参数面板一级导航 | `ExtFFmpegFreeUIPageTargets.ParametersOverview`、`ParametersPresets`、`ParametersOutput`、`ParametersDecoder`、`ParametersVideoEncoder`、`ParametersVideoFrame`、`ParametersVideoQuality`、`ParametersColor`、`ParametersFrameServer`、`ParametersAudio`、`ParametersTrim`、`ParametersFilterOrder`、`ParametersCustom`、`ParametersStreamControl`、`ParametersAdditional` |
+| 左侧主导航 | `ExtFFmpegFreeUIPageTargets.MainStart`、`MainEncodingQueue`、`ParametersOverview`、`MainParameters`、`MainAgent`、`MainStudios`、`MainMediaInfo`、`MainDebugPlayer`、`MainPerformance`、`MainIntegratedTools`、`MainSettings`、`MainSupporters`、`MainPluginManager` |
+| 参数面板一级导航 | `ExtFFmpegFreeUIPageTargets.ParametersPresets`、`MainPrepareFiles`、`ParametersOutput`、`ParametersDecoder`、`ParametersVideoEncoder`、`ParametersVideoFrame`、`ParametersVideoQuality`、`ParametersColor`、`ParametersFrameServer`、`ParametersAudio`、`ParametersTrim`、`ParametersFilterOrder`、`ParametersCustom`、`ParametersStreamControl`、`ParametersAdditional` |
 | 编码队列顶栏 | `ExtFFmpegFreeUIToolbarTargets.EncodingQueueTaskMenu`、`EncodingQueueStart`、`EncodingQueuePause`、`EncodingQueueResume`、`EncodingQueueStop`、`EncodingQueueRemove`、`EncodingQueueReset`、`EncodingQueueLocate` |
+
+> 6.5.1 扩展版调整了入口位置：参数总览位于主导航，准备文件位于参数面板的“预设管理”下方。两个目标保留历史 ID，已有插件不用改常量；`Area` 表示当前实际区域。插在 `ParametersOverview` 前后的插件页面仍可随预设保存状态，插在 `MainPrepareFiles` 前后的页面仍仅保存会话状态。
 
 `ExtPluginRelativePosition.Before` / `After` 的含义随区域变化：对纵向页面导航分别是目标的**上方/下方**，对横向编码队列工具栏分别是目标的**左侧/右侧**。
 
@@ -923,10 +925,10 @@ if (host.PageEntries.AvailableTargets.Any(x =>
 
 `IExtPluginPageContext` 提供 `PluginId`、`ExtensionId`、`TargetId`、`Area`、`Position`、`PageControl`、`SupportsPresetState`、`StateJson`、`StateRestored` 和 `RequestParameterRefresh()`。其中：
 
-- 参数面板导航页的 `SupportsPresetState` 为 `true`，`StateJson` 会随 v6 预设保存和恢复；同一插件的其他参数 UI 扩展共享这份按插件 ID 隔离的 JSON，多个页面应在 JSON 中使用各自字段；
-- 主导航页的 `SupportsPresetState` 为 `false`，`StateJson` 只保留到当前页面实例被释放；
+- `SupportsPresetState` 为 `true` 时，`StateJson` 会随 v6 预设保存和恢复；同一插件的其他参数 UI 扩展共享这份按插件 ID 隔离的 JSON，多个页面应在 JSON 中使用各自字段；
+- `SupportsPresetState` 为 `false` 时，`StateJson` 只保留到当前页面实例被释放。请检查此属性，不要根据导航区域或 ID 前缀推断预设状态能力；
 - `PageControl` 在执行 `CreatePage` 时还是 `null`，工厂返回后才可在 `Cleanup` 中读取；
-- 只有参数面板页面需要调用 `RequestParameterRefresh()`；主导航页面调用时不会执行操作。
+- 关联参数面板状态的页面可以调用 `RequestParameterRefresh()` 更新总览和预览（包括移到主导航的总览目标）；未关联参数面板的页面调用时不执行操作。
 
 若插件页面要自动获得 FFmpegFreeUI 的个性化背景和“超容器背景映射”，页面底板必须是 **LakeUI 的 `ModernPanel`**，控件名称必须精确为 `ModernPanel1`，并设为 `DockStyle.Fill`。普通 WinForms 页面不需要依赖 LakeUI，也能正常显示，只是不会自动获得这项背景映射。
 

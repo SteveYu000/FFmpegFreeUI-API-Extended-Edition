@@ -37,9 +37,7 @@ Friend Module Ext插件页面与工具栏宿主_v2
 
         Dim area = 解析页面区域(surfaceName)
         Dim parameterSurface = TryCast(parameterSurfaceControl, Form_v6_参数面板)
-        If area = ExtPluginPageEntryArea.ParameterPanelTabList AndAlso parameterSurface Is Nothing Then
-            Throw New ArgumentException($"参数面板页面目标 {id} 没有提供参数面板实例")
-        End If
+        ' 导航所在区域与预设状态能力独立：准备文件不保存预设状态；移到主导航的总览仍关联原参数面板。
 
         Dim target As 已注册页面目标 = Nothing
         Dim registrations As List(Of 已注册页面扩展)

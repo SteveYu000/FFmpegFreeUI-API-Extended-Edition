@@ -107,15 +107,15 @@ public interface IExtPluginPageContext
     Control? PageControl { get; }
 
     /// <summary>
-    /// 参数面板 TabPage 为 true，此时 StateJson 会随 v6 预设保存和恢复；
-    /// 主窗口 TabPage 为 false，此时 StateJson 只在本次页面实例中保存。
+    /// 为 true 时 StateJson 会随 v6 预设保存和恢复；为 false 时只在本次页面实例中保存。
+    /// 请以此属性判断能力，不要根据 Area 或目标 ID 前缀推断。页面入口位置可能调整。
     /// </summary>
     bool SupportsPresetState { get; }
     /// <summary>按插件 ID 隔离的有效 JSON 状态。</summary>
     string StateJson { get; set; }
-    /// <summary>宿主从预设恢复插件状态后触发；主窗口页面不会触发。</summary>
+    /// <summary>宿主从预设恢复插件状态后触发；SupportsPresetState 为 false 的页面不会触发。</summary>
     event EventHandler? StateRestored;
-    /// <summary>请求宿主刷新参数总览和预览；主窗口页面调用时不执行操作。</summary>
+    /// <summary>请求宿主刷新参数总览和预览；未关联参数面板的页面调用时不执行操作。</summary>
     void RequestParameterRefresh();
 }
 
@@ -124,6 +124,7 @@ public static class ExtFFmpegFreeUIPageTargets
 {
     public const string MainStart = "ext.tabpage.main.start";
     public const string MainEncodingQueue = "ext.tabpage.main.encoding-queue";
+    /// <summary>准备文件。保留历史 ID；当前入口在参数面板的预设管理下方。</summary>
     public const string MainPrepareFiles = "ext.tabpage.main.prepare-files";
     public const string MainParameters = "ext.tabpage.main.parameters";
     public const string MainAgent = "ext.tabpage.main.agent";
@@ -136,6 +137,7 @@ public static class ExtFFmpegFreeUIPageTargets
     public const string MainSupporters = "ext.tabpage.main.supporters";
     public const string MainPluginManager = "ext.tabpage.main.plugin-manager";
 
+    /// <summary>参数总览。保留历史 ID；当前入口在主导航，仍支持预设状态。</summary>
     public const string ParametersOverview = "ext.tabpage.parameters.overview";
     public const string ParametersPresets = "ext.tabpage.parameters.presets";
     public const string ParametersOutput = "ext.tabpage.parameters.output";

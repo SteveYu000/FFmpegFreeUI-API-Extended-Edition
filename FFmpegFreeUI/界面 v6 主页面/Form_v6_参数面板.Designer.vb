@@ -53,8 +53,8 @@ Partial Class Form_v6_参数面板
         ModernTabListControl1.AnimationDuration = 0
         ModernTabListControl1.BackColor = Color.Transparent
         ModernTabListControl1.Dock = DockStyle.Fill
-        ModernTabPage1.Text = "参数总览"
-        ModernTabPage2.Text = "预设管理"
+        ModernTabPage1.Text = "预设管理"
+        ModernTabPage2.Text = "准备文件"
         ModernTabPage3.IsSeparator = True
         ModernTabPage4.Text = "输出文件设置"
         ModernTabPage5.Text = "解码设置"
