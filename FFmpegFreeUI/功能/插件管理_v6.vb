@@ -739,13 +739,11 @@ Public Class 插件管理
 
     Private Shared Function 加载单个插件(plugin As 插件信息_v6) As 插件加载结果
         If plugin Is Nothing Then Throw New ArgumentNullException(NameOf(plugin))
-        If Not Ext插件扩展桥接_v2.可用 AndAlso
-           (plugin.接口类型 = 插件接口类型_v6.ExtAPI OrElse plugin.接口类型 = 插件接口类型_v6.官方与Ext) Then
-            Throw New InvalidOperationException("插件需要 Ext SDK 与 Ext PluginHost；请使用包含两个 Ext DLL 的发行包")
-        End If
-
+        Dim Ext可用 = Ext插件扩展桥接_v2.可用
         Dim 程序集 = Assembly.LoadFrom(plugin.文件路径)
-        Dim Entry类 As Type = 查找官方Entry类(程序集)
+        ' Ext 不可用时沿用官方的精确入口约定，不因 SDK 引用提前拒绝，
+        ' 也不枚举其他类型，以免触发官方入口并未使用的可选 Ext 依赖。
+        Dim Entry类 As Type = 查找官方Entry类(程序集, 允许兼容查找:=Ext可用)
         Dim Entry类的实例 As Object = Nothing
         If Entry类 IsNot Nothing Then
             If Entry类.GetConstructor(Type.EmptyTypes) IsNot Nothing Then Entry类的实例 = Activator.CreateInstance(Entry类)
@@ -758,9 +756,10 @@ Public Class 插件管理
         End If
 
         Dim 已加载Ext插件 As Boolean
-        If Ext插件扩展桥接_v2.可用 Then 已加载Ext插件 = Ext插件扩展桥接_v2.尝试加载Ext插件(程序集)
+        If Ext可用 Then 已加载Ext插件 = Ext插件扩展桥接_v2.尝试加载Ext插件(程序集)
         If Entry类 Is Nothing Then
             If 已加载Ext插件 Then Return New 插件加载结果 With {.已加载 = True, .状态 = "已加载"}
+            If Not Ext可用 Then Throw New InvalidOperationException("程序集不包含符合官方约定的 Entry 类；当前 Ext Plugin API 不可用")
             Throw New InvalidOperationException("程序集既不包含官方 Entry 类，也不包含 Ext 插件入口")
         End If
 
@@ -780,10 +779,10 @@ Public Class 插件管理
         Return New 插件加载结果 With {.已加载 = True, .状态 = "已加载"}
     End Function
 
-    Private Shared Function 查找官方Entry类(程序集 As Assembly) As Type
+    Private Shared Function 查找官方Entry类(程序集 As Assembly, 允许兼容查找 As Boolean) As Type
         Dim 约定类型名 = 程序集.GetName.Name & ".Entry"
         Dim Entry类 = 程序集.GetType(约定类型名, throwOnError:=False, ignoreCase:=False)
-        If Entry类 IsNot Nothing Then Return Entry类
+        If Entry类 IsNot Nothing OrElse Not 允许兼容查找 Then Return Entry类
         Dim 可加载类型 As IEnumerable(Of Type)
         Try
             可加载类型 = 程序集.GetTypes()

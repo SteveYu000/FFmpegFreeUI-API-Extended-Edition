@@ -8,6 +8,13 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../FFmpegFreeUI/FFmpegFreeUI.vbproj" />
+    <!-- Build-only fixture inputs; keep their own Windows platform targets out of test references. -->
+    <ProjectReference Include="../FFmpegFreeUI.PluginLoadFixture/FFmpegFreeUI.PluginLoadFixture.vbproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" OutputItemType="PluginLoadFixtures" />
+    <ProjectReference Include="../../FFmpegFreeUI.Ext.PluginHost/FFmpegFreeUI.Ext.PluginHost.vbproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" OutputItemType="PluginLoadFixtures" />
+    <ProjectReference Include="../../FFmpegFreeUI.Ext.PluginSdk/FFmpegFreeUI.Ext.PluginSdk.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" OutputItemType="PluginLoadFixtures" />
     <PackageReference Include="LakeUI" Version="5.301.0" />
   </ItemGroup>
+  <Target Name="CopyPluginLoadFixtures" AfterTargets="Build">
+    <Copy SourceFiles="@(PluginLoadFixtures)" DestinationFolder="$(OutDir)PluginLoadFixture" />
+  </Target>
 </Project>

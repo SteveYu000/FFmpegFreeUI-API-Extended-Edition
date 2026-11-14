@@ -10,11 +10,9 @@ Public Class Form_v6_准备文件
     Private Const 后缀列 As Integer = 2
     Private Const 大小列 As Integer = 3
 
-    Private 正在重置排序选择 As Boolean = False
-
     Private Sub Form_v6_准备文件_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         初始化列表()
-        初始化排序下拉框()
+        初始化排序菜单()
 
         绑定文件拖入(Me)
         绑定文件拖入(ModernPanel1)
@@ -37,14 +35,11 @@ Public Class Form_v6_准备文件
         Next
     End Sub
 
-    Private Sub 初始化排序下拉框()
-        MCB_排序.Items.Clear()
-        MCB_排序.Items.Add("列表视图的升序")
-        MCB_排序.Items.Add("列表视图的降序")
-        MCB_排序.Items.Add("按照文件大小升序")
-        MCB_排序.Items.Add("按照文件大小降序")
-        MCB_排序.SelectedIndex = -1
-        MCB_排序.Text = ""
+    Private Sub 初始化排序菜单()
+        ' 保留原 ModernComboBox 的绘制与交互；动作放入独立菜单，避免原生下拉按控件宽度裁切。
+        For Each item In 排序菜单.Items
+            AddHandler item.Click, AddressOf 排序菜单项_Click
+        Next
     End Sub
 
     Private Sub 绑定文件拖入(target As Control)
@@ -356,18 +351,60 @@ Public Class Form_v6_准备文件
         Return ""
     End Function
 
-    Private Sub MCB_排序_SelectedIndexChanged(sender As Object, e As EventArgs) Handles MCB_排序.SelectedIndexChanged
-        If 正在重置排序选择 OrElse MCB_排序.SelectedIndex < 0 Then Exit Sub
+    Private Sub MCB_排序_Click(sender As Object, e As EventArgs) Handles MCB_排序.Click
+        显示排序菜单()
+    End Sub
 
-        应用排序(MCB_排序.SelectedIndex)
+    Private Sub MCB_排序_KeyDown(sender As Object, e As KeyEventArgs) Handles MCB_排序.KeyDown
+        If e.KeyCode = Keys.Down OrElse e.KeyCode = Keys.Enter OrElse e.KeyCode = Keys.Space Then
+            显示排序菜单()
+            e.Handled = True
+            e.SuppressKeyPress = True
+        End If
+    End Sub
 
-        正在重置排序选择 = True
-        Try
-            MCB_排序.SelectedIndex = -1
-            MCB_排序.Text = ""
-        Finally
-            正在重置排序选择 = False
-        End Try
+    Private Sub 显示排序菜单()
+        ' 菜单按项目文字和当前字体独立测宽，不跟随按钮剩余宽度。
+        If Not 排序菜单.MenuFont.Equals(MCB_排序.Font) Then
+            Dim oldFont = 排序菜单.MenuFont
+            排序菜单.MenuFont = DirectCast(MCB_排序.Font.Clone(), Font)
+            oldFont.Dispose()
+        End If
+        ' 普通模式使用不透明底色；仅在已启用赞助者背景时使用原下拉的毛玻璃配置。
+        Dim 使用透明背景 = SP_UnLock AndAlso 设置_v6.实例对象.窗口样式 = 2 AndAlso 设置_v6.实例对象.SP_毛玻璃模式 > 0
+        排序菜单.BackdropMode = If(使用透明背景, ModernContextMenu.BackdropModeEnum.Auto, ModernContextMenu.BackdropModeEnum.None)
+        排序菜单.BackColor = Color.FromArgb(255, MCB_排序.DropDownBackColor)
+        排序菜单.BackColor1 = Color.Transparent
+        排序菜单.BackdropTintColor = MCB_排序.DropDownBackdropTintColor
+        排序菜单.BackdropBlurRadius = MCB_排序.DropDownBackdropBlurRadius
+        排序菜单.BackdropBlurPasses = MCB_排序.DropDownBackdropBlurPasses
+        排序菜单.BackdropDownsampleFactor = MCB_排序.DropDownBackdropDownsampleFactor
+        排序菜单.BackdropNoiseOpacity = MCB_排序.DropDownBackdropNoiseOpacity
+        排序菜单.BackdropNoiseScale = MCB_排序.DropDownBackdropNoiseScale
+        排序菜单.BorderColor = MCB_排序.DropDownBorderColor
+        排序菜单.BorderSize = MCB_排序.DropDownBorderSize
+        排序菜单.CornerRadius = MCB_排序.DropDownBorderRadius
+        排序菜单.HoverBackColor = MCB_排序.DropDownHoverColor
+        排序菜单.PressedBackColor = MCB_排序.DropDownPressedColor
+        排序菜单.HoverRadius = MCB_排序.DropDownHoverRadius
+        排序菜单.ItemHeight = MCB_排序.DropDownItemHeight
+        排序菜单.MenuForeColor = MCB_排序.ForeColor
+        排序菜单.ShadowEnabled = MCB_排序.DropDownShadowEnabled
+        排序菜单.ShadowColor = MCB_排序.DropDownShadowColor
+        排序菜单.ShadowDepth = MCB_排序.DropDownShadowDepth
+        排序菜单.ShadowOpacity = MCB_排序.DropDownShadowOpacity
+        排序菜单.AnimationDuration = MCB_排序.DropDownAnimationDuration
+        ' 原下拉的 Padding 按像素使用，菜单按 DPI 缩放；保持原来的文字及高亮位置。
+        Dim scale = MCB_排序.DeviceDpi / 96.0R
+        Dim pad = MCB_排序.DropDownPadding
+        排序菜单.MenuPadding = New Padding(0, CInt(Math.Round(pad.Top / scale)), 0, CInt(Math.Round(pad.Bottom / scale)))
+        排序菜单.ItemPadding = New Padding(CInt(Math.Round((pad.Left + 4) / scale)), 0, CInt(Math.Round((pad.Right + 4) / scale)), 0)
+        排序菜单.Show(MCB_排序, 0, MCB_排序.Height)
+    End Sub
+
+    Private Sub 排序菜单项_Click(sender As Object, e As EventArgs)
+        Dim item = TryCast(sender, ModernContextMenu.ModernMenuItem)
+        If item IsNot Nothing Then 应用排序(排序菜单.Items.IndexOf(item))
     End Sub
 
     Private Sub UltraDetailListView1_KeyDown(sender As Object, e As KeyEventArgs) Handles UltraDetailListView1.KeyDown

@@ -11,6 +11,7 @@
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="tests/FFmpegFreeUI.RegressionTests/FFmpegFreeUI.RegressionTests.csproj" />
+    <Project Path="tests/FFmpegFreeUI.PluginLoadFixture/FFmpegFreeUI.PluginLoadFixture.vbproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />

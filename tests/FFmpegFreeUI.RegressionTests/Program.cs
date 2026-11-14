@@ -13,6 +13,7 @@ internal static partial class Program
 
     private static async Task<int> MainAsync(string[] args)
     {
+        if (args.Length == 2 && args[0] == "--plugin-load-fixture") return RunPluginLoadFixture(args[1]);
         if (args.FirstOrDefault() == "--agent-args-fixture")
         {
             Console.WriteLine(JsonSerializer.Serialize(args.Skip(1)));
@@ -83,6 +84,8 @@ internal static partial class Program
             TestQueueView();
             Console.WriteLine("PASS: queue multi-selection");
             SynchronizationContext.SetSynchronizationContext(null);
+            await TestPluginLoading(directory);
+            Console.WriteLine("PASS: official plugin fallback without SDK/Host and complete Ext initialization");
             await TestAutomaticUpdate(directory);
             Console.WriteLine("PASS: release assets, updater replacement and rollback");
             await TestProcessLifecycle();

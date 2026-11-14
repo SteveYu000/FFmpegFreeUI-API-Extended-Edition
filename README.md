@@ -31,7 +31,7 @@ Ext Plugin API v2 补充官方插件 API 尚未提供的能力，主要包括：
 
 ### 运行时组件
 
-Ext Plugin API v2 是可选组件。只有程序根目录同时存在 `FFmpegFreeUI.Ext.PluginHost.dll` 和 `FFmpegFreeUI.Ext.PluginSdk.dll` 时才会启用。缺少 SDK 时，FFmpegFreeUI 不会执行依赖它的插件，并会在“插件管理”页显示原因；主程序以及不依赖 SDK 的官方 `Entry` 插件仍可正常运行。
+Ext Plugin API v2 是可选组件。只有程序根目录同时存在 `FFmpegFreeUI.Ext.PluginHost.dll` 和 `FFmpegFreeUI.Ext.PluginSdk.dll` 时才会启用。缺少任一组件或 Ext 不可用时，插件按官方约定尝试加载 `{AssemblyName}.Entry`，不因引用 SDK 提前拒绝。混合插件可自行降级到官方逻辑；没有官方入口或实际执行仍依赖缺失组件的插件会在“插件管理”页显示加载错误，主程序及其他插件继续运行。
 
 ### 插件管理与处理顺序
 

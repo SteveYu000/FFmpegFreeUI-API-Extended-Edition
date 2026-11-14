@@ -22,6 +22,11 @@ Partial Class Form_v6_准备文件
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        components = New System.ComponentModel.Container()
+        Dim 排序菜单项1 As New LakeUI.ModernContextMenu.ModernMenuItem()
+        Dim 排序菜单项2 As New LakeUI.ModernContextMenu.ModernMenuItem()
+        Dim 排序菜单项3 As New LakeUI.ModernContextMenu.ModernMenuItem()
+        Dim 排序菜单项4 As New LakeUI.ModernContextMenu.ModernMenuItem()
         Dim ListColumn1 As LakeUI.UltraDetailListView.ListColumn = New LakeUI.UltraDetailListView.ListColumn()
         Dim ListColumn2 As LakeUI.UltraDetailListView.ListColumn = New LakeUI.UltraDetailListView.ListColumn()
         Dim ListColumn3 As LakeUI.UltraDetailListView.ListColumn = New LakeUI.UltraDetailListView.ListColumn()
@@ -35,6 +40,8 @@ Partial Class Form_v6_准备文件
         Panel1.BackColor1 = Color.Transparent
         Panel1.BorderSize = 0
         MCB_排序 = New LakeUI.ModernComboBox()
+        排序菜单 = New LakeUI.ModernContextMenu()
+        components.Add(排序菜单)
         JustEmptyControl5 = New LakeUI.JustEmptyControl()
         MB_移除全部 = New LakeUI.ModernButton()
         JustEmptyControl4 = New LakeUI.JustEmptyControl()
@@ -148,10 +155,6 @@ Partial Class Form_v6_准备文件
         MCB_排序.DropDownSelectedColor = Color.FromArgb(CByte(40), CByte(220), CByte(220), CByte(220))
         MCB_排序.DropDownSelectedForeColor = Color.White
         MCB_排序.HoverBackColor1 = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
-        MCB_排序.Items.Add("列表视图的升序")
-        MCB_排序.Items.Add("列表视图的降序")
-        MCB_排序.Items.Add("按照文件大小升序")
-        MCB_排序.Items.Add("按照文件大小降序")
         MCB_排序.Location = New Point(650, 0)
         MCB_排序.Margin = New Padding(2, 2, 2, 2)
         MCB_排序.Name = "MCB_排序"
@@ -164,6 +167,30 @@ Partial Class Form_v6_准备文件
         MCB_排序.ToolTipPadding = New Padding(15)
         MCB_排序.WaterText = "排序"
         MCB_排序.WaterTextForeColor = Color.FromArgb(CByte(120), CByte(255), CByte(255), CByte(255))
+        '
+        ' 排序菜单
+        '
+        排序菜单.BackdropBlurPasses = 2
+        排序菜单.BackdropBlurRadius = 30
+        排序菜单.BackdropMode = LakeUI.ModernContextMenu.BackdropModeEnum.None
+        排序菜单.BackdropNoiseOpacity = CByte(0)
+        排序菜单.BackdropTintColor = Color.FromArgb(CByte(40), CByte(0), CByte(0), CByte(0))
+        排序菜单.BorderColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
+        排序菜单.HoverBackColor = Color.FromArgb(CByte(60), CByte(220), CByte(220), CByte(220))
+        排序菜单.HoverRadius = 0
+        排序菜单.IconSize = 0
+        排序菜单.ItemHeight = 30
+        排序菜单.ItemPadding = New Padding(14, 0, 14, 0)
+        排序菜单项1.Text = "列表视图的升序"
+        排序菜单项2.Text = "列表视图的降序"
+        排序菜单项3.Text = "按照文件大小升序"
+        排序菜单项4.Text = "按照文件大小降序"
+        排序菜单.Items.Add(排序菜单项1)
+        排序菜单.Items.Add(排序菜单项2)
+        排序菜单.Items.Add(排序菜单项3)
+        排序菜单.Items.Add(排序菜单项4)
+        排序菜单.MenuPadding = New Padding(0, 10, 0, 10)
+        排序菜单.PressedBackColor = Color.FromArgb(CByte(80), CByte(220), CByte(220), CByte(220))
         '
         ' JustEmptyControl5
         '
@@ -315,6 +342,7 @@ Partial Class Form_v6_准备文件
     Friend WithEvents MB_移除选中 As LakeUI.ModernButton
     Friend WithEvents JustEmptyControl3 As LakeUI.JustEmptyControl
     Friend WithEvents MCB_排序 As LakeUI.ModernComboBox
+    Friend WithEvents 排序菜单 As LakeUI.ModernContextMenu
     Friend WithEvents HtmlColorLabel1 As LakeUI.HtmlColorLabel
     Friend WithEvents UltraDetailListView1 As LakeUI.UltraDetailListView
 End Class

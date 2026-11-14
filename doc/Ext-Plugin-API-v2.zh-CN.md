@@ -162,8 +162,9 @@ Plugin\
 - FFmpegFreeUI 只从 `Plugin` 目录发现文件名匹配 `*.3fui.dll` 的入口程序集。
 - `PluginHost` 和 `PluginSdk` 必须放在程序根目录，不要放进 `Plugin`。
 - 插件自己的托管依赖可以放在 `Plugin`；不要复制另一份 SDK、PluginHost、LakeUI 或宿主自带依赖。
-- 根目录缺少 `FFmpegFreeUI.Ext.PluginSdk.dll` 时，Ext Plugin API v2 会安全禁用。依赖 SDK 的插件会在程序集加载之前被静默跳过，FFmpegFreeUI 本体仍可运行。
-- 根目录缺少 `FFmpegFreeUI.Ext.PluginHost.dll`、版本不兼容或初始化失败时，v2 同样安全禁用。
+- 根目录缺少 `FFmpegFreeUI.Ext.PluginSdk.dll` 或 `FFmpegFreeUI.Ext.PluginHost.dll` 时，Ext Plugin API v2 会安全禁用；组件版本不兼容或初始化失败时同样禁用。
+- Ext 不可用时，插件按官方逻辑加载：精确查找 `{AssemblyName}.Entry`，注入可用的 `SetHost_*` 回调，再调用静态 `Entry()`。
+- 降级是否成功取决于插件本身是否做兼容性处理。没有官方入口的纯 Ext 插件，或官方入口确实用到缺失依赖的插件，会在插件管理页显示加载错误；其他插件和 FFmpegFreeUI 本体继续运行。
 - 当前桥接层接受 `2.2.0` 或更高的 `2.x` 组件，并要求 SDK 与 PluginHost 的主、次版本一致；当前发行包应使用 `2.5.x` SDK 搭配 `2.5.x` Host。
 - 新主程序若误配成完整的旧版 SDK/Host 组合，只会保留该旧版合同本身提供的能力；v2.3 参数目录/声明式命令、v2.4 布局能力和 v2.5 预设总览能力会按实际版本安全降级。这只用于容错，发布时不要混装版本。
 - 只提供 `Entry` / `SetHost_*` 的插件仍走官方兼容逻辑；需要补充能力时，可以在同一程序集内再实现 `IExtFFmpegFreeUIPlugin`，无需放弃官方接口。
@@ -421,7 +422,7 @@ Ext SDK 的定位是补充官方插件接口尚未提供的能力，而不是替
 1. 一个或多个 `IExtFFmpegFreeUIPlugin` 实现；
 2. 一个官方兼容 `Entry` 类及其 `SetHost_*` 方法。
 
-宿主按以下顺序加载双入口插件：
+Ext 组件可用时，宿主按以下顺序加载双入口插件：
 
 1. 找到 `Entry` 类并注入全部可用的官方回调；
 2. 初始化 `IExtFFmpegFreeUIPlugin`，注册 Ext 扩展；
@@ -430,6 +431,10 @@ Ext SDK 的定位是补充官方插件接口尚未提供的能力，而不是替
 因此官方回调在 Ext `Initialize` 执行前已经可用；一般仍建议把官方注册集中放在 `Entry()` 中，把 Ext 注册集中放在 `Initialize()` 中，避免重复初始化。纯官方插件和纯 Ext 插件的行为保持不变。
 
 宿主首先按原有 `{AssemblyName}.Entry` 约定查找；若未找到，也接受程序集中唯一一个名称为 `Entry` 的非嵌套类型，以兼容程序集名称以 `.3fui` 结尾的 Ext 项目。存在多个候选 `Entry` 时会拒绝加载，插件应只保留一个官方入口。
+
+需要同时兼容纯官方版本或缺少 Ext DLL 的扩展版时，必须使用精确的 `{AssemblyName}.Entry` 类型名；后者不会执行上述宽松查找。文件可以命名为 `MyPlugin.3fui.dll`，但程序集名保持 `MyPlugin`，对应类型名为 `MyPlugin.Entry`。
+
+官方入口的基类、字段、属性、方法签名、静态初始化及实际执行路径应与可选 Ext 依赖隔离；只在函数内部判断 DLL 文件是否存在，不能保证类型解析或 JIT 编译不会提前加载依赖。Ext 专用代码应放入独立类型或按需加载的适配程序集。完整 Ext 环境下可以由 `Initialize(host)` 在完成能力/版本检查后设置共享模式标记，随后由 `Entry()` 选择官方或 Ext 实现；Ext 初始化异常仍会按原规则报告加载失败，不会自动掩盖该异常。
 
 ### 4.2 C# 入口
 

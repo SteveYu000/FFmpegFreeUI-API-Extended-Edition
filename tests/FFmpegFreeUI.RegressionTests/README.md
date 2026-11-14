@@ -21,6 +21,16 @@ Run only these checks with:
 dotnet run --project tests/FFmpegFreeUI.RegressionTests -- --agent-only
 ```
 
+## Optional Ext plugin loading
+
+A small VB fixture contains both the exact official `{AssemblyName}.Entry` and a
+real SDK interface implementation. Each loader case runs in a separate process
+and directory with neither Ext DLL, only the SDK, only the Host, or both. Checks
+verify official callback injection, actual fallback entry execution, complete Ext
+initialization order, and honest reporting of required-dependency / initialization
+failures. The test does not install plugins into the user's application or reuse
+an SDK already loaded by another case. Fixture outputs stay in `PluginLoadFixture/`.
+
 ## VMAF AUTO contract
 
 - New/empty selections default to AUTO; saved explicit selections remain manual.

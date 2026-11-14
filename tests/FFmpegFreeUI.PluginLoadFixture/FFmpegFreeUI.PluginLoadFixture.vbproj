@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>FFmpegFreeUI.PluginLoadFixture</RootNamespace>
+    <AssemblyName>FFmpegFreeUI.PluginLoadFixture</AssemblyName>
+    <OptionStrict>On</OptionStrict>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../FFmpegFreeUI.Ext.PluginSdk/FFmpegFreeUI.Ext.PluginSdk.csproj" />
+  </ItemGroup>
+</Project>
