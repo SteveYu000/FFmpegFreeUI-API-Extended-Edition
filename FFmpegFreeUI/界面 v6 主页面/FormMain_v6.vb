@@ -191,6 +191,15 @@ Public Class FormMain_v6
                面板.Dock = DockStyle.Fill
     End Function
 
+    Friend Sub 选中编码队列页面()
+        For index = 0 To ModernTabListControl1.Items.Count - 1
+            If ModernTabListControl1.Items(index).BoundControl Is Form_v6_编码队列 Then
+                ModernTabListControl1.SelectedIndex = index
+                Exit Sub
+            End If
+        Next
+    End Sub
+
     Private Sub ModernTabListControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ModernTabListControl1.SelectedIndexChanged
         Dim selectedControl As Control = Nothing
         If ModernTabListControl1.SelectedIndex >= 0 AndAlso

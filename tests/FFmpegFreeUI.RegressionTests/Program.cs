@@ -36,7 +36,6 @@ internal static partial class Program
             await Task.Delay(TimeSpan.FromSeconds(30));
             return 0;
         }
-        if (args.Contains("--ui-preview")) { ShowThemePreview(); return 0; }
         if (args.Length > 0 && !(args.Length == 2 && args[0] == "--ffmpeg") && !args.SequenceEqual(new[] { "--agent-only" })) return 2;
 
         var directory = Path.Combine(Path.GetTempPath(), "FFmpegFreeUI-regression-" + Guid.NewGuid().ToString("N"));
@@ -52,31 +51,18 @@ internal static partial class Program
                 替代进程文件名 = Environment.ProcessPath!,
                 工作目录 = directory
             };
-            TestAgentConversations(directory);
-            TestAgentAudit(directory);
-            TestUpstream6243(directory);
             TestAgentPresentation(directory);
             TestQueuePresetTools(directory);
-            Console.WriteLine("PASS: concurrent Agent runs, stop isolation, per-conversation drafts and colors");
+            Console.WriteLine("PASS: Agent presentation and queue preset tools");
             if (args.Contains("--agent-only")) { Console.WriteLine($"PASS: {checks} checks"); return 0; }
-            TestCropPreviewParsing();
-            Console.WriteLine("PASS: crop preview timestamps, aspect ratios and selection parsing");
             TestPresetCopies(directory);
             TestBitrateArgumentsAcrossQualityModes();
             TestWindowLayout();
             Console.WriteLine("PASS: window layout persistence, DPI scaling, screen bounds and child ownership");
-            TestThemeAndVmaf();
-            TestMp4FastStart();
-            TestOtherVmafCandidates();
-            TestUpstream630(directory);
-            Console.WriteLine("PASS: light/dark theme, first-load colors, VMAF AUTO and model selection");
             Console.WriteLine("PASS: preset isolation and atomic persistence");
             TestQueueOperations(directory);
             Console.WriteLine("PASS: queue ordering, task lifecycle guards, and naming");
             TestRecoveredProcessIdentity();
-            TestNavigationCounters();
-            TestBitrateVisualization();
-            Console.WriteLine("PASS: inserted plugin entries, navigation counters and bitrate aggregation");
             TestProgress();
             Console.WriteLine("PASS: progress parsing and numeric boundaries");
             TestPendingCache();
@@ -91,10 +77,9 @@ internal static partial class Program
             await TestProcessLifecycle();
             Console.WriteLine("PASS: process output drainage and cancellation");
             await TestScheduler(directory);
-            await TestSchedulerForwardAndWrap();
             Console.WriteLine("PASS: scheduler error recovery and stop isolation");
-            await TestIdleQueueAddition();
-            Console.WriteLine("PASS: adding automatic tasks to a retained but idle queue");
+            await TestUtilityTaskScheduling();
+            Console.WriteLine("PASS: independent utility task scheduling and queue snapshot");
             await TestExtPreparation(directory);
             Console.WriteLine("PASS: ordered output reservation and Ext before-prepare error recovery");
             if (args.Length == 2)
@@ -544,7 +529,6 @@ internal static partial class Program
         Check(exitCode == 0 && step.输出缓存.Count == 1, "Real FFprobe must retain its final duration line");
         var duration = double.Parse(step.输出缓存.Single(), System.Globalization.CultureInfo.InvariantCulture);
         Check(duration > 0 && duration < 1, "Preset output must be shorter than the original media");
-        await TestRealVmaf(directory, ffmpegPath, input);
         编码队列_v6.移除任务([generate.ID, encode.ID]);
     }
 

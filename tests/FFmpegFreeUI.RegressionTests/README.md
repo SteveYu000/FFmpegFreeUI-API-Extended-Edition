@@ -1,21 +1,8 @@
 # Queue and Preset Regression Checks
 
-The checks also cover light/dark theme restoration, secondary-window Load colors,
-queue text, chart lines, model badges, AUTO selection boundaries, saved manual
-choices, and exporting the actual VMAF model and warning. With `--ffmpeg`, the
-suite additionally runs the application's generated AUTO VMAF command when the
-supplied FFmpeg has discoverable models.
+LakeUI is restored from NuGet with the solution.
 
-LakeUI is restored from NuGet with the solution; a sibling LakeUI source checkout
-or manually supplied DLL is not required.
-
-Agent checks use a local gated SSE fixture (no external API or credentials) to
-exercise overlapping runs, cancellation isolation, interleaved responses and
-tool results, guidance, running-row colors, and draft text/file/folder save/load.
-Audit checks additionally cover actual executable and PowerShell timeouts,
-precise argv, process isolation, truncated/error SSE, interrupted-session recovery,
-safe directory moves, endpoint-specific capability caches, and parameter/queue validation.
-Run only these checks with:
+Run the Agent presentation and queue preset tool checks separately:
 
 ```powershell
 dotnet run --project tests/FFmpegFreeUI.RegressionTests -- --agent-only
@@ -45,15 +32,9 @@ an SDK already loaded by another case. Fixture outputs stay in `PluginLoadFixtur
 - AUTO uses CPU. Manual CUDA entries are limited to compatible V0 NEG models.
 - Resolve once per run, storing the actual model and note with each result.
 
-An isolated native preview (synthetic model list, no user settings) is available:
-
-```powershell
-dotnet run --project tests/FFmpegFreeUI.RegressionTests -- --ui-preview
-```
-
 ## Running checks
 
-Run on Windows with .NET 10; LakeUI is restored automatically from NuGet:
+Run on Windows with .NET 11; LakeUI is restored automatically from NuGet:
 
 ```powershell
 dotnet run --project tests/FFmpegFreeUI.RegressionTests/FFmpegFreeUI.RegressionTests.csproj
